@@ -40,8 +40,8 @@
                             {% for item in categories %}
                             <tr>
                                 <td class="text-center">{{ forloop.counter }}</td>
-                                <td>{{ item.date_added|date:"Y-m-d H:i" }}</td>
-                                <td>{{ item.name}}</td>
+                                <td class="text-center">{{ item.date_added|date:"Y-m-d H:i" }}</td>
+                                <td class="text-center">{{ item.name}}</td>
                                 <td class="text-center">
                                     {% if item.status == '1' %}
                                     <span class="badge badge-success bg-gradient bg-success px-3 rounded-pill bg-opacity-75 text-sm py-1">Active</span> {% else %}
@@ -92,7 +92,7 @@
         $('#price-tbl').DataTable({
             columnDefs: [{
                 orderable: false,
-                targets: [5]
+                targets: [4]
             }],
             lengthMenu: [
                 [25, 50, 100, -1],
