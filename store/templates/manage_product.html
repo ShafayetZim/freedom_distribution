@@ -3,6 +3,15 @@
   <form action="" id="product-form">
     <input type="hidden" name="id" value="{{product.id}}" />
     <div class="mb-3">
+      <label for="category" class="control-label">Category</label>
+      <select name="category" id="category" class="form-select form-control-sm rounded-0">
+          <option value="" disabled selected></option>
+          {% for item in category %}
+          <option value="{{item.pk}}">{{item.name}}</option>
+          {% endfor %}
+      </select>
+    </div>
+    <div class="mb-3">
       <label for="name" class="control-label">Name</label>
       <input
         type="text"
@@ -14,14 +23,14 @@
       />
     </div>
     <div class="mb-3">
-      <label for="buy_price" class="control-label">Buy Price</label>
+      <label for="buy" class="control-label">Buy Price</label>
       <input
         type="number"
         step="any"
-        id="buy_price"
-        name="buy_price"
+        id="buy"
+        name="buy"
         class="form-control form-control-sm rounded-0"
-        value="{{product.buy_price|floatformat}}"
+        value="{{product.buy|floatformat}}"
         required
       />
     </div>
@@ -37,18 +46,18 @@
         required
       />
     </div>
-    <div class="mb-3">
-      <label for="description" class="control-label">Description</label>
-      <textarea
-        rows="3"
-        id="description"
-        name="description"
-        class="form-control form-control-sm rounded-0"
-        required
-      >
-{{product.description}}</textarea
-      >
-    </div>
+<!--    <div class="mb-3">-->
+<!--      <label for="description" class="control-label">Description</label>-->
+<!--      <textarea-->
+<!--        rows="3"-->
+<!--        id="description"-->
+<!--        name="description"-->
+<!--        class="form-control form-control-sm rounded-0"-->
+<!--        required-->
+<!--      >-->
+<!--{{product.description}}</textarea-->
+<!--      >-->
+<!--    </div>-->
     <div class="mb-3">
       <label for="status" class="control-label">Status</label>
       <select
@@ -120,4 +129,6 @@
       });
     });
   });
+
 </script>
+
