@@ -28,19 +28,23 @@
           <table class="table table-bordered table-striped" id="product-tbl">
             <colgroup>
               <col width="5%" />
-              <col width="15%" />
+              <col width="25%" />
               <col width="20%" />
-              <col width="30%" />
-              <col width="15%" />
-              <col width="15%" />
+              <col width="10%" />
+              <col width="10%" />
+              <col width="10%" />
+              <col width="10%" />
+              <col width="10%" />
             </colgroup>
             <thead>
               <tr>
                 <th class="text-center">#</th>
-                <th class="text-center">DateTime</th>
                 <th class="text-center">Name</th>
-                <th class="text-center">Description</th>
+                <th class="text-center">Category</th>
+                <th class="text-center">Buy</th>
+                <th class="text-center">Price</th>
                 <th class="text-center">Status</th>
+                <th class="text-center">Stock</th>
                 <th class="text-center">Action</th>
               </tr>
             </thead>
@@ -48,9 +52,10 @@
               {% for product in products %}
               <tr>
                 <td class="text-center">{{ forloop.counter }}</td>
-                <td>{{ product.date_added|date:"Y-m-d H:i" }}</td>
-                <td>{{ product.name}}</td>
-                <td>{{ product.description }}</td>
+                <td class="text-center">{{ product.name }}</td>
+                <td class="text-center">{{ product.category}}</td>
+                <td class="text-center">{{ product.buy }}</td>
+                <td class="text-center">{{ product.price}}</td>
                 <td class="text-center">
                   {% if product.status == '1' %}
                   <span
@@ -64,6 +69,7 @@
                   >
                   {% endif %}
                 </td>
+                <td class="text-center">{{ product.available|floatformat }}</td>
                 <td class="text-center">
                   <div class="dropdown">
                     <button
@@ -188,5 +194,6 @@
       },
     });
   }
+
 </script>
 {% endblock ScriptBlock %}
