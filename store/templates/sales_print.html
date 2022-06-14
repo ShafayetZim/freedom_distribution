@@ -1,0 +1,213 @@
+{% load humanize %}
+<div style="padding: 0px">
+  <div class="center" style="text-align: left">
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <table
+      style="
+        height: 20px;
+        width: 100%;
+        border-collapse: collapse;
+        border-style: hidden;
+      "
+      border="0"
+    >
+      <tbody>
+        <tr style="height: 20px; border-style: hidden">
+          <td
+            style="
+              width: 75.7668%;
+              height: 20px;
+              font-size: 20px;
+              border-style: hidden;
+            "
+          >
+            <strong>Shop: </strong>Freedom Distribution
+          </td>
+          <td style="width: 24.2332%; height: 30px; font-size: 13px">
+            <strong>Invoice no: </strong>{{invoice_info.code}}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <table
+      style="
+        height: 20px;
+        width: 100%;
+        border-collapse: collapse;
+        border-style: hidden;
+      "
+      border="0"
+    >
+      <tbody>
+        <tr style="height: 20px; border-style: hidden">
+          <td
+            style="
+              width: 75.7668%;
+              height: 13px;
+              font-size: 13px;
+              border-style: hidden;
+            "
+          >
+            <strong>Mobile: </strong>01523-458120
+          </td>
+          <td style="width: 24.2332%; height: 30px; font-size: 13px">
+            <strong>Date: </strong>{{invoice_info.date_added}}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="center" style="text-align: left">
+    <table
+      style="height: 20px; width: 100%; border-collapse: collapse"
+      border="0"
+    >
+      <tbody>
+        <tr style="height: 20px; border-style: hidden">
+          <td style="width: 75.7668%; height: 20px; font-size: 13px">
+            <strong>Address: </strong>Bashundhara R/A
+          </td>
+          <td
+            style="
+              width: 24.2332%;
+              height: 30px;
+              font-size: 13px;
+              border-style: hidden;
+            "
+          >
+            <strong>Road: </strong>{{invoice_info.road}}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <!--    <strong>Address: </strong>Bashundhara</div>-->
+    <div class="center" style="text-align: left">&nbsp;</div>
+    <div class="center" style="text-align: left">
+      <table
+        style="
+          height: 98px;
+          width: 100%;
+          border-collapse: collapse;
+          margin-left: auto;
+          margin-right: auto;
+        "
+        border=".5"
+        cellspacing="2"
+        cellpadding="2"
+      >
+        <tbody>
+          <tr style="height: 18px">
+            <td style="width: 11.82%; height: 43px; text-align: center">
+              Sl. No.
+            </td>
+            <td style="width: 34.1105%; height: 43px; text-align: center">
+              Description of goods
+            </td>
+            <td style="width: 14.4785%; height: 43px; text-align: center">
+              Quantity
+            </td>
+            <td style="width: 16.5235%; height: 43px; text-align: center">
+              Unit Price
+            </td>
+            <td style="width: 23.0675%; height: 43px; text-align: center">
+              Amount of Tk.
+            </td>
+          </tr>
+
+          <tr>
+            <td
+              style="
+                width: 10%;
+                height: 500px;
+                text-align: center;
+                vertical-align: top;
+              "
+            >
+              {% for item in sales_item %}
+              <p style="padding-top: 25px">{{forloop.counter}}</p>
+              {% endfor %}
+            </td>
+            <td
+              style="
+                width: 45%;
+                height: 500px;
+                text-align: left;
+                vertical-align: top;
+              "
+            >
+              {% for item in sales_item %}
+              <p style="padding-top: 25px; padding-left: 10px">
+                {{item.product}}
+              </p>
+              {% endfor %}
+            </td>
+
+            <td
+              style="
+                width: 15%;
+                height: 500px;
+                text-align: center;
+                vertical-align: top;
+              "
+            >
+              {% for item in sales_item %}
+              <p style="padding-top: 25px">{{item.quantity|intcomma}}</p>
+              {% endfor %}
+            </td>
+            <td
+              style="
+                width: 15%;
+                height: 500px;
+                text-align: center;
+                vertical-align: top;
+              "
+            >
+              {% for item in sales_item %}
+              <p style="padding-top: 25px">{{item.price}}</p>
+              {% endfor %}
+            </td>
+            <td
+              style="
+                width: 15%;
+                height: 500px;
+                text-align: center;
+                vertical-align: top;
+              "
+            >
+              {% for item in sales_item %}
+              <p style="padding-top: 25px">{{item.total_amount}}</p>
+              {% endfor %}
+            </td>
+          </tr>
+
+          <tr style="height: 28px">
+            <td style="width: 70%; height: 28px" colspan="3">&nbsp;</td>
+            <td style="width: 15%; text-align: center; height: 28px">
+              Total Tk.
+            </td>
+            <td style="width: 15%; text-align: center; height: 28px">
+              {{invoice_info.totalProducts|intcomma}}
+            </td>
+          </tr>
+          <tr style="height: 28px">
+            <td
+              style="width: 50%; text-align: center; height: 28px"
+              colspan="3"
+            >
+              &nbsp;Paid Tk. {{invoice_info.tendered|intcomma}}
+            </td>
+            <td style="width: 15%; text-align: center; height: 28px">
+              Due Tk.
+            </td>
+            <td style="width: 15%; text-align: center; height: 28px">
+              {{invoice_info.change|intcomma}}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
