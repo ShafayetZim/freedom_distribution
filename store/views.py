@@ -216,22 +216,22 @@ def home(request):
     context = context_data(request)
     context['page'] = 'home'
     context['page_title'] = 'Home'
-    # date = datetime.datetime.now()
-    # year = date.strftime('%Y')
-    # month = date.strftime('%m')
-    # day = date.strftime('%d')
-    # context['category'] = models.Category.objects.count()
-    # context['products'] = models.Products.objects.count()
-    # context['todays_transaction'] = models.Sales.objects.filter(
-    #         date_added__year = year,
-    #         date_added__month = month,
-    #         date_added__day = day,
-    # ).count()
-    # context['todays_sales'] = models.Sales.objects.filter(
-    #         date_added__year = year,
-    #         date_added__month = month,
-    #         date_added__day = day,
-    # ).aggregate(Sum('total_amount'))['total_amount__sum']
+    date = datetime.datetime.now()
+    year = date.strftime('%Y')
+    month = date.strftime('%m')
+    day = date.strftime('%d')
+    context['category'] = models.Category.objects.count()
+    context['products'] = models.Products.objects.count()
+    context['todays_transaction'] = models.Sales.objects.filter(
+            date_added__year = year,
+            date_added__month = month,
+            date_added__day = day,
+    ).count()
+    context['todays_sales'] = models.Sales.objects.filter(
+            date_added__year = year,
+            date_added__month = month,
+            date_added__day = day,
+    ).aggregate(Sum('total_amount'))['total_amount__sum']
     return render(request, 'home.html', context)
 
 
