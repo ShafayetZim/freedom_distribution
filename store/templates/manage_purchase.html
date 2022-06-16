@@ -55,9 +55,7 @@
                                 <select id="products" class="form-control form-control-sm rounded-0">
                                     <option value="" disabled selected></option>
                                     {% for product in products %}
-                                    {% if product.available > 0 %}
                                     <option value="{{product.pk}}" data-price = "{{product.buy}}" data-available = "{{product.available}}">{{product.name}}</option>
-                                    {% endif %}
                                     {% endfor %}
                                 </select>
                             </div>
@@ -223,21 +221,9 @@
             width: "100%",
             selectionCssClass: "form-control form-control-sm rounded-0"
         })
-        $('#tendered_amount').on('change input', function() {
-            var tender = $(this).val()
-            var total = $('[name="total_amount"]').val()
-            tender = tender > 0 ? tender : 0;
-            total = total > 0 ? total : 0;
-            change = parseFloat(tender) - parseFloat(total)
-            $('#change').text(parseFloat(change).toLocaleString('en-US', {
-                style: 'decimal',
-                maximumFractionDigits: 2,
-                minimumFractionDigits: 2
-            }))
 
-        })
         $('#pay_later').click(function() {
-            $('#tendered_amount').val(0).attr('required', false)
+
             $('#laundry-form').submit()
         })
         $('#laundry-submit-btn').click(function() {
@@ -302,8 +288,7 @@
             tr.find('.product_total').text(parseFloat(buy).toLocaleString('en-US'))
             tr.find('[name="product_id[]"]').val(pid)
             tr.find('[name="product_price[]"]').val(buy)
-            tr.find('[name="product_quantity[]"]').attr('max', max)
-            tr.find('[name="product_free_quantity[]"]').attr('max', max)
+
             $('#product_list tbody').append(tr)
             calc_total()
             $('#products').val('').trigger('change')
@@ -328,15 +313,7 @@
                 _this[0].reportValidity();
                 return false;
             }
-            if ($('#tendered_amount').prop('required') == true) {
-                var change = $('#change').text()
-                change = change.replace(/,/gi, '')
-                change = !isNaN(change) ? change : 0
-                if (change < 0) {
-                    alert("Tendered amount is invalid.")
-                    return false
-                }
-            }
+
             start_loader();
             $.ajax({
                 headers: {
