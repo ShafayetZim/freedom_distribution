@@ -1,6 +1,11 @@
 <option value="">---------</option>
-{% for product in products %}
-{% if product.available > 0 %}
-<option value="{{ product.pk }}" data-price = "{{product.price}}" data-available = "{{product.available}}">{{ product.name }}</option>
-{% endif %}
-{% endfor %}
+{% for product in products %} {% if product.available > 0 %}
+<option
+  value="{{ product.pk }}"
+  data-buy="{{product.buy}}"
+  data-price="{{product.price}}"
+  data-available="{{product.available}}"
+>
+  {{ product.name }}
+</option>
+{% endif %} {% endfor %}
