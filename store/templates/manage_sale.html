@@ -1,0 +1,460 @@
+{% extends 'base.html' %}{% load static %}{% load humanize %}{% block pageContent %}
+<style>
+    #laundry-img {
+        max-width: 100%;
+        max-height: 10em;
+        object-fit: scale-down;
+        object-position: center center;
+    }
+</style>
+<section class="py-4">
+    <div class="container">
+        <form action="" id="laundry-form" data-product-url="{% url 'ajax_load_product' %}" novalidate>
+            <input type="hidden" name="id" value="{{sale.id}}">
+            <input type="hidden" name="code" value="{% if sale.code  %}{{sale.code}}{% else %}generate{% endif %}">
+            <input type="hidden" name="status" value="{% if sale.status  %}{{sale.status}}{% else %}0{% endif %}">
+            <input type="hidden" name="payment" value="{% if sale.payment  %}{{sale.payment}}{% else %}0{% endif %}">
+            <input type="hidden" name="total_amount" value="{% if sale.total_amount  %}{{sale.total_amount}}{% else %}0{% endif %}">
+            <div class="card rounded-0 mb-3">
+                <div class="card-header">
+                    <div class="card-title py-1">Transaction Details</div>
+                </div>
+                <div class="card-body">
+                    <div class="container-fluid">
+                        {% if sale.code %}
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                <label for="" class="control-label">Transaction Code</label>
+                                <div class="h5"><b>{{sale.code}}</b></div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                <label for="road" class="control-label">Road</label>
+                                <select name="road" id="road" value="{{ sale.road_id }}" class="form-select form-control-sm rounded-0" required>
+                                    {% if sale.road %}
+                                    <option selected value="{{sale.road.pk}}">{{sale.road}}</option>
+                                    {% endif %}
+                                    {% for item in road %}
+                                    <option value="{{item.pk}}">{{item.name}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+<!--                            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">-->
+<!--                                <label for="client" class="control-label">Fullname</label>-->
+<!--                                <input type="text" class="form-control form-control-sm rounded-0" name="client" id="client" value="{{sale.client}}" required>-->
+<!--                            </div>-->
+<!--                            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">-->
+<!--                                <label for="contact" class="control-label">Contact #</label>-->
+<!--                                <input type="text" class="form-control form-control-sm rounded-0" name="contact" id="contact" value="{{sale.contact}}">-->
+<!--                            </div>-->
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                <label for="salesman" class="control-label">Salesman</label>
+                                <select name="salesman" id="salesman" value="{{ sale.salesman_id }}" class="form-select form-control-sm rounded-0" required>
+                                    {% if sale.salesman %}
+                                    <option selected value="{{sale.salesman.pk}}">{{sale.salesman}}</option>
+                                    {% endif %}
+                                    {% for item in salesman %}
+                                    <option value="{{item.pk}}">{{item.name}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                <label for="deliveryman" class="control-label">Deliveryman</label>
+                                <select name="deliveryman" id="deliveryman" value="{{ sale.deliveryman_id }}" class="form-select form-control-sm rounded-0" required>
+                                    {% if sale.deliveryman %}
+                                    <option selected value="{{sale.deliveryman.pk}}">{{sale.deliveryman}}</option>
+                                    {% endif %}
+                                    {% for item in deliveryman %}
+                                    <option value="{{item.pk}}">{{item.name}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card rounded-0 mb-3">
+                <div class="card-header">
+                    <div class="card-title py-1">Item List</div>
+                </div>
+                <div class="card-body">
+                    <div class="container-fluid">
+                        <div class="row align-items-end">
+                            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                                <label for="category" class="control-label">Category</label>
+                                  <select name="category" id="category" class="form-select form-control-sm rounded-0">
+                                      <option value="" disabled selected></option>
+                                      {% for item in category %}
+                                      <option value="{{item.pk}}">{{item.name}}</option>
+                                      {% endfor %}
+                                  </select>
+                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                                <label for="products" class="control-label">Products</label>
+                                <select id="products" class="form-control form-control-sm rounded-0">
+                                    <option value="" disabled selected></option>
+                                    {% for product in products %}
+                                    {% if product.available > 0 %}
+                                    <option value="{{product.pk}}" data-buy = "{{product.buy}}" data-price = "{{product.price}}" data-available = "{{product.available}}">{{product.name}}</option>
+                                    {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                                <button class="btn btn-primary btn-sm rounded-0 bg-gradient bg-primary" type="button" id="add_product"><i class="fa fa-plus"></i> Add Product</button>
+                            </div>
+                        </div>
+                        <div class="clear-fix mt-2"></div>
+                        <table class="table table-bordered" id="product_list">
+                            <colgroup>
+                                <col width="5%">
+                                <col width="30%">
+                                <col width="10%">
+                                <col width="10%">
+                                <col width="10%">
+                                <col width="10%">
+                                <col width="10%">
+                                <col width="15%">
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th class="p-1 text-center"></th>
+                                    <th class="p-1 text-center">Product Name</th>
+                                    <th class="p-1 text-center">Buy Price</th>
+                                    <th class="p-1 text-center">Unit Price</th>
+                                    <th class="p-1 text-center">Available</th>
+                                    <th class="p-1 text-center">Quantity</th>
+                                    <th class="p-1 text-center">Free</th>
+                                    <th class="p-1 text-center">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for pitem in pitems %}
+                                <tr>
+                                    <td class="px-2 py-1 align-middle text-center">
+                                        <input type="hidden" name="product_id[]" value="{{pitem.product.id}}">
+                                        <input type="hidden" name="product_buy[]" value="{{pitem.buy}}">
+
+                                        <button class="btn btn-outline-danger btn-sm rounded-0 rem-product" type="button"><i class="fa fa-times"></i></button>
+                                    </td>
+                                    <td class="px-2 py-1 align-middle product_type">{{pitem.product.name}}</td>
+                                    <td class="px-2 py-1 align-middle text-end product_buy">{{pitem.buy|floatformat}}</td>
+                                    <td class="px-2 py-1 align-middle text-end">
+                                        <input type="number" name="product_price[]" value="{{pitem.price}}">
+                                    </td>
+                                    <td class="px-2 py-1 align-middle text-end  product_available">{{pitem.available}}</td>
+                                    <td class="px-2 py-1 align-middle">
+                                        <input type="number" min="1" value="{{pitem.quantity|floatformat}}" class="form-control form-control-sm rounded-0 text-center" name="product_quantity[]" required>
+                                    </td>
+                                    <td class="px-2 py-1 align-middle">
+                                        <input type="number" min="0" value="{{pitem.free_quantity|floatformat}}" class="form-control form-control-sm rounded-0 text-center" name="product_free_quantity[]" required>
+                                    </td>
+                                    <td class="px-2 py-1 align-middle product_total text-end">{{pitem.total_amount|floatformat}}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th class="text-center" colspan="5">Total</th>
+                                    <th class="text-end sub-total-product">0.00</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="card rounded-0 mb-3">
+                <div class="card-body">
+                    <div class="d-flex w-100 justify-content-end align-items-center">
+                        <div class="col-auto">
+                            <h4 class="fw-bolder text-muted pe-2">Grand Total:</h4>
+                        </div>
+                        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 text-end">
+                            <h4 class="fw-bolder pe-2 gtotal">{% if sale.total_amount %}{{sale.total_amount|floatformat:2|intcomma}}{% else %}0.00{% endif %}</h4>
+                        </div>
+                    </div>
+                    <div class="d-flex w-100 justify-content-end align-items-center">
+                        <div class="col-auto">
+                            <h4 class="fw-bolder text-muted pe-2">Paid Amount:</h4>
+                        </div>
+                        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 text-end">
+                            <input type="number" step="any" class="form-control form-control-lg rounded-0 text-end" id="tendered_amount" name="tendered" value="{% if sale.tendered %}{{sale.tendered|floatformat:2}}{% else %}0{% endif %}" required>
+                        </div>
+                    </div>
+                    <div class="d-flex w-100 justify-content-end align-items-center">
+                        <div class="col-auto">
+                            <h4 class="fw-bolder text-muted pe-2">Due Amount:</h4>
+                        </div>
+                        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 text-end">
+                            <h4 class="fw-bolder pe-2 " id="change">{% if sale.change %}{{sale.change|floatformat:2|intcomma}}{% else %}0.00{% endif %}</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer py-1 text-center">
+                    <button class="btn btn-primary btn-sm rounded-0" type="button" id="pay_later">Pay Later</button>
+                    <button class="btn btn-success btn-sm rounded-0" id="laundry-submit-btn" form="laundry-form"><i class="fa fa-save"></i> Pay</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+
+<noscript id="product-clone">
+    <tr>
+        <td class="px-2 py-1 align-middle text-center">
+            <input type="hidden" name="product_id[]" value="">
+            <input type="hidden" name="product_buy[]" value="">
+
+            <button class="btn btn-outline-danger btn-sm rounded-0 rem-product" type="button"><i class="fa fa-times"></i></button>
+        </td>
+        <td class="px-2 py-1 align-middle product_type"></td>
+        <td class="px-2 py-1 align-middle text-end product_buy">0.00</td>
+        <td class="px-2 py-1 align-middle text-end">
+            <input type="number" name="product_price[]" value="">
+        </td>
+        <td class="px-2 py-1 align-middle text-end product_available"></td>
+        <td class="px-2 py-1 align-middle">
+            <input type="number" min="1" value="1" class="form-control form-control-sm rounded-0 text-center" name="product_quantity[]" required>
+        </td>
+        <td class="px-2 py-1 align-middle">
+            <input type="number" min="0" value="0" class="form-control form-control-sm rounded-0 text-center" name="product_free_quantity[]" required>
+        </td>
+        <td class="px-2 py-1 align-middle product_total text-end">0.00</td>
+    </tr>
+</noscript> {% endblock pageContent %} {% block ScriptBlock %}
+
+<script>
+    function calc_total() {
+        var sub_laundry = 0
+        var sub_product = 0
+        var gtotal = 0
+        $('#laundry_list tbody tr').each(function() {
+            var price = $(this).find('[name="laundry_price[]"]').val()
+            var weight = $(this).find('[name="laundry_weight[]"]').val()
+            weight = weight > 0 ? weight : 0;
+            price = price > 0 ? price : 0;
+            sub_laundry += parseFloat(parseFloat(weight) * parseFloat(price))
+            gtotal += parseFloat(parseFloat(weight) * parseFloat(price))
+            $(this).find('.laundry_total').text(parseFloat(parseFloat(weight) * parseFloat(price)).toLocaleString('en-US'))
+        })
+        $('.sub-total-laundry').text(parseFloat(sub_laundry).toLocaleString('en-US', {
+            style: 'decimal',
+            maximumFractionDigits: 2,
+            minimumFractionDigits: 2
+        }))
+        $('#product_list tbody tr').each(function() {
+            var buy = $(this).find('[name="product_buy[]"]').val()
+            var price = $(this).find('[name="product_price[]"]').val()
+            var max = $(this).find('[name="product_available[]"]').val()
+            var qty = $(this).find('[name="product_quantity[]"]').val()
+            var free = $(this).find('[name="product_free_quantity[]"]').val()
+            qty = qty > 0 ? qty : 0;
+            price = price > 0 ? price : 0;
+            sub_product += parseFloat(parseFloat(qty) * parseFloat(price))
+            gtotal += parseFloat(parseFloat(qty) * parseFloat(price))
+            $(this).find('.product_total').text(parseFloat(parseFloat(qty) * parseFloat(price)).toLocaleString('en-US'))
+        })
+        $('.sub-total-product').text(parseFloat(sub_product).toLocaleString('en-US', {
+            style: 'decimal',
+            maximumFractionDigits: 2,
+            minimumFractionDigits: 2
+        }))
+        $('[name="total_amount"]').val(gtotal)
+        $('.gtotal').text(parseFloat(gtotal).toLocaleString('en-US', {
+            style: 'decimal',
+            maximumFractionDigits: 2,
+            minimumFractionDigits: 2
+        }))
+        $
+    }
+    $(function() {
+        calc_total()
+        $('#road').select2({
+            placeholder: "Please Select Road Name Here",
+            width: "100%",
+            selectionCssClass: "form-control form-control-sm rounded-0"
+        })
+        $('#category').select2({
+            placeholder: "Please Select Road Name Here",
+            width: "100%",
+            selectionCssClass: "form-control form-control-sm rounded-0"
+        })
+        $('#salesman').select2({
+            placeholder: "Please Select Salesman Name Here",
+            width: "100%",
+            selectionCssClass: "form-control form-control-sm rounded-0"
+        })
+        $('#deliveryman').select2({
+            placeholder: "Please Select Deliveryman Here",
+            width: "100%",
+            selectionCssClass: "form-control form-control-sm rounded-0"
+        })
+        $('#products').select2({
+            placeholder: "Please Select Products Here",
+            width: "100%",
+            selectionCssClass: "form-control form-control-sm rounded-0"
+        })
+
+
+        $('#add_product').click(function() {
+            var pid = $('#products').val()
+            if (pid < '1') {
+                return false
+            }
+            var buy = $('#products option[value="' + pid + '"]').attr('data-buy')
+            var price = $('#products option[value="' + pid + '"]').attr('data-price')
+            var max = $('#products option[value="' + pid + '"]').attr('data-available')
+            var product_name = $('#products option[value="' + pid + '"]').text()
+            var tr = $($('noscript#product-clone').html()).clone()
+            tr.find('.product_type').text(product_name)
+            tr.find('.product_buy').text(parseFloat(buy).toLocaleString('en-US'))
+            tr.find('.product_price').text(parseFloat(price).toLocaleString('en-US'))
+            tr.find('.product_total').text(parseFloat(price).toLocaleString('en-US'))
+            tr.find('.product_available').text(parseFloat(max).toLocaleString('en-US'))
+            tr.find('[name="product_id[]"]').val(pid)
+            tr.find('[name="product_buy[]"]').val(buy)
+            tr.find('[name="product_price[]"]').val(price)
+            tr.find('[name="product_available[]"]').val(max)
+            tr.find('[name="product_quantity[]"]').attr('max', max)
+            tr.find('[name="product_free_quantity[]"]').attr('max', max)
+            $('#product_list tbody').append(tr)
+            calc_total()
+            $('#products').val('').trigger('change')
+            tr.find('[name="product_quantity[]"]').on('input change', function() {
+                calc_total()
+            })
+            calc_total()
+            $('#products').val('').trigger('change')
+            tr.find('[name="product_price[]"]').on('input change', function() {
+                calc_total()
+            })
+            tr.find('.rem-product').click(function() {
+                if (confirm("Are you sure to remove this item?") == true) {
+                    tr.remove()
+                    calc_total()
+                }
+            })
+        })
+        $('#laundry-form').submit(function(e) {
+            e.preventDefault();
+            var _this = $(this)
+            $('.err-msg').remove();
+            var el = $('<div>')
+            el.addClass("alert alert-danger err-msg")
+            el.hide()
+            if (_this[0].checkValidity() == false) {
+                _this[0].reportValidity();
+                return false;
+            }
+            if ($('#tendered_amount').prop('required') == true) {
+                var change = $('#change').text()
+                change = change.replace(/,/gi, '')
+                change = !isNaN(change) ? change : 0
+                if (change < 0) {
+                    alert("Tendered amount is invalid.")
+                    return false
+                }
+            }
+            start_loader();
+            $.ajax({
+                headers: {
+                    "X-CSRFToken": '{{csrf_token}}'
+                },
+                url: "{% url 'save-sale' %}",
+                data: new FormData($(this)[0]),
+                cache: false,
+                contentType: false,
+                processData: false,
+                method: 'POST',
+                type: 'POST',
+                dataType: 'json',
+                error: err => {
+                    console.log(err)
+                    alert("An error occured", 'error');
+                    end_loader();
+                },
+                success: function(resp) {
+                    if (typeof resp == 'object' && resp.status == 'success') {
+                        location.replace('{% url "view-sale" %}/' + resp.id)
+                    } else if (resp.status == 'failed' && !!resp.msg) {
+                        el.text(resp.msg)
+                    } else {
+                        el.text("An error occured", 'error');
+                        end_loader();
+                        console.err(resp)
+                    }
+                    _this.prepend(el)
+                    el.show('slow')
+                    $("html, body, .modal").scrollTop(0);
+                    end_loader()
+                }
+            })
+        })
+    })
+    // this one is for fetching product data
+    $("#category").change(function () {
+      var url = $("#laundry-form").attr("data-product-url");  // get the url of the `load_product` view
+      var categoryId = $(this).val();  // get the selected country ID from the HTML input
+
+      $.ajax({                       // initialize an AJAX request
+        url: '{% url 'ajax_load_product' %}',                    // set the url of the request (= localhost:8000/hr/ajax/load-cities/)
+        data: {
+          'category': categoryId       // add the category id to the GET parameters
+        },
+        success: function (data) {   // `data` is the return of the `load_cities` view function
+          $("#products").html(data);  // replace the contents of the city input with the data that came from the server
+        }
+      });
+
+      $('#tendered_amount').on('change input', function() {
+            var tender = $(this).val()
+            var total = $('[name="total_amount"]').val()
+            tender = tender > 0 ? tender : 0;
+            total = total > 0 ? total : 0;
+            change = parseFloat(total) - parseFloat(tender)
+            $('#change').text(parseFloat(change).toLocaleString('en-US', {
+                style: 'decimal',
+                maximumFractionDigits: 2,
+                minimumFractionDigits: 2
+            }))
+
+        })
+        $('#pay_later').click(function() {
+            $('#tendered_amount').val(0).attr('required', false)
+            $('#laundry-form').submit()
+        })
+        $('#laundry-submit-btn').click(function() {
+            $('#tendered_amount').attr('required', true)
+        })
+        $('#product_list tbody').find('[name="product_price[]"]').on('input change', function() {
+            calc_total()
+        })
+        $('#laundry_list tbody').find('.rem-laundry').click(function() {
+            if (confirm("Are you sure to remove this item?") == true) {
+                $(this).closest('tr').remove()
+                calc_total()
+            }
+        })
+        $('#product_list tbody').find('[name="product_quantity[]"]').on('input change', function() {
+            calc_total()
+        })
+        $('#product_list tbody').find('.rem-product').click(function() {
+            if (confirm("Are you sure to remove this item?") == true) {
+                $(this).closest('tr').remove()
+                calc_total()
+            }
+        })
+
+
+
+
+
+    });
+</script>
+
+{% endblock ScriptBlock %}
