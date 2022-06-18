@@ -70,4 +70,5 @@ urlpatterns = [
     path('delete_road/<int:pk>',views.delete_road,name='delete-road'),
     path('print-sales/<id>', views.print_sales, name='print-sales'),
     path('ajax/load-product/', views.load_product, name='ajax_load_product'),
+    path('low_stock',views.low_stock,name='low-stock'),
 ]+ static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
