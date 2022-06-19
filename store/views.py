@@ -222,6 +222,7 @@ def home(request):
     day = date.strftime('%d')
     context['category'] = models.Category.objects.count()
     context['products'] = models.Products.objects.count()
+    context['stocks'] = models.Products.objects.all()
     context['todays_transaction'] = models.Sales.objects.filter(
             date_added__year = year,
             date_added__month = month,
@@ -813,7 +814,6 @@ def delete_employee(request, pk=None):
     return HttpResponse(json.dumps(resp), content_type="application/json")
 
 
-
 @login_required
 def road(request):
     context = context_data(request)
@@ -907,3 +907,14 @@ def load_product(request):
     products = models.Products.objects.filter(category_id=category_id).order_by('name')
     context = {'products': products}
     return render(request, 'dropdown_sales.html', context)
+
+
+# low stock
+@login_required
+def low_stock(request):
+    context = context_data(request)
+    context['page'] = 'low_stock'
+    context['page_title'] = 'Low Stocks'
+    context['products'] = models.Products.objects.all()
+
+    return render(request, 'low_stock.html', context)
