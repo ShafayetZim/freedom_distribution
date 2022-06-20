@@ -21,7 +21,7 @@
                         <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
                             <div class="mb-3">
                                 <button class="btn btn-sm btn-primary bg-gradient bg-primary rounded-0"><i class="fa fa-filter"></i> Filter</button>
-                                <button class="btn btn-sm btn-success bg-gradient bg-success rounded-0" type="button" id="print"><i class="fa fa-print"></i> Print</button>
+<!--                                <button class="btn btn-sm btn-success bg-gradient bg-success rounded-0" type="button" id="print"><i class="fa fa-print"></i> Print</button>-->
                             </div>
                         </div>
                     </div>
@@ -44,7 +44,7 @@
                                 <th class="text-center">#</th>
                                 <th class="text-center">Date Added</th>
                                 <th class="text-center">Code</th>
-                                <th class="text-center">Client</th>
+                                <th class="text-center">Road</th>
                                 <th class="text-center">Total</th>
                             </tr>
                         </thead>
@@ -60,7 +60,7 @@
                                 </td>
                                 <td>
                                     <div class="lh-1">
-                                        <div>{{ item.client}}</div>
+                                        <div>{{ item.road}}</div>
                                         <div>{{ item.contact}}</div>
                                     </div>
                                 </td>
@@ -93,7 +93,7 @@
         </style>
         <div class="d-flex w-100">
             <div class="col-2 text-center">
-                <img src="{{system_host}}{% static 'assets/default/img/logo.jpg' %}" style="width:4em;height:4em;object-fit:cover;object-position:center center" alt="" class="rounded-circle p-0 img-thumbnail">
+                <img src="{{system_host}}{% static 'assets/default/img/logo-light.png' %}" style="width:12em;height:4em;object-fit:cover;object-position:center center" alt="" class="rounded-circle p-0 img-thumbnail">
             </div>
             <div class="col-8">
                 <div class="lh-1">
