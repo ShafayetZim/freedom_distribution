@@ -6,7 +6,7 @@
     <hr>
     <div class="row justify-content-center">
         <div class="col-lg-3 col-md-6 col-sm-12 col-xs-12 px-1 pb-2">
-            <div class="card card-default rounded-0 shadow bg-primary bg-gradient border-0 text-light">
+            <div class="card card-default rounded-0 shadow bg-info bg-gradient border-0 text-light">
                 <div class="card-body">
                     <div class="container-fluid">
                         <div class="row mx-0 w-100 align-items-center">
@@ -67,10 +67,29 @@
                             <div class="col-9">
                                 <h1 class="text-end">{{todays_sales|floatformat|intcomma}}</h1>
                             </div>
-                            <div class="col-12 text-end"><b>Todays Sales</b></div>
+                            <div class="col-12 text-end"><b>Today's Sales</b></div>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 col-sm-12 col-xs-12 px-1 pb-2">
+            <div class="card card-default rounded-0 shadow bg-gradient bg-primary bg-opacity-75 text-light">
+                <a href="{% url 'daily-report' %}" style="color: white">
+                    <div class="card-body">
+                        <div class="container-fluid">
+                            <div class="row mx-0 w-100 align-items-center">
+                                <div class="col-3">
+                                    <i class="fs-1 text-light fas fa-clipboard-list"></i>
+                                </div>
+                                <div class="col-9">
+                                    <h1 class="text-end">Click</h1>
+                                </div>
+                                <div class="col-12 text-end"><b>Daily Report</b></div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
             </div>
         </div>
         <div class="col-lg-3 col-md-6 col-sm-12 col-xs-12 px-1 pb-2">
