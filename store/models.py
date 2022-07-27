@@ -33,6 +33,23 @@ class Road(models.Model):
         return str(f"{self.name}")
 
 
+class Client(models.Model):
+    name = models.CharField(max_length=100)
+    shop = models.CharField(max_length=100)
+    mobile = models.CharField(max_length=20)
+    address = models.CharField(max_length=100, null=True, blank=True)
+    road = models.ForeignKey(Road, on_delete=models.CASCADE)
+    delete_flag = models.IntegerField(default=0)
+    date_added = models.DateTimeField(default=timezone.now)
+    date_updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name_plural = "List of Client"
+
+    def __str__(self):
+        return str(f"{self.name}")
+
+
 class Category(models.Model):
     name = models.CharField(max_length=250)
     status = models.CharField(max_length=2, choices=(('1','Active'), ('2','Inactive')), default = 1)
@@ -42,6 +59,20 @@ class Category(models.Model):
 
     class Meta:
         verbose_name_plural = "List of Category"
+
+    def __str__(self):
+        return str(f"{self.name}")
+
+
+class Brand(models.Model):
+    name = models.CharField(max_length=250)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, )
+    delete_flag = models.IntegerField(default=0)
+    date_added = models.DateTimeField(default=timezone.now)
+    date_updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name_plural = "List of Brand"
 
     def __str__(self):
         return str(f"{self.name}")
