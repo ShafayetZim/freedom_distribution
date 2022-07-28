@@ -1,0 +1,108 @@
+{% load static %}
+<div class="container-fluid">
+  <form action="" id="client-form">
+    <input type="hidden" name="id" value="{{client.id}}" />
+    <div class="mb-3">
+      <label for="name" class="control-label">Name</label>
+      <input
+        type="text"
+        id="name"
+        name="name"
+        class="form-control form-control-sm rounded-0"
+        value="{{client.name}}"
+        required
+      />
+    </div>
+      <div class="mb-3">
+      <label for="shop" class="control-label">Shop</label>
+      <input
+        type="text"
+        id="shop"
+        name="shop"
+        class="form-control form-control-sm rounded-0"
+        value="{{client.shop}}"
+        required
+      />
+    </div>
+    <div class="mb-3">
+      <label for="mobile" class="control-label">Mobile</label>
+      <input
+        type="text"
+        id="Mobile"
+        name="mobile"
+        class="form-control form-control-sm rounded-0"
+        value="{{client.mobile}}"
+        required
+      />
+    </div>
+    <div class="mb-3">
+      <label for="Address" class="control-label">Address</label>
+      <input
+        type="text"
+        id="address"
+        name="address"
+        class="form-control form-control-sm rounded-0 text-end"
+        value="{{client.address}}"
+      />
+    </div>
+    <div class="mb-3">
+      <label for="road" class="control-label">Road</label>
+      <select name="road" id="road" class="form-select form-control-sm rounded-0">
+          <option value="" disabled selected></option>
+          {% for item in road %}
+          <option value="{{item.pk}}">{{item.name}}</option>
+          {% endfor %}
+      </select>
+    </div>
+  </form>
+</div>
+<script>
+  $(function () {
+    $("#client-form").submit(function (e) {
+      e.preventDefault();
+      var _this = $(this);
+      $(".err-msg").remove();
+      var el = $("<div>");
+      el.addClass("alert alert-danger err-msg");
+      el.hide();
+      if (_this[0].checkValidity() == false) {
+        _this[0].reportValidity();
+        return false;
+      }
+      start_loader();
+      $.ajax({
+        headers: {
+          "X-CSRFToken": "{{csrf_token}}",
+        },
+        url: "{% url 'save-client' %}",
+        data: new FormData($(this)[0]),
+        cache: false,
+        contentType: false,
+        processData: false,
+        method: "POST",
+        type: "POST",
+        dataType: "json",
+        error: (err) => {
+          console.log(err);
+          alert("An error occured", "error");
+          end_loader();
+        },
+        success: function (resp) {
+          if (typeof resp == "object" && resp.status == "success") {
+            location.reload();
+          } else if (resp.status == "failed" && !!resp.msg) {
+            el.text(resp.msg);
+          } else {
+            el.text("An error occured", "error");
+            end_loader();
+            console.err(resp);
+          }
+          _this.prepend(el);
+          el.show("slow");
+          $("html, body, .modal").scrollTop(0);
+          end_loader();
+        },
+      });
+    });
+  });
+</script>

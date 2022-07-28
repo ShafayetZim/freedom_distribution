@@ -1,0 +1,28 @@
+{% load static %} {% load humanize %}
+<style>
+  #uni_modal .modal-footer {
+    display: none;
+  }
+
+  #uni_modal .modal-sub-footer {
+    display: flex;
+  }
+</style>
+<div class="container-fluid" id="e-details">
+  <div class="lh-1">
+    <dl>
+      <dt>Name</dt>
+      <dd class="ps-4">{{client.name}}</dd>
+      <dt>Shop</dt>
+      <dd class="ps-4">{{client.shop}}</dd>
+      <dt>Mobile</dt>
+      <dd class="ps-4">{{client.mobile}}</dd>
+      <dt>Address</dt>
+      <dd class="ps-4">{{client.address}}</dd>
+      <dt>Road</dt>
+      <dd class="ps-4">
+        {{client.road}}
+      </dd>
+    </dl>
+  </div>
+</div>
