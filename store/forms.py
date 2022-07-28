@@ -50,7 +50,7 @@ class UpdateProfile(UserChangeForm):
             user = User.objects.exclude(id=self.cleaned_data['id']).get(username = username)
         except Exception as e:
             return username
-        raise forms.ValidationError(f"The {user.username} mail is already exists/taken")
+        raise forms.ValidationError(f"The {user.username} username is already exists/taken")
 
 
 class UpdateUser(UserChangeForm):
@@ -109,6 +109,29 @@ class SaveCategory(forms.ModelForm):
         except:
             return name
         raise forms.ValidationError("Category Type already exists.")
+
+
+class SaveBrand(forms.ModelForm):
+    name = forms.CharField(max_length=250)
+    category = forms.Select(
+        attrs={'class': 'form-control form-control-sm rounded-0', 'value': '', 'id': 'id_category'}
+    )
+
+    class Meta:
+        model = models.Brand
+        fields = ('name', 'category')
+
+    def clean_name(self):
+        id = self.data['id'] if (self.data['id']).isnumeric() else 0
+        name = self.cleaned_data['name']
+        try:
+            if id > 0:
+                brand = models.Brand.objects.exclude(id=id).get(name=name, delete_flag=0)
+            else:
+                brand = models.Brand.objects.get(name=name, delete_flag=0)
+        except:
+            return name
+        raise forms.ValidationError(f"Brand {brand.name} already exist")
 
 
 class SaveProducts(forms.ModelForm):
@@ -308,3 +331,17 @@ class SaveRoad(forms.ModelForm):
     class Meta:
         model = models.Road
         fields = ('name',)
+
+
+class SaveClient(forms.ModelForm):
+    name = forms.CharField(max_length=100)
+    shop = forms.CharField(max_length=100)
+    mobile = forms.CharField(max_length=20)
+    address = forms.CharField(max_length=100)
+    road = forms.Select(
+        attrs={'class': 'form-control form-control-sm rounded-0', 'value': '', 'id': 'id_road'}
+    )
+
+    class Meta:
+        model = models.Client
+        fields = ('name', 'shop', 'mobile', 'address', 'road')

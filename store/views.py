@@ -318,6 +318,88 @@ def delete_category(request, pk = None):
 
 
 @login_required
+def brand(request):
+    context = context_data(request)
+    context['page'] = 'Brand'
+    context['page_title'] = "Brand List"
+    context['brands'] = models.Brand.objects.filter(delete_flag=0).all()
+    return render(request, 'brand.html', context)
+
+
+@login_required
+def save_brand(request):
+    resp = { 'status': 'failed', 'msg' : '' }
+    if request.method == 'POST':
+        post = request.POST
+        if not post['id'] == '':
+            brand = models.Brand.objects.get(id = post['id'])
+            form = forms.SaveBrand(request.POST, instance=brand)
+        else:
+            form = forms.SaveBrand(request.POST)
+
+        if form.is_valid():
+            form.save()
+            if post['id'] == '':
+                messages.success(request, "Brand has been saved successfully.")
+            else:
+                messages.success(request, "Brand has been updated successfully.")
+            resp['status'] = 'success'
+        else:
+            for field in form:
+                for error in field.errors:
+                    if not resp['msg'] == '':
+                        resp['msg'] += str('<br/>')
+                    resp['msg'] += str(f'[{field.name}] {error}')
+    else:
+         resp['msg'] = "There's no data sent on the request"
+
+    return HttpResponse(json.dumps(resp), content_type="application/json")
+
+
+@login_required
+def view_brand(request, pk=None):
+    context = context_data(request)
+    context['page'] = 'view_brand'
+    context['page_title'] = 'View Brand'
+    if pk is None:
+        context['brand'] = {}
+    else:
+        context['brand'] = models.Brand.objects.get(id=pk)
+
+    return render(request, 'view_brand.html', context)
+
+
+@login_required
+def manage_brand(request, pk=None):
+    context = context_data(request)
+    context['page'] = 'manage_brand'
+    context['page_title'] = 'Manage Brand'
+    context['category'] = models.Category.objects.all()
+    if pk is None:
+        context['brand'] = {}
+    else:
+        context['brand'] = models.Brand.objects.get(id=pk)
+
+    return render(request, 'manage_brand.html', context)
+
+
+@login_required
+def delete_brand(request, pk=None):
+    resp = {'status': 'failed', 'msg': ''}
+    if pk is None:
+        resp['msg'] = 'Brand ID is invalid'
+    else:
+        try:
+            models.Brand.objects.filter(pk=pk).update(delete_flag=1)
+            messages.success(request, "Brand has been deleted successfully.")
+            resp['status'] = 'success'
+        except:
+            resp['msg'] = "Deleting Brand Failed"
+
+    return HttpResponse(json.dumps(resp), content_type="application/json")
+
+
+@login_required
 def products(request):
     context = context_data(request)
     context['page'] = 'Product'
@@ -878,6 +960,90 @@ def delete_road(request, pk=None):
             resp['status'] = 'success'
         except:
             resp['msg'] = "Deleting Road Failed"
+
+    return HttpResponse(json.dumps(resp), content_type="application/json")
+
+
+@login_required
+def client(request):
+    context = context_data(request)
+    context['page'] = 'Client'
+    context['page_title'] = "Client List"
+    context['clients'] = models.Client.objects.filter(delete_flag=0).all()
+    return render(request, 'client.html', context)
+
+
+@login_required
+def save_client(request):
+    resp = {'status': 'failed', 'msg': ''}
+    if request.method == 'POST':
+        post = request.POST
+        if not post['id'] == '':
+            client = models.Client.objects.get(id=post['id'])
+            form = forms.SaveClient(request.POST, instance=client)
+        else:
+            form = forms.SaveClient(request.POST)
+
+        if form.is_valid():
+            form.save()
+            if post['id'] == '':
+                messages.success(request, "Client has been saved successfully.")
+            else:
+                messages.success(request, "Client has been updated successfully.")
+            resp['status'] = 'success'
+
+        else:
+            for field in form:
+                for error in field.errors:
+                    if not resp['msg'] == '':
+                        resp['msg'] += str('<br/>')
+                    resp['msg'] += str(f'[{field.name}] {error}')
+
+    else:
+        resp['msg'] = "There's no data sent on the request."
+
+    return HttpResponse(json.dumps(resp), content_type="application/json")
+
+
+@login_required
+def view_client(request, pk=None):
+    context = context_data(request)
+    context['page'] = 'view_client'
+    context['page_title'] = 'View Client'
+    if pk is None:
+        context['client'] = {}
+    else:
+        context['client'] = models.Client.objects.get(id=pk)
+
+    return render(request, 'view_client.html', context)
+
+
+@login_required
+def manage_client(request, pk=None):
+    context = context_data(request)
+    context['page'] = 'manage_client'
+    context['page_title'] = 'Manage Client'
+    context['road'] = models.Road.objects.all()
+    if pk is None:
+        context['client'] = {}
+    else:
+        context['client'] = models.Client.objects.get(id=pk)
+
+    return render(request, 'manage_client.html', context)
+
+
+@login_required
+def delete_client(request, pk=None):
+    resp = {'status': 'failed', 'msg': ''}
+    if pk is None:
+        resp['msg'] = 'Client ID is invalid'
+    else:
+        try:
+            models.Client.objects.filter(pk=pk).update(delete_flag=1)
+            messages.success(request, "Client has been deleted successfully.")
+            resp['status'] = 'success'
+        except:
+            resp['msg'] = "Deleting Client Failed"
 
     return HttpResponse(json.dumps(resp), content_type="application/json")
 
