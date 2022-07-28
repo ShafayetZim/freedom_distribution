@@ -72,13 +72,13 @@
 <script>
         $(function() {
         $('#create_new').click(function() {
-            uni_modal("<i class='fa fa-plus'></i> Add New Price", "{% url 'manage-category' %}")
+            uni_modal("<i class='fa fa-plus'></i> Add New Category", "{% url 'manage-category' %}")
         })
         $('.view-data').click(function() {
-            uni_modal("<i class='fa fa-th-list'></i> Price Details", $(this).attr('data-url'))
+            uni_modal("<i class='fa fa-th-list'></i> Category Details", $(this).attr('data-url'))
         })
         $('.edit-data').click(function() {
-            uni_modal("<i class='fa fa-edit'></i> Edit Price Details", $(this).attr('data-url'))
+            uni_modal("<i class='fa fa-edit'></i> Edit Category Details", $(this).attr('data-url'))
         })
         $('.view_image').click(function() {
             var img = $(this).attr('data-img-url')
@@ -86,7 +86,7 @@
             $('#viewer_modal').modal('show')
         })
         $('.delete-data').click(function() {
-            _conf("Are you sure to delete this cat?", 'delete_price', ["'" + $(this).attr('data-url') + "'"])
+            _conf("Are you sure to delete this cat?", 'delete_category', ["'" + $(this).attr('data-url') + "'"])
         })
         $('#price-tbl').find('td, th').addClass('px-2 py-1 align-middle')
         $('#price-tbl').DataTable({
@@ -101,7 +101,7 @@
         })
     })
 
-    function delete_price(url) {
+    function delete_category(url) {
 
         var _this = $('#confirm_modal .modal-body')
         $('.err-msg').remove();
