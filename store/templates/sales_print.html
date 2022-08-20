@@ -83,6 +83,29 @@
         </tr>
       </tbody>
     </table>
+    <table
+      style="height: 20px; width: 100%; border-collapse: collapse"
+      border="0"
+    >
+      <tbody>
+        <tr style="height: 20px; border-style: hidden">
+          <td style="width: 75.7668%; height: 20px; font-size: 13px">
+            <strong>Salesman: </strong>{{invoice_info.salesman}}
+          </td>
+          <td
+            style="
+              width: 24.2332%;
+              height: 30px;
+              font-size: 13px;
+              border-style: hidden;
+            "
+          >
+            <strong>Deliveryman: </strong>{{invoice_info.deliveryman}}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
     <!--    <strong>Address: </strong>Bashundhara</div>-->
     <div class="center" style="text-align: left">&nbsp;</div>
     <div class="center" style="text-align: left">
@@ -178,6 +201,72 @@
               "
             >
               {% for item in sales_item %}
+              <p style="padding-top: 25px">{{item.total_amount}}</p>
+              {% endfor %}
+            </td>
+          </tr>
+
+          <tr>
+            <td
+              style="
+                width: 10%;
+                height: 500px;
+                text-align: center;
+                vertical-align: top;
+              "
+            >
+              {% for item in sales_return %}
+              <p style="padding-top: 25px">{{forloop.counter}}</p>
+              {% endfor %}
+            </td>
+            <td
+              style="
+                width: 45%;
+                height: 500px;
+                text-align: left;
+                vertical-align: top;
+              "
+            >
+              {% for item in sales_return %}
+              <p style="padding-top: 25px; padding-left: 10px">
+                {{item.product}}
+              </p>
+              {% endfor %}
+            </td>
+
+            <td
+              style="
+                width: 15%;
+                height: 500px;
+                text-align: center;
+                vertical-align: top;
+              "
+            >
+              {% for item in sales_return %}
+              <p style="padding-top: 25px">{{item.quantity|intcomma}}</p>
+              {% endfor %}
+            </td>
+            <td
+              style="
+                width: 15%;
+                height: 500px;
+                text-align: center;
+                vertical-align: top;
+              "
+            >
+              {% for item in sales_return %}
+              <p style="padding-top: 25px">{{item.price}}</p>
+              {% endfor %}
+            </td>
+            <td
+              style="
+                width: 15%;
+                height: 500px;
+                text-align: center;
+                vertical-align: top;
+              "
+            >
+              {% for item in sales_return %}
               <p style="padding-top: 25px">{{item.total_amount}}</p>
               {% endfor %}
             </td>
