@@ -26,3 +26,47 @@
     </dl>
   </div>
 </div>
+
+<div class="container-fluid">
+
+    <div class="card-body">
+            <div class="container-fluid">
+              <div class="card-title mb-0">Dues History</div>
+              <table class="table table-stripped table-bordered">
+                <thead>
+                  <tr>
+                    <th class="px-1 py-1 text-center">#</th>
+                    <th class="px-1 py-1 text-center">Date Added</th>
+                    <th class="px-1 py-1 text-center">Transaction Code</th>
+                    <th class="px-1 py-1 text-center">Balance</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for stockout in stockouts %}
+                  {% if stockout.balance != 0 %}
+                  <tr>
+                    <td class="px-1 py-1 align-middle text-center">
+                      {{ forloop.counter }}
+                    </td>
+                    <td class="px-1 py-1 align-middle">
+                      {{ stockout.sale.date_added|date:"F d, Y" }}
+                    </td>
+                    <td class="px-1 py-1 align-middle">
+                      <a
+                        href="{% url 'view-sale-pk' stockout.sale.pk %}"
+                        target="_blank"
+                        >{{ stockout.sale.code }}</a
+                      >
+                    </td>
+                    <td class="px-1 py-1 align-middle text-end">
+                      {{ stockout.balance|floatformat|intcomma }}
+                    </td>
+                  </tr>
+                  {% endif %}
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+</div>
