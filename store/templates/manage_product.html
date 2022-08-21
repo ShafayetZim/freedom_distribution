@@ -3,12 +3,25 @@
   <form action="" id="product-form">
     <input type="hidden" name="id" value="{{product.id}}" />
     <div class="mb-3">
-      <label for="category" class="control-label">Category</label>
+      <label for="category" class="control-label">Group</label>
       <select name="category" id="category" class="form-select form-control-sm rounded-0">
-          <option value="" disabled selected></option>
-          {% for item in category %}
+        {% if product.category %}
+          <option selected value="{{product.category.pk}}">{{product.category}}</option>
+        {% endif %}
+        {% for item in category %}
           <option value="{{item.pk}}">{{item.name}}</option>
-          {% endfor %}
+        {% endfor %}
+      </select>
+    </div>
+    <div class="mb-3">
+      <label for="brand" class="control-label">Brand</label>
+      <select name="brand" id="brand" class="form-select form-control-sm rounded-0">
+        {% if product.brand %}
+          <option selected value="{{product.brand.pk}}">{{product.brand}}</option>
+        {% endif %}
+        {% for item in brand %}
+          <option value="{{item.pk}}">{{item.name}}</option>
+        {% endfor %}
       </select>
     </div>
     <div class="mb-3">
@@ -19,6 +32,17 @@
         name="name"
         class="form-control form-control-sm rounded-0"
         value="{{product.name}}"
+        required
+      />
+    </div>
+    <div class="mb-3">
+      <label for="code" class="control-label">Code</label>
+      <input
+        type="text"
+        id="code"
+        name="code"
+        class="form-control form-control-sm rounded-0"
+        value="{{product.code}}"
         required
       />
     </div>
@@ -35,7 +59,7 @@
       />
     </div>
     <div class="mb-3">
-      <label for="price" class="control-label">Price</label>
+      <label for="price" class="control-label">Sale Price</label>
       <input
         type="number"
         step="any"
@@ -43,6 +67,18 @@
         name="price"
         class="form-control form-control-sm rounded-0"
         value="{{product.price|floatformat}}"
+        required
+      />
+    </div>
+    <div class="mb-3">
+      <label for="mrp" class="control-label">Mrp Price</label>
+      <input
+        type="number"
+        step="any"
+        id="mrp"
+        name="mrp"
+        class="form-control form-control-sm rounded-0"
+        value="{{product.mrp|floatformat}}"
         required
       />
     </div>
