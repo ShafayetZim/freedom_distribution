@@ -9,7 +9,7 @@
 </style>
 <section class="py-4">
     <div class="container">
-        <h3 class="fw-bolder text-center">List of Category Types</h3>
+        <h3 class="fw-bolder text-center">List of Groups</h3>
         <center>
             <hr class="bg-primary opacity-100" style="height:3px" width="5%">
         </center>
@@ -31,7 +31,7 @@
                             <tr>
                                 <th class="text-center">#</th>
                                 <th class="text-center">DateTime</th>
-                                <th class="text-center">Category Type</th>
+                                <th class="text-center">Group Name</th>
                                 <th class="text-center">Status</th>
                                 <th class="text-center">Action</th>
                             </tr>
@@ -72,13 +72,13 @@
 <script>
         $(function() {
         $('#create_new').click(function() {
-            uni_modal("<i class='fa fa-plus'></i> Add New Category", "{% url 'manage-category' %}")
+            uni_modal("<i class='fa fa-plus'></i> Add New Group", "{% url 'manage-category' %}")
         })
         $('.view-data').click(function() {
-            uni_modal("<i class='fa fa-th-list'></i> Category Details", $(this).attr('data-url'))
+            uni_modal("<i class='fa fa-th-list'></i> Group Details", $(this).attr('data-url'))
         })
         $('.edit-data').click(function() {
-            uni_modal("<i class='fa fa-edit'></i> Edit Category Details", $(this).attr('data-url'))
+            uni_modal("<i class='fa fa-edit'></i> Edit Group Details", $(this).attr('data-url'))
         })
         $('.view_image').click(function() {
             var img = $(this).attr('data-img-url')
