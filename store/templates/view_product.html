@@ -31,8 +31,12 @@
             <dl>
               <dt>Name</dt>
               <dd class="ps-4">{{product.name}}</dd>
-              <dt>Category</dt>
+              <dt>Code</dt>
+              <dd class="ps-4">{{product.code}}</dd>
+              <dt>Group</dt>
               <dd class="ps-4">{{product.category}}</dd>
+              <dt>Brand</dt>
+              <dd class="ps-4">{{product.brand}}</dd>
               <dt>Status</dt>
               <dd class="ps-4">
                 {% if product.status == '1' %}
@@ -47,10 +51,12 @@
                 >
                 {% endif %}
               </dd>
-              <dt>Buy</dt>
+              <dt>Buy Price</dt>
               <dd class="ps-4">{{product.buy}}</dd>
-              <dt class="h5 fw-bolder">Price</dt>
-              <dd class="ps-4 h4 fw-bolder">{{product.price|floatformat:2}}</dd>
+              <dt>Sale Price</dt>
+              <dd class="ps-4">{{product.price|floatformat:2}}</dd>
+              <dt>Mrp Price</dt>
+              <dd class="ps-4">{{product.mrp}}</dd>
               <dt class="h5 fw-bolder">Available Stock</dt>
               <dd class="ps-4 h4 fw-bolder">
                 {{product.available|floatformat}}
@@ -60,125 +66,125 @@
         </div>
       </div>
     </div>
-    <div class="row mx-0 my-3">
-      <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-        <div class="card rounded-0 shadow">
-          <div class="card-header py -1">
-            <div class="d-flex w-100">
-              <div class="col-auto flex-shrink-1 flex-grow-1">
-                <div class="card-title mb-0">Stock-In History</div>
-              </div>
-              <div class="col-auto">
-                <button
-                  class="btn btn-primary btn-sm rounded-0 bg-gradient bg-primary"
-                  type="button"
-                  id="add_stock"
-                >
-                  <i class="far fa-plus-square"></i> New Entry
-                </button>
-              </div>
-            </div>
-          </div>
-          <div class="card-body">
-            <div class="container-fluid">
-              <table class="table table-stripped table-bordered">
-                <thead>
-                  <tr>
-                    <th class="px-1 py-1 text-center">#</th>
-                    <th class="px-1 py-1 text-center">Date Added</th>
-                    <th class="px-1 py-1 text-center">Quantity</th>
-                    <th class="px-1 py-1 text-center">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for stockin in stockins %}
-                  <tr>
-                    <td class="px-1 py-1 align-middle text-center">
-                      {{ forloop.counter }}
-                    </td>
-                    <td class="px-1 py-1 align-middle">
-                      {{ stockin.date_added|date:"F d, Y" }}
-                    </td>
-                    <td class="px-1 py-1 align-middle text-end">
-                      {{ stockin.quantity|floatformat|intcomma }}
-                    </td>
-                    <td class="px-1 py-1 align-middle text-center">
-                      <div class="btn-group">
-                        <button
-                          class="btn btn-sm btn-primary rounded-0 bg-gradient bg-primary edit-si"
-                          type="button"
-                          data-url="{% url 'manage-stockin-pid-pk' stockin.product_id stockin.id %}"
-                          title="Edit Stock-In"
-                        >
-                          <i class="fa fa-edit"></i>
-                        </button>
-                        <button
-                          class="btn btn-sm btn-danger rounded-0 bg-gradient bg-danger delete-si"
-                          type="button"
-                          data-url="{% url 'delete-stockin' stockin.pk %}"
-                          title="Delete Stock-In"
-                        >
-                          <i class="fa fa-trash"></i>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-        <div class="card rounded-0 shadow">
-          <div class="card-header py -1">
-            <div class="d-flex w-100">
-              <div class="col-auto flex-shrink-1 flex-grow-1">
-                <div class="card-title mb-0">Sale History</div>
-              </div>
-              <div class="col-auto"></div>
-            </div>
-          </div>
-          <div class="card-body">
-            <div class="container-fluid">
-              <table class="table table-stripped table-bordered">
-                <thead>
-                  <tr>
-                    <th class="px-1 py-1 text-center">#</th>
-                    <th class="px-1 py-1 text-center">Date Added</th>
-                    <th class="px-1 py-1 text-center">Transaction Code</th>
-                    <th class="px-1 py-1 text-center">Quantity</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for stockout in stockouts %}
-                  <tr>
-                    <td class="px-1 py-1 align-middle text-center">
-                      {{ forloop.counter }}
-                    </td>
-                    <td class="px-1 py-1 align-middle">
-                      {{ stockout.sale.date_added|date:"F d, Y" }}
-                    </td>
-                    <td class="px-1 py-1 align-middle">
-                      <a
-                        href="{% url 'view-sale-pk' stockout.sale.pk %}"
-                        target="_blank"
-                        >{{ stockout.sale.code }}</a
-                      >
-                    </td>
-                    <td class="px-1 py-1 align-middle text-end">
-                      {{ stockout.quantity|floatformat|intcomma }}
-                    </td>
-                  </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+<!--    <div class="row mx-0 my-3">-->
+<!--      <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">-->
+<!--        <div class="card rounded-0 shadow">-->
+<!--          <div class="card-header py -1">-->
+<!--            <div class="d-flex w-100">-->
+<!--              <div class="col-auto flex-shrink-1 flex-grow-1">-->
+<!--                <div class="card-title mb-0">Stock-In History</div>-->
+<!--              </div>-->
+<!--              <div class="col-auto">-->
+<!--                <button-->
+<!--                  class="btn btn-primary btn-sm rounded-0 bg-gradient bg-primary"-->
+<!--                  type="button"-->
+<!--                  id="add_stock"-->
+<!--                >-->
+<!--                  <i class="far fa-plus-square"></i> New Entry-->
+<!--                </button>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--          <div class="card-body">-->
+<!--            <div class="container-fluid">-->
+<!--              <table class="table table-stripped table-bordered">-->
+<!--                <thead>-->
+<!--                  <tr>-->
+<!--                    <th class="px-1 py-1 text-center">#</th>-->
+<!--                    <th class="px-1 py-1 text-center">Date Added</th>-->
+<!--                    <th class="px-1 py-1 text-center">Quantity</th>-->
+<!--                    <th class="px-1 py-1 text-center">Action</th>-->
+<!--                  </tr>-->
+<!--                </thead>-->
+<!--                <tbody>-->
+<!--                  {% for stockin in stockins %}-->
+<!--                  <tr>-->
+<!--                    <td class="px-1 py-1 align-middle text-center">-->
+<!--                      {{ forloop.counter }}-->
+<!--                    </td>-->
+<!--                    <td class="px-1 py-1 align-middle">-->
+<!--                      {{ stockin.date_added|date:"F d, Y" }}-->
+<!--                    </td>-->
+<!--                    <td class="px-1 py-1 align-middle text-end">-->
+<!--                      {{ stockin.quantity|floatformat|intcomma }}-->
+<!--                    </td>-->
+<!--                    <td class="px-1 py-1 align-middle text-center">-->
+<!--                      <div class="btn-group">-->
+<!--                        <button-->
+<!--                          class="btn btn-sm btn-primary rounded-0 bg-gradient bg-primary edit-si"-->
+<!--                          type="button"-->
+<!--                          data-url="{% url 'manage-stockin-pid-pk' stockin.product_id stockin.id %}"-->
+<!--                          title="Edit Stock-In"-->
+<!--                        >-->
+<!--                          <i class="fa fa-edit"></i>-->
+<!--                        </button>-->
+<!--                        <button-->
+<!--                          class="btn btn-sm btn-danger rounded-0 bg-gradient bg-danger delete-si"-->
+<!--                          type="button"-->
+<!--                          data-url="{% url 'delete-stockin' stockin.pk %}"-->
+<!--                          title="Delete Stock-In"-->
+<!--                        >-->
+<!--                          <i class="fa fa-trash"></i>-->
+<!--                        </button>-->
+<!--                      </div>-->
+<!--                    </td>-->
+<!--                  </tr>-->
+<!--                  {% endfor %}-->
+<!--                </tbody>-->
+<!--              </table>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--      <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">-->
+<!--        <div class="card rounded-0 shadow">-->
+<!--          <div class="card-header py -1">-->
+<!--            <div class="d-flex w-100">-->
+<!--              <div class="col-auto flex-shrink-1 flex-grow-1">-->
+<!--                <div class="card-title mb-0">Sale History</div>-->
+<!--              </div>-->
+<!--              <div class="col-auto"></div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--          <div class="card-body">-->
+<!--            <div class="container-fluid">-->
+<!--              <table class="table table-stripped table-bordered">-->
+<!--                <thead>-->
+<!--                  <tr>-->
+<!--                    <th class="px-1 py-1 text-center">#</th>-->
+<!--                    <th class="px-1 py-1 text-center">Date Added</th>-->
+<!--                    <th class="px-1 py-1 text-center">Transaction Code</th>-->
+<!--                    <th class="px-1 py-1 text-center">Quantity</th>-->
+<!--                  </tr>-->
+<!--                </thead>-->
+<!--                <tbody>-->
+<!--                  {% for stockout in stockouts %}-->
+<!--                  <tr>-->
+<!--                    <td class="px-1 py-1 align-middle text-center">-->
+<!--                      {{ forloop.counter }}-->
+<!--                    </td>-->
+<!--                    <td class="px-1 py-1 align-middle">-->
+<!--                      {{ stockout.sale.date_added|date:"F d, Y" }}-->
+<!--                    </td>-->
+<!--                    <td class="px-1 py-1 align-middle">-->
+<!--                      <a-->
+<!--                        href="{% url 'view-sale-pk' stockout.sale.pk %}"-->
+<!--                        target="_blank"-->
+<!--                        >{{ stockout.sale.code }}</a-->
+<!--                      >-->
+<!--                    </td>-->
+<!--                    <td class="px-1 py-1 align-middle text-end">-->
+<!--                      {{ stockout.quantity|floatformat|intcomma }}-->
+<!--                    </td>-->
+<!--                  </tr>-->
+<!--                  {% endfor %}-->
+<!--                </tbody>-->
+<!--              </table>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
   </div>
 </section>
 {% endblock pageContent %} {% block ScriptBlock %}
