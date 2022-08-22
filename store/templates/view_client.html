@@ -38,6 +38,7 @@
                     <th class="px-1 py-1 text-center">#</th>
                     <th class="px-1 py-1 text-center">Date Added</th>
                     <th class="px-1 py-1 text-center">Transaction Code</th>
+                    <th class="px-1 py-1 text-center">Brand</th>
                     <th class="px-1 py-1 text-center">Balance</th>
                   </tr>
                 </thead>
@@ -53,10 +54,13 @@
                     </td>
                     <td class="px-1 py-1 align-middle">
                       <a
-                        href="{% url 'view-sale-pk' stockout.sale.pk %}"
+                        href="{% url 'manage-sale-pk' stockout.sale.pk %}"
                         target="_blank"
                         >{{ stockout.sale.code }}</a
                       >
+                    </td>
+                    <td class="px-1 py-1 align-middle text-end">
+                      {{ stockout.brand }}
                     </td>
                     <td class="px-1 py-1 align-middle text-end">
                       {{ stockout.balance|floatformat|intcomma }}
