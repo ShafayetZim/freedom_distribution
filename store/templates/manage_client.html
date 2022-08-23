@@ -47,8 +47,10 @@
     </div>
     <div class="mb-3">
       <label for="road" class="control-label">Road</label>
-      <select name="road" id="road" class="form-select form-control-sm rounded-0">
-          <option value="" disabled selected></option>
+      <select name="road" id="road" value="{{client.road_id}}" class="form-select form-control-sm rounded-0">
+        {% if client.road %}
+          <option selected value="{{client.road.pk}}">{{client.road}}</option>
+        {% endif %}
           {% for item in road %}
           <option value="{{item.pk}}">{{item.name}}</option>
           {% endfor %}
