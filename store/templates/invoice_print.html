@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+table, th, td {
+  border: 1px ;
+  border-collapse: collapse;
+}
+th, td {
+  font-size: 14px;
+  padding-top: 5px;
+}
+th {
+    background-color: grey;
+    text-align: center;
+    color: white;
+    padding-right: 1px;
+    width: 18%;
+    border-right: 2px solid white;
+}
+td {
+    text-align: center;
+    width: 32%;
+    padding-left: 3px;
+    border-style: hidden;
+}
+#div1 {
+    height:20px;
+}
+#div2 {
+    height:20px;
+}
+#div3 {
+    height:20px;
+}
+.footer {
+   position: fixed;
+   left: 0;
+   border-top: 2px solid grey;
+   bottom: 0;
+   width: 100%;
+   color: black;
+   text-align: center;
+   font-size: 14px;
+}
+
+
+</style>
+</head>
+<body>
+
+
+
+<div id="div1">
+<div class="center" style="text-align: left;">
+
+    <table style="width: 100%; border-collapse: collapse; border-style: hidden;" border="0">
+        <tbody>
+        <tr style="border-style: hidden;">
+            <td style="width: 25%;  height:120px; border-right: none;"><img class="" src="../static/assets/img/pdf-logo.png" alt="Header Avatar" width="700" height="100"></td>
+            <td style="width: 50%;  height:120px; font-size:12px; text-align: center; padding-left:2px;"><span style="font-size: 20px;">Freedom Distribution</span><br />
+                Your Trusted Business Partner <br />
+                16 Moharaja Rd, Mymensingh 2200 <br />
+                Tel: 01917713794 <br />
+                www.freedomdistribution.com.bd <br />
+                Email: info@freedomdistribution.com.bd
+            </td>
+            <td style="width: 25%;  height:120px; padding-top:0px;"><img src="{{shipment.barcode.path}}" alt="" height="160px" width="540px" /></td>
+
+
+
+
+        </tr>
+
+        </tbody>
+    </table>
+</div>
+
+</div>
+
+<br />
+
+<div class="center" style="text-align: left">
+
+    <table
+      style="
+        height: 20px;
+        width: 100%;
+        border-collapse: collapse;
+        border-style: hidden;
+      "
+      border="0"
+    >
+      <tbody>
+        <tr style="height: 20px; border-style: hidden">
+          <td
+            style="
+              width: 75.7668%;
+              height: 20px;
+              font-size: 20px;
+              border-style: hidden;
+              text-align: left;
+            "
+          >
+            <strong>Date: </strong>{{invoice_info.date_added}}
+          </td>
+          <td style="width: 24.2332%; height: 30px; font-size: 13px; text-align: left; border-style: hidden">
+            <strong>Invoice no: </strong>{{invoice_info.code}}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <table
+      style="
+        height: 20px;
+        width: 100%;
+        border-collapse: collapse;
+        border-style: hidden;
+      "
+      border="0"
+    >
+      <tbody>
+        <tr style="height: 20px; border-style: hidden">
+          <td
+            style="
+              width: 75.7668%;
+              height: 20px;
+              font-size: 20px;
+              border-style: hidden;
+              text-align: left;
+            "
+          >
+            <strong>Deliveryman: </strong>{{invoice_info.deliveryman}}
+          </td>
+          <td style="width: 24.2332%; height: 30px; font-size: 13px; text-align: left; border-style: hidden">
+            <strong>Salesman: </strong>{{invoice_info.salesman}}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <table
+      style="
+        height: 20px;
+        width: 100%;
+        border-collapse: collapse;
+        border-style: hidden;
+      "
+      border="0"
+    >
+      <tbody>
+        <tr style="height: 20px; border-style: hidden">
+          <td
+            style="
+              width: 75.7668%;
+              height: 20px;
+              font-size: 20px;
+              border-style: hidden;
+              text-align: left;
+            "
+          >
+            <strong>Road: </strong>{{invoice_info.road}}
+          </td>
+          <td style="width: 24.2332%; height: 30px; font-size: 13px; text-align: left; border-style: hidden">
+            <strong> </strong>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+  </div>
+
+<br />
+{% if sales_item %}
+<table>
+    <tr>
+        <th colspan="4" style="border-right: none;">Sale Item</th>
+    </tr>
+</table>
+
+<br />
+
+<table>
+    <tr>
+        <th>Sl. No.</th>
+        <th style="width: 75%;">Products</th>
+        <th>Price</th>
+        <th>Quantity</th>
+        <th>Free</th>
+        <th>Good</th>
+        <th>Damage</th>
+        <th>Total</th>
+    </tr>
+  {% for item in sales_item %}
+    <tr>
+        <td>{{forloop.counter}}</td>
+        <td style="width: 75%;">{{item.product}}</td>
+        <td>{{item.price}}</td>
+        <td>{{item.quantity}}</td>
+        <td>{{item.free_quantity}}</td>
+        <td>{{item.good_quantity}}</td>
+        <td>{{item.damage_quantity}}</td>
+        <td>{{item.total_amount}}</td>
+    </tr>
+  {% endfor %}
+    <tr>
+        <td colspan="6" style="text-align: right">&nbsp;Sale Total: &nbsp;</td>
+        <td colspan="2" style="text-align: right"> {{invoice_info.totalProducts}} /- &nbsp;</td>
+    </tr>
+</table>
+
+<br />
+{% endif %}
+{% if sales_return %}
+<table>
+    <tr>
+        <th colspan="4" style="border-right: none;">Return Item</th>
+    </tr>
+</table>
+
+<br />
+
+<table>
+    <tr>
+        <th>Sl. No.</th>
+        <th style="width: 75%;">Products</th>
+        <th>Quantity</th>
+        <th>Price</th>
+        <th>Total</th>
+    </tr>
+  {% for item in sales_return %}
+    <tr>
+        <td>{{forloop.counter}}</td>
+        <td style="width: 75%;">{{item.product}}</td>
+        <td>{{item.quantity}}</td>
+        <td>{{item.price}}</td>
+        <td>{{item.total_amount}}</td>
+    </tr>
+  {% endfor %}
+    <tr>
+        <td colspan="4" style="text-align: right">&nbsp;Return Total: &nbsp;</td>
+        <td colspan="1" style="text-align: right">{{invoice_info.totalReturns}} /- &nbsp;</td>
+    </tr>
+</table>
+
+<br />
+{% endif %}
+{% if sales_due %}
+<table>
+    <tr>
+        <th colspan="4" style="border-right: none;">Client Dues</th>
+    </tr>
+</table>
+
+<br />
+
+<table>
+    <tr>
+        <th>Sl. No.</th>
+        <th>Client</th>
+        <th>Due</th>
+        <th>Paid</th>
+        <th>Remaining</th>
+    </tr>
+  {% for item in sales_due %}
+    <tr>
+        <td>{{forloop.counter}}</td>
+        <td>{{item.client}}</td>
+        <td>{{item.due}}</td>
+        <td>{{item.paid}}</td>
+        <td>{{item.balance}}</td>
+    </tr>
+  {% endfor %}
+    <tr>
+        <td colspan="4" style="text-align: right">&nbsp;Dues Total: &nbsp;</td>
+        <td colspan="1" style="text-align: right">{{invoice_info.totalItems}} /- &nbsp;</td>
+    </tr>
+</table>
+
+<br />
+{% endif %}
+
+
+<table>
+    <tr>
+        <th colspan="4" style="border-right: none;">Sub Total</th>
+    </tr>
+    <tr>
+        <td colspan="4" style="text-align: right">
+            Grand Total: {{invoice_info.total_amount}} /- &nbsp;<br />
+            Extra Amount: {{invoice_info.extra}} /- &nbsp;<br />
+            Cost Amount: {{invoice_info.cost}} /- &nbsp;<br />
+            General Commission: {{invoice_info.display_commission}} /- &nbsp;<br />
+            Display Commission: {{invoice_info.general_commission}} /- &nbsp;<br />
+            Paid Amount: {{invoice_info.tendered}} /- &nbsp;<br />
+            Short Amount: {{invoice_info.short}} /- &nbsp;<br />
+
+        </td>
+    </tr>
+<!--    <tr>-->
+<!--        <td colspan="2">&nbsp; </td>-->
+<!--        <td colspan="2"></td>-->
+<!--    </tr>-->
+<!--    <tr>-->
+<!--        <td colspan="2">Clients Signature</td>-->
+<!--        <td colspan="2">Authorized Signature</td>-->
+<!--    </tr>-->
+</table>
+
+
+
+</body>
+</html>
