@@ -29,13 +29,13 @@
             <colgroup>
               <col width="5%" />
               <col width="24%" />
-              <col width="10%" />
-              <col width="13%" />
+              <col width="11%" />
+              <col width="8%" />
               <col width="7%" />
               <col width="8%" />
-              <col width="8%" />
-              <col width="8%" />
-              <col width="8%" />
+              <col width="9%" />
+              <col width="9%" />
+              <col width="10%" />
               <col width="9%" />
             </colgroup>
             <thead>
@@ -43,12 +43,12 @@
                 <th class="text-center">#</th>
                 <th class="text-center">Name</th>
                 <th class="text-center">Code</th>
-                <th class="text-center">Group</th>
                 <th class="text-center">Buy</th>
                 <th class="text-center">Price</th>
                 <th class="text-center">Mrp</th>
                 <th class="text-center">Status</th>
                 <th class="text-center">Stock</th>
+                <th class="text-center">Damage</th>
                 <th class="text-center">Action</th>
               </tr>
             </thead>
@@ -58,7 +58,6 @@
                 <td class="text-center">{{ forloop.counter }}</td>
                 <td class="text-center">{{ product.name }}</td>
                 <td class="text-center">{{ product.code }}</td>
-                <td class="text-center">{{ product.category}}</td>
                 <td class="text-center">{{ product.buy }}</td>
                 <td class="text-center">{{ product.price}}</td>
                 <td class="text-center">{{ product.mrp}}</td>
@@ -76,6 +75,7 @@
                   {% endif %}
                 </td>
                 <td class="text-center">{{ product.available|floatformat }}</td>
+                <td class="text-center">{{ product.damage|floatformat}}</td>
                 <td class="text-center">
                   <div class="dropdown">
                     <button
