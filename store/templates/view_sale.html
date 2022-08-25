@@ -63,9 +63,11 @@
             </div>
         </div>
 
+        {% if pitems %}
+
         <div class="card rounded-0 mb-3">
             <div class="card-header py-1">
-                <div class="card-title mb-0 py-1">Item List</div>
+                <div class="card-title mb-0 py-1">Sale Items List</div>
             </div>
             <div class="card-body">
                 <div class="container-fluid">
@@ -73,9 +75,11 @@
                         <colgroup>
                             <col width="30%">
                             <col width="15%">
-                            <col width="20%">
+                            <col width="10%">
+                            <col width="10%">
+                            <col width="10%">
+                            <col width="10%">
                             <col width="15%">
-                            <col width="20%">
                         </colgroup>
                         <thead>
                             <tr>
@@ -83,6 +87,8 @@
                                 <th class="p-1 text-center">Unit Price</th>
                                 <th class="p-1 text-center">Quantity</th>
                                 <th class="p-1 text-center">Free</th>
+                                <th class="p-1 text-center">Good</th>
+                                <th class="p-1 text-center">Damage</th>
                                 <th class="p-1 text-center">Total</th>
                             </tr>
                         </thead>
@@ -93,6 +99,8 @@
                                 <td class="px-2 py-1 align-middle text-end product_price">{{pitem.price|floatformat}}</td>
                                 <td class="px-2 py-1 align-middle text-center">{{pitem.quantity|floatformat}}</td>
                                 <td class="px-2 py-1 align-middle text-center">{{pitem.free_quantity|floatformat}}</td>
+                                <td class="px-2 py-1 align-middle text-center">{{pitem.good_quantity|floatformat}}</td>
+                                <td class="px-2 py-1 align-middle text-center">{{pitem.damage_quantity|floatformat}}</td>
                                 <td class="px-2 py-1 align-middle product_total text-end">{{pitem.total_amount|floatformat}}</td>
                             </tr>
                             {% endfor %}
@@ -107,17 +115,176 @@
                 </div>
             </div>
         </div>
+
+        {% endif %}
+
+        {% if ritems %}
+
+        <div class="card rounded-0 mb-3">
+            <div class="card-header py-1">
+                <div class="card-title mb-0 py-1">Return Items List</div>
+            </div>
+            <div class="card-body">
+                <div class="container-fluid">
+                    <table class="table table-bordered" id="return_list">
+                        <colgroup>
+                            <col width="40%">
+                            <col width="20%">
+                            <col width="20%">
+                            <col width="20%">
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th class="p-1 text-center">Product Name</th>
+                                <th class="p-1 text-center">Price</th>
+                                <th class="p-1 text-center">Quantity</th>
+                                <th class="p-1 text-center">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in ritems %}
+                            <tr>
+                                <td class="px-2 py-1 align-middle laundry_type">{{item.product.name}}</td>
+                                <td class="px-2 py-1 align-middle text-end laundry_price">{{item.price|floatformat}}</td>
+                                <td class="px-2 py-1 align-middle text-center">{{item.quantity|floatformat}}</td>
+                                <td class="px-2 py-1 align-middle laundry_total text-end">{{item.total_amount|floatformat}}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th class="text-center" colspan="3">Total</th>
+                                <th class="text-end sub-total-return">{{sale.totalReturns|floatformat:2|intcomma}}</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        {% endif %}
+
+        {% if items %}
+
+        <div class="card rounded-0 mb-3">
+            <div class="card-header py-1">
+                <div class="card-title mb-0 py-1">Client Dues List</div>
+            </div>
+            <div class="card-body">
+                <div class="container-fluid">
+                    <table class="table table-bordered" id="laundry_list">
+                        <colgroup>
+                            <col width="27%">
+                            <col width="28%">
+                            <col width="15%">
+                            <col width="15%">
+                            <col width="15%">
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th class="p-1 text-center">Client Name</th>
+                                <th class="p-1 text-center">Brand Name</th>
+                                <th class="p-1 text-center">Dues</th>
+                                <th class="p-1 text-center">Paid</th>
+                                <th class="p-1 text-center">Balance</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in items %}
+                            <tr>
+                                <td class="px-2 py-1 align-middle laundry_type">{{item.client.name}}</td>
+                                <td class="px-2 py-1 align-middle">{{item.brand}}</td>
+                                <td class="px-2 py-1 align-middle text-end laundry_price">{{item.due|floatformat}}</td>
+                                <td class="px-2 py-1 align-middle text-center">{{item.paid|floatformat}}</td>
+                                <td class="px-2 py-1 align-middle laundry_total text-end">{{item.balance|floatformat}}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th class="text-center" colspan="3">Total</th>
+                                <th class="text-end sub-total-laundry">{{sale.totalItems|floatformat:2|intcomma}}</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        {% endif %}
+
+        {% if bitems %}
+        <div class="card rounded-0 mb-3">
+            <div class="card-header py-1">
+                <div class="card-title mb-0 py-1">Brand Commission List</div>
+            </div>
+            <div class="card-body">
+                <div class="container-fluid">
+                    <table class="table table-bordered" id="brand_list">
+                        <colgroup>
+                            <col width="40%">
+                            <col width="20%">
+                            <col width="20%">
+                            <col width="20%">
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th class="p-1 text-center">Brand Name</th>
+                                <th class="p-1 text-center">Commission</th>
+                                <th class="p-1 text-center"></th>
+                                <th class="p-1 text-center">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in bitems %}
+                            <tr>
+                                <td class="px-2 py-1 align-middle laundry_type">{{item.brand.name}}</td>
+                                <td class="px-2 py-1 align-middle text-end laundry_price">{{item.commission|floatformat}}</td>
+                                <td class="px-2 py-1 align-middle text-center">{{item.paid|floatformat}}</td>
+                                <td class="px-2 py-1 align-middle brand_total text-end">{{item.total_amount|floatformat}}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th class="text-center" colspan="3">Total</th>
+                                <th class="text-end sub-total-laundry">{{sale.totalCommissions|floatformat:2|intcomma}}</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
         <div class="card rounded-0 mb-3">
             <div class="card-body">
                 <div id="payment-details">
                     <div class="d-flex w-100 justify-content-end align-items-center">
                         <div class="col-auto">
-                            <h4 class="fw-bolder text-muted pe-2">Grand Total:</h4>
+                            <h4 class="fw-bolder text-muted pe-2">Sub Total:</h4>
                         </div>
                         <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 text-end">
                             <h4 class="fw-bolder pe-2 gtotal">{% if sale.total_amount %}{{sale.total_amount|floatformat:2|intcomma}}{% else %}0.00{% endif %}</h4>
                         </div>
                     </div>
+                    <div class="d-flex w-100 justify-content-end align-items-center">
+                        <div class="col-auto">
+                            <h4 class="fw-bolder text-muted pe-2">Extra Amount:</h4>
+                        </div>
+                        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 text-end">
+                            <h4 class="fw-bolder pe-2">{% if sale.extra %}{{sale.extra|floatformat:2|intcomma}}{% else %}0.00{% endif %}</h4>
+                        </div>
+                    </div>
+                    <div class="d-flex w-100 justify-content-end align-items-center">
+                        <div class="col-auto">
+                            <h4 class="fw-bolder text-muted pe-2">Cost Amount:</h4>
+                        </div>
+                        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 text-end">
+                            <h4 class="fw-bolder pe-2">{% if sale.cost %}{{sale.cost|floatformat:2|intcomma}}{% else %}0.00{% endif %}</h4>
+                        </div>
+                    </div>
+
                     <div class="d-flex w-100 justify-content-end align-items-center">
                         <div class="col-auto">
                             <h4 class="fw-bolder text-muted pe-2">Paid Amount:</h4>
@@ -128,12 +295,20 @@
                     </div>
                     <div class="d-flex w-100 justify-content-end align-items-center">
                         <div class="col-auto">
-                            <h4 class="fw-bolder text-muted pe-2">Due Amount:</h4>
+                            <h4 class="fw-bolder text-muted pe-2">Ground Total:</h4>
                         </div>
                         <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 text-end">
-                            <h4 class="fw-bolder pe-2 " id="change">{% if sale.change %}{{sale.change|floatformat:2|intcomma}}{% else %}0.00{% endif %}</h4>
+                            <h4 class="fw-bolder pe-2">{% if sale.short %}{{sale.short|floatformat:2|intcomma}}{% else %}0.00{% endif %}</h4>
                         </div>
                     </div>
+<!--                    <div class="d-flex w-100 justify-content-end align-items-center">-->
+<!--                        <div class="col-auto">-->
+<!--                            <h4 class="fw-bolder text-muted pe-2">Due Amount:</h4>-->
+<!--                        </div>-->
+<!--                        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 text-end">-->
+<!--                            <h4 class="fw-bolder pe-2 " id="change">{% if sale.change %}{{sale.change|floatformat:2|intcomma}}{% else %}0.00{% endif %}</h4>-->
+<!--                        </div>-->
+<!--                    </div>-->
                 </div>
             </div>
             <div class="card-footer py-1 text-center">
@@ -170,7 +345,7 @@
 <script>
     $(function() {
         $('#delete-data').click(function() {
-            _conf("Are you sure to delete this Transaction?", 'delete_laundry', ["'" + '{% url "delete-sale" sale.pk %}' + "'"])
+            _conf("Are you sure to delete this Transaction?", 'delete_sale', ["'" + '{% url "delete-sale" sale.pk %}' + "'"])
         })
         $('#update-status').click(function() {
             uni_modal("Updated Transaction's Status", '{% url "transacton-update-status" sale.pk %}')
@@ -194,8 +369,10 @@
             var cdetails = $('#client-details').clone()
             cdetails.find('.col-lg-6').addClass('col-6')
             el += cdetails[0].outerHTML
-            el += "<h5>Laundry Items</h5>"
+            el += "<h5>Client Dues</h5>"
             el += $('#laundry_list').clone()[0].outerHTML
+            el += "<h5>Return Items</h5>"
+            el += $('#return_list').clone()[0].outerHTML
             el += "<h5>Product Items</h5>"
             el += $('#product_list').clone()[0].outerHTML
             el += $('#payment-details').clone()[0].outerHTML
@@ -216,7 +393,7 @@
         })
     })
 
-    function delete_laundry(url) {
+    function delete_sale(url) {
 
         var _this = $('#confirm_modal .modal-body')
         $('.err-msg').remove();
