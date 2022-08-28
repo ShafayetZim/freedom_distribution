@@ -3,17 +3,6 @@
   <form action="" id="product-form">
     <input type="hidden" name="id" value="{{product.id}}" />
     <div class="mb-3">
-      <label for="category" class="control-label">Group</label>
-      <select name="category" id="category" class="form-select form-control-sm rounded-0">
-        {% if product.category %}
-          <option selected value="{{product.category.pk}}">{{product.category}}</option>
-        {% endif %}
-        {% for item in category %}
-          <option value="{{item.pk}}">{{item.name}}</option>
-        {% endfor %}
-      </select>
-    </div>
-    <div class="mb-3">
       <label for="brand" class="control-label">Brand</label>
       <select name="brand" id="brand" class="form-select form-control-sm rounded-0">
         {% if product.brand %}

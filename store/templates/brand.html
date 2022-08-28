@@ -21,18 +21,16 @@
                     </div>
                     <table class="table table-bordered table-striped" id="price-tbl">
                         <colprice>
-                            <col width="5%">
+                            <col width="10%">
                             <col width="25%">
                             <col width="40%">
-                            <col width="15%">
-                            <col width="15%">
+                            <col width="25%">
                         </colprice>
                         <thead>
                             <tr>
                                 <th class="text-center">#</th>
                                 <th class="text-center">DateTime</th>
                                 <th class="text-center">Brand Name</th>
-                                <th class="text-center">Group</th>
                                 <th class="text-center">Action</th>
                             </tr>
                         </thead>
@@ -42,7 +40,6 @@
                                 <td class="text-center">{{ forloop.counter }}</td>
                                 <td class="text-center">{{ item.date_added|date:"Y-m-d H:i" }}</td>
                                 <td class="text-center">{{ item.name}}</td>
-                                <td class="text-center">{{ item.category}}</td>
                                 <td class="text-center">
                                     <div class="dropdown">
                                         <button class="btn btn-light btn-sm rounded-0 border dropdown-toggle" type="button" id="abtn{{item.pk}}" data-bs-toggle="dropdown" aria-expanded="false">

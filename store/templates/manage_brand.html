@@ -13,28 +13,7 @@
         required
       />
     </div>
-    <!-- <div class="mb-3">
-      <label for="price" class="control-label">Price per kg.</label>
-      <input
-        type="number"
-        id="price"
-        name="price"
-        class="form-control form-control-sm rounded-0 text-end"
-        value="{{price.price}}"
-        required
-      />
-    </div> -->
-    <div class="mb-3">
-      <label for="category" class="control-label">Group</label>
-      <select name="category" id="category" class="form-select form-control-sm rounded-0">
-          {% if brand.category %}
-          <option selected value="{{brand.category.pk}}">{{brand.category}}</option>
-          {% endif %}
-          {% for item in category %}
-          <option value="{{item.pk}}">{{item.name}}</option>
-          {% endfor %}
-      </select>
-    </div>
+
   </form>
 </div>
 <script>
