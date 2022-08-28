@@ -11,12 +11,12 @@
                     <div class="container-fluid">
                         <div class="row mx-0 w-100 align-items-center">
                             <div class="col-3">
-                                <i class="fs-1 text-light fa fa-tshirt"></i>
+                                <i class="fs-1 text-light fa fa-soap"></i>
                             </div>
                             <div class="col-9">
-                                <h1 class="text-end">{{category|intcomma}}</h1>
+                                <h1 class="text-end">{{brand|intcomma}}</h1>
                             </div>
-                            <div class="col-12 text-end"><b>Category</b></div>
+                            <div class="col-12 text-end"><b>Brand</b></div>
                         </div>
                     </div>
                 </div>
@@ -28,7 +28,7 @@
                     <div class="container-fluid">
                         <div class="row mx-0 w-100 align-items-center">
                             <div class="col-3">
-                                <i class="fs-1 text-light fa fa-soap"></i>
+                                <i class="fs-1 text-light fa fa-tshirt"></i>
                             </div>
                             <div class="col-9">
                                 <h1 class="text-end">{{products|intcomma}}</h1>
@@ -58,19 +58,21 @@
         </div>
         <div class="col-lg-3 col-md-6 col-sm-12 col-xs-12 px-1 pb-2">
             <div class="card card-default rounded-0 shadow bg-gradient bg-warning bg-opacity-75 text-light">
-                <div class="card-body">
-                    <div class="container-fluid">
-                        <div class="row mx-0 w-100 align-items-center">
-                            <div class="col-3">
-                                <i class="fs-1 text-light fa fa-coins"></i>
+                <a href="{% url 'commission-bill-page' %}" style="color: white">
+                    <div class="card-body">
+                        <div class="container-fluid">
+                            <div class="row mx-0 w-100 align-items-center">
+                                <div class="col-3">
+                                    <i class="fs-1 text-light fa fa-coins"></i>
+                                </div>
+                                <div class="col-9">
+                                    <h1 class="text-end">Click</h1>
+                                </div>
+                                <div class="col-12 text-end"><b>Monthly Commission</b></div>
                             </div>
-                            <div class="col-9">
-                                <h1 class="text-end">{{todays_sales|floatformat|intcomma}}</h1>
-                            </div>
-                            <div class="col-12 text-end"><b>Today's Sales</b></div>
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
         </div>
         <div class="col-lg-3 col-md-6 col-sm-12 col-xs-12 px-1 pb-2">
@@ -99,12 +101,107 @@
                         <div class="container-fluid">
                             <div class="row mx-0 w-100 align-items-center">
                                 <div class="col-3">
-                                    <i class="fs-1 text-light fa fa-list"></i>
+                                    <i class="fs-1 text-light fa fa-warning"></i>
                                 </div>
                                 <div class="col-9">
                                     <h1 class="text-end">Click</h1>
                                 </div>
                                 <div class="col-12 text-end"><b>Low Stock</b></div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 col-sm-12 col-xs-12 px-1 pb-2">
+            <div class="card card-default rounded-0 shadow bg-gradient bg-info bg-opacity-75 text-light">
+                <a href="{% url 'commission-preview' %}" style="color: white">
+                    <div class="card-body">
+                        <div class="container-fluid">
+                            <div class="row mx-0 w-100 align-items-center">
+                                <div class="col-3">
+                                    <i class="fs-1 text-light fa fa-list"></i>
+                                </div>
+                                <div class="col-9">
+                                    <h1 class="text-end">Click</h1>
+                                </div>
+                                <div class="col-12 text-end"><b>Commission Report</b></div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 col-sm-12 col-xs-12 px-1 pb-2">
+            <div class="card card-default rounded-0 shadow bg-gradient bg-dark bg-opacity-75 text-light">
+                <a href="{% url 'free-product-report' %}" style="color: white">
+                    <div class="card-body">
+                        <div class="container-fluid">
+                            <div class="row mx-0 w-100 align-items-center">
+                                <div class="col-3">
+                                    <i class="fs-1 text-light fas fa-clipboard-check"></i>
+                                </div>
+                                <div class="col-9">
+                                    <h1 class="text-end">Click</h1>
+                                </div>
+                                <div class="col-12 text-end"><b>Free Product Report</b></div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 col-sm-12 col-xs-12 px-1 pb-2">
+            <div class="card card-default rounded-0 shadow bg-gradient bg-success bg-opacity-75 text-light">
+                <a href="{% url 'advance-report' %}" style="color: white">
+                    <div class="card-body">
+                        <div class="container-fluid">
+                            <div class="row mx-0 w-100 align-items-center">
+                                <div class="col-3">
+                                    <i class="fs-1 text-light fas fa-calculator"></i>
+                                </div>
+                                <div class="col-9">
+                                    <h1 class="text-end">Click</h1>
+                                </div>
+                                <div class="col-12 text-end"><b>Advance Report</b></div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 col-sm-12 col-xs-12 px-1 pb-2">
+            <div class="card card-default rounded-0 shadow bg-gradient bg-warning bg-opacity-75 text-light">
+                <a href="{% url 'expense-page' %}" style="color: white">
+                    <div class="card-body">
+                        <div class="container-fluid">
+                            <div class="row mx-0 w-100 align-items-center">
+                                <div class="col-3">
+                                    <i class="fs-1 text-light fab fa-opencart"></i>
+                                </div>
+                                <div class="col-9">
+                                    <h1 class="text-end">Click</h1>
+                                </div>
+                                <div class="col-12 text-end"><b>Expense List</b></div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 col-sm-12 col-xs-12 px-1 pb-2">
+            <div class="card card-default rounded-0 shadow bg-gradient bg-primary bg-opacity-75 text-light">
+                <a href="{% url 'surplus-page' %}" style="color: white">
+                    <div class="card-body">
+                        <div class="container-fluid">
+                            <div class="row mx-0 w-100 align-items-center">
+                                <div class="col-3">
+                                    <i class="fs-1 text-light fas fa-balance-scale"></i>
+                                </div>
+                                <div class="col-9">
+                                    <h1 class="text-end">Click</h1>
+                                </div>
+                                <div class="col-12 text-end"><b>Surplus List</b></div>
                             </div>
                         </div>
                     </div>
