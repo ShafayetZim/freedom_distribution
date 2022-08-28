@@ -1,0 +1,554 @@
+{% extends 'base.html' %}{% load static %}{% load humanize %}{% block pageContent %}
+<style>
+    #laundry-img {
+        max-width: 100%;
+        max-height: 10em;
+        object-fit: scale-down;
+        object-position: center center;
+    }
+</style>
+<section class="py-4">
+    <div class="container">
+        <div class="card rounded-0 mb-3">
+            <div class="card-header py-1">
+                <div class="card-title mb-0">Filter Advance Report</div>
+            </div>
+            <div class="card-body">
+
+                <form method="GET">
+                    <section class="site_filter">
+                        <div class="container-fluid">
+                            <div class="row justify-content-center">
+
+
+                                <div class="col">
+                                    <div class="form-group">
+                                        <label for="date">Start Date</label>
+                                        <input type="date" class="form-control mr-sm-3" id="start_date" name="start_date"
+                                               value={{start_date}} required>
+
+                                    </div>
+                                </div>
+
+                                <div class="col">
+                                    <div class="form-group">
+                                        <label for="date">End Date</label>
+                                        <input type="date" class="form-control mr-sm-3" id="end_date" name="end_date"
+                                               value={{end_date}} required>
+
+                                    </div>
+                                </div>
+
+                                <div class="col">
+                                    <div class="form-group">
+                                        <label for="WorkName">Check Brand</label>
+                                        <select class="form-control" id="check_brand" name="check_brand">
+                                            <option value="All">All</option>
+                                            {% for item in brand %}
+                                            <option value="{{item.pk}}">{{item.name}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </section>
+
+                    <div class="text-center mt-3">
+                        <button class="btn btn-success">View</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card rounded-0 shadow mb-3">
+            <div class="card-body">
+                <div class="container-fluid">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <tbody>
+                        <tr>
+
+                        </tr>
+
+                        <tr>
+                            <td style="width: 30%;"><h6>Date Range: {{start_date }} To {{end_date}}</h6></td>
+                            <td style="width: 30%;">&nbsp;</td>
+                            <td style="width: 30%;  text-align: right;">
+                                {% if commission %}
+
+                                {% endif %}
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <br>
+                    <table class="table table-bordered table-striped" style="border-collapse: collapse; width: 100%;" border="1" cellpadding="8">
+                        <tbody>
+                        <tr>
+
+                        </tr>
+                         {% for item in online %}
+                        <tr>
+
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="3" class="text-center">Total Sale</th>
+                                <th class="text-end fw-bolder">{{gross|floatformat:2|intcomma}}</th>
+                            </tr>
+                            <tr>
+                                <th colspan="3" class="text-center">Total Cost</th>
+                                <th class="text-end fw-bolder">{{cost|floatformat:2|intcomma}}</th>
+                            </tr>
+                            <tr>
+                                <th colspan="3" class="text-center">Total Damage</th>
+                                <th class="text-end fw-bolder">{{knockout|floatformat:2|intcomma}}</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+
+        <form action="" id="advance-form">
+            <input type="hidden" name="id" value="{{surplus.id}}">
+            <input type="hidden" name="code" value="{% if surplus.code  %}{{surplus.code}}{% else %}generate{% endif %}">
+            <input type="hidden" name="status" value="{% if surplus.status  %}{{surplus.status}}{% else %}0{% endif %}">
+            <input type="hidden" name="month" value="{% if surplus.month  %}{{surplus.month}}{% else %}0{% endif %}">
+            <div class="card rounded-0 mb-3">
+                <div class="card-header">
+                    <div class="card-title py-1">Surplus Details</div>
+                </div>
+                <div class="card-body">
+                    <div class="container-fluid">
+                        {% if surplus.code %}
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                <label for="" class="control-label">Charge Code</label>
+                                <div class="h5"><b>{{surplus.code}}</b></div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                <label for="month" class="control-label">Month</label>
+                                <select
+                                    type="text"
+                                    id="month"
+                                    name="month"
+                                    class="form-select form-select-sm rounded-0"
+                                    required
+                                  >
+                                    {% if bills.month == '1' %}
+                                    <option value="1" selected>January</option>
+                                    {% else %}
+                                    <option value="1">January</option>
+                                    {% endif %} {% if bills.month == '2' %}
+                                    <option value="2" selected>February</option>
+                                    {% else %}
+                                    <option value="2">February</option>
+                                    {% endif %} {% if bills.month == '3' %}
+                                    <option value="3" selected>March</option>
+                                    {% else %}
+                                    <option value="3">March</option>
+                                    {% endif %} {% if bills.month == '4' %}
+                                    <option value="4" selected>April</option>
+                                    {% else %}
+                                    <option value="4">April</option>
+                                    {% endif %} {% if bills.month == '5' %}
+                                    <option value="5" selected>May</option>
+                                    {% else %}
+                                    <option value="5">May</option>
+                                    {% endif %} {% if bills.month == '6' %}
+                                    <option value="6" selected>June</option>
+                                    {% else %}
+                                    <option value="6">June</option>
+                                    {% endif %} {% if bills.month == '7' %}
+                                    <option value="7" selected>July</option>
+                                    {% else %}
+                                    <option value="7">July</option>
+                                    {% endif %} {% if bills.month == '8' %}
+                                    <option value="8" selected>August</option>
+                                    {% else %}
+                                    <option value="8">August</option>
+                                    {% endif %} {% if bills.month == '9' %}
+                                    <option value="9" selected>September</option>
+                                    {% else %}
+                                    <option value="9">September</option>
+                                    {% endif %} {% if bills.month == '10' %}
+                                    <option value="10" selected>October</option>
+                                    {% else %}
+                                    <option value="10">October</option>
+                                    {% endif %} {% if bills.month == '11' %}
+                                    <option value="11" selected>November</option>
+                                    {% else %}
+                                    <option value="11">November</option>
+                                    {% endif %} {% if bills.month == '12' %}
+                                    <option value="12" selected>December</option>
+                                    {% else %}
+                                    <option value="12">December</option>
+                                    {% endif %}
+                                  </select>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                <label for="damage" class="control-label">Total Damage</label>
+                                <input type="text" onblur="findTotal()" class="form-control form-control-sm rounded-0 out" name="total_damage" id="damage" value="{{knockout}}" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                <label for="client" class="control-label">Total Cost</label>
+                                <input type="text" onblur="findTotal()" class="form-control form-control-sm rounded-0 out" name="total_cost" id="costs" value="{{cost}}" required>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                <label for="contact" class="control-label">Total Expense</label>
+                                <input type="text" onblur="findTotal()" class="form-control form-control-sm rounded-0 out" name="total_expense" id="total_expense" value="{{surplus.total_expense}}">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                <label for="client" class="control-label">Total Sale</label>
+                                <input type="text" onblur="findTotal()" class="form-control form-control-sm rounded-0 in" name="total_sale" id="total_sale" value="{{gross}}" required>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                <label for="contact" class="control-label">Profit Margin</label>
+                                <input type="text" class="form-control form-control-sm rounded-0 margin" name="margin" id="margin" value="{{surplus.margin}}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card rounded-0 mb-3">
+                <div class="card-header">
+                    <div class="card-title py-1">Advance List</div>
+                </div>
+                <div class="card-body">
+                    <div class="container-fluid">
+                        <div class="row align-items-end">
+                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                <label for="expenses" class="control-label">Expense</label>
+                                <select id="expenses" class="form-control form-control-sm rounded-0">
+                                    <option value="" disabled selected></option>
+                                    {% for item in expense %}
+                                    <option value="{{item.pk}}">{{item.name}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                <button class="btn btn-primary btn-sm rounded-0 bg-gradient bg-primary" type="button" id="add_expense"><i class="fa fa-plus"></i> Add brand</button>
+                            </div>
+                        </div>
+                        <div class="clear-fix mt-2"></div>
+                        <table class="table table-bordered" id="product_list">
+                            <colgroup>
+                                <col width="5%">
+                                <col width="30%">
+                                <col width="30%">
+                                <col width="17%">
+                                <col width="18%">
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th class="p-1 text-center"></th>
+                                    <th class="p-1 text-center">Expense Name</th>
+                                    <th class="p-1 text-center">Note</th>
+                                    <th class="p-1 text-center">Amount</th>
+                                    <th class="p-1 text-center">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for pitem in pitems %}
+                                <tr>
+                                    <td class="px-2 py-1 align-middle text-center">
+                                        <input type="hidden" name="expense_id[]" value="{{pitem.expense.id}}">
+                                        <button class="btn btn-outline-danger btn-sm rounded-0 rem-expense" type="button"><i class="fa fa-times"></i></button>
+                                    </td>
+                                    <td class="px-2 py-1 align-middle expense_type">{{pitem.expense.name}}</td>
+                                    <td class="px-2 py-1 align-middle">
+                                        <input type="text" value="{{pitem.note}}" class="form-control form-control-sm rounded-0 text-center" name="expense_note[]">
+                                    </td>
+                                    <td class="px-2 py-1 align-middle">
+                                        <input type="number" min="1" value="{{pitem.amount|floatformat}}" class="form-control form-control-sm rounded-0 text-center" name="expense_amount[]" required>
+                                    </td>
+                                    <td class="px-2 py-1 align-middle expense_total text-end">{{pitem.total_amount|floatformat}}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th class="text-end" colspan="4">Total</th>
+                                    <th class="text-end sub-total-product">0.00</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="card rounded-0 mb-3">
+                <div class="card-body">
+                    <div class="d-flex w-100 justify-content-end align-items-center">
+                        <div class="col-auto">
+                            <h4 class="fw-bolder text-muted pe-2">Charge total:</h4>
+                        </div>
+                        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 text-end">
+                            <h4 class="fw-bolder pe-2 gtotal">{% if surplus.total_expense %}{{surplus.total_expense|floatformat:2|intcomma}}{% else %}0.00{% endif %}</h4>
+                        </div>
+                    </div>
+<!--                    <div class="d-flex w-100 justify-content-end align-items-center">-->
+<!--                        <div class="col-auto">-->
+<!--                            <h4 class="fw-bolder text-muted pe-2">Paid Amount:</h4>-->
+<!--                        </div>-->
+<!--                        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 text-end">-->
+<!--                            <input type="number" step="any" class="form-control form-control-lg rounded-0 text-end" id="tendered_amount" name="tendered" value="{% if purchase.tendered %}{{purchase.tendered|floatformat:2}}{% else %}0{% endif %}" required>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                    <div class="d-flex w-100 justify-content-end align-items-center">-->
+<!--                        <div class="col-auto">-->
+<!--                            <h4 class="fw-bolder text-muted pe-2">Change:</h4>-->
+<!--                        </div>-->
+<!--                        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 text-end">-->
+<!--                            <h4 class="fw-bolder pe-2 " id="change">{% if purchase.change %}{{purchase.change|floatformat:2|intcomma}}{% else %}0.00{% endif %}</h4>-->
+<!--                        </div>-->
+<!--                    </div>-->
+                </div>
+                <div class="card-footer py-1 text-center">
+                    <button class="btn btn-primary btn-sm rounded-0" type="button" id="pay_later">Save</button>
+<!--                    <button class="btn btn-success btn-sm rounded-0" id="laundry-submit-btn" form="laundry-form"><i class="fa fa-save"></i> Pay</button>-->
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+
+<noscript id="product-clone">
+    <tr>
+        <td class="px-2 py-1 align-middle text-center">
+            <input type="hidden" name="expense_id[]" value="">
+            <button class="btn btn-outline-danger btn-sm rounded-0 rem-expense" type="button"><i class="fa fa-times"></i></button>
+        </td>
+        <td class="px-2 py-1 align-middle expense_type"></td>
+        <td class="px-2 py-1 align-middle">
+            <input type="text" class="form-control form-control-sm rounded-0 text-center" name="expense_note[]">
+        </td>
+        <td class="px-2 py-1 align-middle">
+            <input type="number" min="0" value="0" class="form-control form-control-sm rounded-0 text-center" name="expense_amount[]" required>
+        </td>
+        <td class="px-2 py-1 align-middle expense_total text-end">0.00</td>
+    </tr>
+</noscript> {% endblock pageContent %} {% block ScriptBlock %}
+<script>
+    function calc_total() {
+        var sub_laundry = 0
+        var sub_product = 0
+        var gtotal = 0
+        $('#laundry_list tbody tr').each(function() {
+            var price = $(this).find('[name="laundry_price[]"]').val()
+            var weight = $(this).find('[name="laundry_weight[]"]').val()
+            weight = weight > 0 ? weight : 0;
+            price = price > 0 ? price : 0;
+            sub_laundry += parseFloat(parseFloat(weight) * parseFloat(price))
+            gtotal += parseFloat(parseFloat(weight) * parseFloat(price))
+            $(this).find('.laundry_total').text(parseFloat(parseFloat(weight) * parseFloat(price)).toLocaleString('en-US'))
+        })
+        $('.sub-total-laundry').text(parseFloat(sub_laundry).toLocaleString('en-US', {
+            style: 'decimal',
+            maximumFractionDigits: 2,
+            minimumFractionDigits: 2
+        }))
+        $('#product_list tbody tr').each(function() {
+            var buy = $(this).find('[name="expense_amount[]"]').val()
+
+            buy = buy > 0 ? buy : 0;
+            sub_product += parseFloat(parseFloat(buy))
+            gtotal += parseFloat(parseFloat(buy))
+            $(this).find('.expense_total').text(parseFloat(parseFloat(buy)).toLocaleString('en-US'))
+        })
+        $('.sub-total-product').text(parseFloat(sub_product).toLocaleString('en-US', {
+            style: 'decimal',
+            maximumFractionDigits: 2,
+            minimumFractionDigits: 2
+        }))
+        $('[name="total_amount"]').val(gtotal)
+        $('[name="total_expense"]').val(gtotal)
+
+        $('.gtotal').text(parseFloat(gtotal).toLocaleString('en-US', {
+            style: 'decimal',
+            maximumFractionDigits: 2,
+            minimumFractionDigits: 2
+        }))
+        $
+    }
+    $(function() {
+        calc_total()
+        $('#prices').select2({
+            placeholder: "Please Select Laundry Type Here",
+            width: "100%",
+            selectionCssClass: "form-control form-control-sm rounded-0"
+        })
+        $('#expenses').select2({
+            placeholder: "Please Select Expenses Here",
+            width: "100%",
+            selectionCssClass: "form-control form-control-sm rounded-0"
+        })
+
+        $('#pay_later').click(function() {
+
+            $('#advance-form').submit()
+        })
+        $('#laundry-submit-btn').click(function() {
+            $('#tendered_amount').attr('required', true)
+        })
+        $('#laundry_list tbody').find('[name="laundry_weight[]"]').on('input change', function() {
+            calc_total()
+        })
+        $('#laundry_list tbody').find('.rem-laundry').click(function() {
+            if (confirm("Are you sure to remove this item?") == true) {
+                $(this).closest('tr').remove()
+                calc_total()
+            }
+        })
+        $('#product_list tbody').find('[name="expense_amount[]"]').on('input change', function() {
+            calc_total()
+        })
+        $('#product_list tbody').find('[name="brand_advance[]"]').on('input change', function() {
+            calc_total()
+        })
+        $('#product_list tbody').find('.rem-expense').click(function() {
+            if (confirm("Are you sure to remove this item?") == true) {
+                $(this).closest('tr').remove()
+                calc_total()
+            }
+        })
+        $('#add_laundry').click(function() {
+            var pid = $('#prices').val()
+            if (pid < '1') {
+                return false
+            }
+            var price = $('#prices option[value="' + pid + '"]').attr('data-price')
+            var laundry_type = $('#prices option[value="' + pid + '"]').text()
+            var tr = $($('noscript#laundry-clone').html()).clone()
+            tr.find('.laundry_type').text(laundry_type)
+            tr.find('.laundry_price').text(parseFloat(price).toLocaleString('en-US'))
+            tr.find('.laundry_total').text(parseFloat(price).toLocaleString('en-US'))
+            tr.find('[name="price_id[]"]').val(pid)
+            tr.find('[name="laundry_price[]"]').val(price)
+            $('#laundry_list tbody').append(tr)
+            calc_total()
+            $('#prices').val('').trigger('change')
+            tr.find('[name="laundry_weight[]"]').on('input change', function() {
+                calc_total()
+            })
+            tr.find('.rem-laundry').click(function() {
+                if (confirm("Are you sure to remove this item?") == true) {
+                    tr.remove()
+                    calc_total()
+                }
+            })
+        })
+
+        $('#add_expense').click(function() {
+            var pid = $('#expenses').val()
+            if (pid < '1') {
+                return false
+            }
+
+            var expense_name = $('#expenses option[value="' + pid + '"]').text()
+            var tr = $($('noscript#product-clone').html()).clone()
+            tr.find('.expense_type').text(expense_name)
+            tr.find('[name="expense_id[]"]').val(pid)
+            tr.find('[name="expense_note[]"]').val()
+
+            $('#product_list tbody').append(tr)
+            calc_total()
+            $('#expenses').val('').trigger('change')
+            tr.find('[name="expense_amount[]"]').on('input change', function() {
+                calc_total()
+            })
+            calc_total()
+            $('#brands').val('').trigger('change')
+            tr.find('[name="brand_advance[]"]').on('input change', function() {
+                calc_total()
+            })
+            tr.find('.rem-expense').click(function() {
+                if (confirm("Are you sure to remove this item?") == true) {
+                    tr.remove()
+                    calc_total()
+                }
+            })
+        })
+        $('#advance-form').submit(function(e) {
+            e.preventDefault();
+            var _this = $(this)
+            $('.err-msg').remove();
+            var el = $('<div>')
+            el.addClass("alert alert-danger err-msg")
+            el.hide()
+            if (_this[0].checkValidity() == false) {
+                _this[0].reportValidity();
+                return false;
+            }
+
+            start_loader();
+            $.ajax({
+                headers: {
+                    "X-CSRFToken": '{{csrf_token}}'
+                },
+                url: "{% url 'save-surplus' %}",
+                data: new FormData($(this)[0]),
+                cache: false,
+                contentType: false,
+                processData: false,
+                method: 'POST',
+                type: 'POST',
+                dataType: 'json',
+                error: err => {
+                    console.log(err)
+                    alert("An error occured", 'error');
+                    end_loader();
+                },
+                success: function(resp) {
+                    if (typeof resp == 'object' && resp.status == 'success') {
+                        location.replace('{% url "view-surplus" %}/' + resp.id)
+                    } else if (resp.status == 'failed' && !!resp.msg) {
+                        el.text(resp.msg)
+                    } else {
+                        el.text("An error occured", 'error');
+                        end_loader();
+                        console.err(resp)
+                    }
+                    _this.prepend(el)
+                    el.show('slow')
+                    $("html, body, .modal").scrollTop(0);
+                    end_loader()
+                }
+            })
+        })
+    })
+
+
+
+    function findTotal(){
+        var arr = document.getElementsByClassName('out');
+        var tot1=0;
+        var tot2 =0;
+        for(var i=0;i<arr.length;i++){
+            if(parseFloat(arr[i].value))
+                tot1 += parseFloat(arr[i].value);
+        }
+        var arr2 = document.getElementsByClassName('in');
+        for(var i=0;i<arr2.length;i++){
+            if(parseFloat(arr2[i].value))
+                tot2 += parseFloat(arr2[i].value);
+        }
+
+        var tot = parseFloat(parseFloat(tot2) - parseFloat(tot1))
+        document.getElementById('margin').value = tot;
+    }
+
+</script>
+{% endblock ScriptBlock %}
