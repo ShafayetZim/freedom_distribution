@@ -174,16 +174,18 @@
                 <div class="container-fluid">
                     <table class="table table-bordered" id="laundry_list">
                         <colgroup>
-                            <col width="27%">
-                            <col width="28%">
-                            <col width="15%">
-                            <col width="15%">
-                            <col width="15%">
+                            <col width="20%">
+                            <col width="22%">
+                            <col width="22%">
+                            <col width="12%">
+                            <col width="12%">
+                            <col width="12%">
                         </colgroup>
                         <thead>
                             <tr>
                                 <th class="p-1 text-center">Client Name</th>
                                 <th class="p-1 text-center">Brand Name</th>
+                                <th class="p-1 text-center">Note</th>
                                 <th class="p-1 text-center">Dues</th>
                                 <th class="p-1 text-center">Paid</th>
                                 <th class="p-1 text-center">Balance</th>
@@ -194,6 +196,7 @@
                             <tr>
                                 <td class="px-2 py-1 align-middle laundry_type">{{item.client.name}}</td>
                                 <td class="px-2 py-1 align-middle">{{item.brand}}</td>
+                                <td class="px-2 py-1 align-middle">{{item.note}}</td>
                                 <td class="px-2 py-1 align-middle text-end laundry_price">{{item.due|floatformat}}</td>
                                 <td class="px-2 py-1 align-middle text-center">{{item.paid|floatformat}}</td>
                                 <td class="px-2 py-1 align-middle laundry_total text-end">{{item.balance|floatformat}}</td>
