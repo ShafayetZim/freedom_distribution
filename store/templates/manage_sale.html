@@ -6,8 +6,34 @@
         object-fit: scale-down;
         object-position: center center;
     }
+    .alert {
+      padding: 20px;
+      background-color: #ff9800;
+      color: white;
+    }
+
+    .closebtn {
+      margin-left: 15px;
+      color: white;
+      font-weight: bold;
+      float: right;
+      font-size: 22px;
+      line-height: 20px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .closebtn:hover {
+      color: black;
+    }
 </style>
 <section class="py-4">
+    {% if sale.code %}
+    <div class="alert">
+      <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+      <strong>Warning!</strong> First select the group for edit/update purpose.
+    </div>
+    {% endif %}
     <div class="container">
         <form action="" id="laundry-form" data-product-url="{% url 'ajax_load_product' %}" novalidate>
             <input type="hidden" name="id" value="{{sale.id}}">
@@ -80,16 +106,16 @@
 
             <div class="card rounded-0 mb-3">
                 <div class="card-header">
-                    <div class="card-title py-1">Item List</div>
+                    <div class="card-title py-1">Sale Item List</div>
                 </div>
                 <div class="card-body">
                     <div class="container-fluid">
                         <div class="row align-items-end">
                             <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
-                                <label for="category" class="control-label">Category</label>
-                                  <select name="category" id="category" class="form-select form-control-sm rounded-0">
+                                <label for="category" class="control-label">Brand</label>
+                                  <select name="brand" id="category" class="form-select form-control-sm rounded-0">
                                       <option value="" disabled selected></option>
-                                      {% for item in category %}
+                                      {% for item in brand %}
                                       <option value="{{item.pk}}">{{item.name}}</option>
                                       {% endfor %}
                                   </select>
@@ -100,7 +126,7 @@
                                     <option value="" disabled selected></option>
                                     {% for product in products %}
                                     {% if product.available > 0 %}
-                                    <option value="{{product.pk}}" data-buy = "{{product.buy}}" data-price = "{{product.price}}" data-available = "{{product.available}}">{{product.name}}</option>
+                                    <option value="{{product.pk}}" data-buy = "{{product.buy}}" data-price = "{{product.price}}" data-available = "{{product.available}}" data-brand="{{product.brand}}">{{product.name}}</option>
                                     {% endif %}
                                     {% endfor %}
                                 </select>
@@ -113,13 +139,16 @@
                         <table class="table table-bordered" id="product_list">
                             <colgroup>
                                 <col width="5%">
-                                <col width="30%">
+                                <col width="25%">
+                                <col width="8%">
+                                <col width="8%">
+                                <col width="8%">
+                                <col width="9%">
+                                <col width="9%">
+                                <col width="8%">
+                                <col width="8%">
+                                <col width="2%">
                                 <col width="10%">
-                                <col width="10%">
-                                <col width="10%">
-                                <col width="10%">
-                                <col width="10%">
-                                <col width="15%">
                             </colgroup>
                             <thead>
                                 <tr>
@@ -130,6 +159,9 @@
                                     <th class="p-1 text-center">Available</th>
                                     <th class="p-1 text-center">Quantity</th>
                                     <th class="p-1 text-center">Free</th>
+                                    <th class="p-1 text-center">Good</th>
+                                    <th class="p-1 text-center">Damage</th>
+                                    <th class="p-1 text-center"></th>
                                     <th class="p-1 text-center">Total</th>
                                 </tr>
                             </thead>
@@ -139,13 +171,13 @@
                                     <td class="px-2 py-1 align-middle text-center">
                                         <input type="hidden" name="product_id[]" value="{{pitem.product.id}}">
                                         <input type="hidden" name="product_buy[]" value="{{pitem.buy}}">
-
+                                        <input type="hidden" name="product_brand[]" value="{{pitem.brand}}">
                                         <button class="btn btn-outline-danger btn-sm rounded-0 rem-product" type="button"><i class="fa fa-times"></i></button>
                                     </td>
                                     <td class="px-2 py-1 align-middle product_type">{{pitem.product.name}}</td>
                                     <td class="px-2 py-1 align-middle text-end product_buy">{{pitem.buy|floatformat}}</td>
                                     <td class="px-2 py-1 align-middle text-end">
-                                        <input type="number" name="product_price[]" value="{{pitem.price}}">
+                                        <input type="number" step="0.01" name="product_price[]" value="{{pitem.price}}">
                                     </td>
                                     <td class="px-2 py-1 align-middle text-end  product_available">{{pitem.available}}</td>
                                     <td class="px-2 py-1 align-middle">
@@ -153,6 +185,15 @@
                                     </td>
                                     <td class="px-2 py-1 align-middle">
                                         <input type="number" min="0" value="{{pitem.free_quantity|floatformat}}" class="form-control form-control-sm rounded-0 text-center" name="product_free_quantity[]" required>
+                                    </td>
+                                    <td class="px-2 py-1 align-middle">
+                                        <input type="number" min="0" value="{{pitem.good_quantity|floatformat}}" class="form-control form-control-sm rounded-0 text-center" name="product_good_quantity[]" required>
+                                    </td>
+                                    <td class="px-2 py-1 align-middle">
+                                        <input type="number" min="0" value="{{pitem.damage_quantity|floatformat}}" class="form-control form-control-sm rounded-0 text-center" name="product_damage_quantity[]" required>
+                                    </td>
+                                    <td class="px-2 py-1 align-middle">
+                                        <input type="hidden" min="0" value="{{pitem.sign|floatformat}}" class="form-control form-control-sm rounded-0 text-center" name="product_sign[]" required>
                                     </td>
                                     <td class="px-2 py-1 align-middle product_total text-end">{{pitem.total_amount|floatformat}}</td>
                                 </tr>
@@ -168,16 +209,289 @@
                     </div>
                 </div>
             </div>
+{% if sale.code %}
+            <div class="card rounded-0 mb-3">
+                <div class="card-header">
+                    <div class="card-title py-1">Damaged Return Item List</div>
+                </div>
+                <div class="card-body">
+                    <div class="container-fluid">
+                        <div class="row align-items-end">
+<!--                            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">-->
+<!--                                <label for="category" class="control-label">Category</label>-->
+<!--                                  <select name="rcategory" id="rcategory" class="form-select form-control-sm rounded-0">-->
+<!--                                      <option value="" disabled selected></option>-->
+<!--                                      {% for item in category %}-->
+<!--                                      <option value="{{item.pk}}">{{item.name}}</option>-->
+<!--                                      {% endfor %}-->
+<!--                                  </select>-->
+<!--                            </div>-->
+                            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                                <label for="products" class="control-label">Products</label>
+                                <select id="rproducts" class="form-control form-control-sm rounded-0">
+                                    <option value="" disabled selected></option>
+                                    {% for product in products %}
+                                    {% if product.available > 0 %}
+                                    <option value="{{product.pk}}" data-buy = "{{product.buy}}" data-price = "{{product.price}}" data-available = "{{product.available}}">{{product.name}}</option>
+                                    {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                                <button class="btn btn-primary btn-sm rounded-0 bg-gradient bg-primary" type="button" id="add_return"><i class="fa fa-plus"></i> Add Return</button>
+                            </div>
+                        </div>
+                        <div class="clear-fix mt-2"></div>
+                        <table class="table table-bordered" id="return_list">
+                            <colgroup>
+                                <col width="5%">
+                                <col width="25%">
+<!--                                <col width="13%">-->
+                                <col width="26%">
+<!--                                <col width="13%">-->
+                                <col width="26%">
+                                <col width="2%">
+                                <col width="2%">
+                                <col width="2%">
+                                <col width="2%">
+                                <col width="10%">
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th class="p-1 text-center"></th>
+                                    <th class="p-1 text-center">Product Name</th>
+<!--                                    <th class="p-1 text-center">Buy Price</th>-->
+                                    <th class="p-1 text-center">Unit Price</th>
+<!--                                    <th class="p-1 text-center">Available</th>-->
+                                    <th class="p-1 text-center">Quantity</th>
+                                    <th class="p-1 text-center"></th>
+                                    <th class="p-1 text-center"></th>
+                                    <th class="p-1 text-center"></th>
+                                    <th class="p-1 text-center"></th>
+                                    <th class="p-1 text-center">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for pitem in ritems %}
+                                <tr>
+                                    <td class="px-2 py-1 align-middle text-center">
+                                        <input type="hidden" name="return_id[]" value="{{pitem.product.id}}">
+                                        <input type="hidden" name="return_buy[]" value="{{pitem.buy}}">
+
+                                        <button class="btn btn-outline-danger btn-sm rounded-0 rem-return" type="button"><i class="fa fa-times"></i></button>
+                                    </td>
+                                    <td class="px-2 py-1 align-middle product_type">{{pitem.product.name}}</td>
+<!--                                    <td class="px-2 py-1 align-middle text-end product_buy">{{pitem.buy|floatformat}}</td>-->
+                                    <td class="px-2 py-1 align-middle text-end">
+                                        <input type="number" name="return_price[]" value="{{pitem.price}}">
+                                    </td>
+<!--                                    <td class="px-2 py-1 align-middle text-end  product_available">{{pitem.available}}</td>-->
+                                    <td class="px-2 py-1 align-middle">
+                                        <input type="number" min="1" value="{{pitem.quantity|floatformat}}" class="form-control form-control-sm rounded-0 text-center" name="return_quantity[]" required>
+                                    </td>
+                                    <td class="px-2 py-1 align-middle">
+                                        <input type="hidden" min="0" value="{{pitem.free_quantity|floatformat}}" class="form-control form-control-sm rounded-0 text-center" name="return_free_quantity[]" required>
+                                    </td>
+                                    <td class="px-2 py-1 align-middle">
+                                        <input type="hidden" min="0" value="{{pitem.good_quantity|floatformat}}" class="form-control form-control-sm rounded-0 text-center" name="return_good_quantity[]" required>
+                                    </td>
+                                    <td class="px-2 py-1 align-middle">
+                                        <input type="hidden" min="0" value="{{pitem.damage_quantity|floatformat}}" class="form-control form-control-sm rounded-0 text-center" name="return_damage_quantity[]" required>
+                                    </td>
+                                    <td class="px-2 py-1 align-middle">
+                                        <input type="hidden" min="0" value="{{pitem.sign|floatformat}}" class="form-control form-control-sm rounded-0 text-center" name="return_sign[]" required>
+                                    </td>
+                                    <td class="px-2 py-1 align-middle product_total text-end">{{pitem.total_amount|floatformat}}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th class="text-center" colspan="5">Total</th>
+                                    <th class="text-end sub-total-return">0.00</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card rounded-0 mb-3">
+                <div class="card-header">
+                    <div class="card-title py-1">Client Dues List</div>
+                </div>
+                <div class="card-body">
+                    <div class="container-fluid">
+                        <div class="row align-items-end">
+                            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                                <label for="prices" class="control-label">Client</label>
+                                <select id="prices" class="form-control form-control-sm rounded-0">
+                                    <option value="" disabled selected></option>
+                                    {% for price in prices %}
+                                    <option value="{{price.pk}}" data-price = "{{price.due}}">{{price.name}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                <button class="btn btn-primary btn-sm rounded-0 bg-gradient bg-primary" type="button" id="add_laundry"><i class="fa fa-plus"></i> Add Client</button>
+                            </div>
+                        </div>
+                        <div class="clear-fix mt-2"></div>
+                        <table class="table table-bordered" id="laundry_list">
+                            <colgroup>
+                                <col width="5%">
+                                <col width="20%">
+                                <col width="22%">
+                                <col width="22%">
+                                <col width="11%">
+                                <col width="10%">
+                                <col width="10%">
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th class="p-1 text-center"></th>
+                                    <th class="p-1 text-center">Client Name</th>
+                                    <th class="p-1 text-center">Brand Name</th>
+                                    <th class="p-1 text-center">Note</th>
+                                    <th class="p-1 text-center">Dues</th>
+                                    <th class="p-1 text-center">Paid</th>
+                                    <th class="p-1 text-center">Balance</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in items %}
+                                <tr>
+                                    <td class="px-2 py-1 align-middle text-center">
+                                        <input type="hidden" name="price_id[]" value="{{item.client.id}}">
+<!--                                        <input type="hidden" name="laundry_price[]" value="{{item.due}}">-->
+                                        <button class="btn btn-outline-danger btn-sm rounded-0 rem-laundry" type="button"><i class="fa fa-times"></i></button>
+                                    </td>
+                                    <td class="px-2 py-1 align-middle laundry_type">{{item.client.name}}</td>
+                                    <td class="px-2 py-1 align-middle text-start">
+                                       <select name="laundry_brand[]" class="form-select form-control-sm rounded-0" required>
+                                            {% if item.brand %}
+                                            <option selected value="{{item.brand}}">{{item.brand}}</option>
+                                            {% endif %}
+                                            {% for item in brands %}
+                                            <option value="{{item.name}}">{{item.name}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </td>
+                                    <td class="px-2 py-1 align-middle">
+                                        <input type="text" class="form-control form-control-sm rounded-0 text-center" name="laundry_note[]" value="{{item.note}}">
+                                    </td>
+                                    <td class="px-2 py-1 align-middle">
+                                        <input type="number" min="0"  step="any" class="form-control form-control-sm rounded-0 text-center" name="laundry_price[]" value="{{item.due|floatformat}}" required>
+                                    </td>
+                                    <td class="px-2 py-1 align-middle">
+                                        <input type="number" min="0"  step="any" class="form-control form-control-sm rounded-0 text-center" name="laundry_weight[]" value="{{item.paid|floatformat}}" required>
+                                    </td>
+                                    <td class="px-2 py-1 align-middle laundry_total text-end">{{item.balance|floatformat}}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th class="text-center" colspan="4">Total</th>
+                                    <th class="text-end sub-total-laundry">0.00</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+{% endif %}
+            <div class="card rounded-0 mb-3">
+                <div class="card-header">
+                    <div class="card-title py-1">Brand Commission List</div>
+                </div>
+                <div class="card-body">
+                    <div class="container-fluid">
+                        <div class="row align-items-end">
+                            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                                <label for="brands" class="control-label">Brand</label>
+                                <select id="brands" class="form-control form-control-sm rounded-0">
+                                    <option value="" disabled selected></option>
+                                    {% for brand in brands %}
+                                    <option value="{{brand.pk}}" data-price = "{{brand.commission}}">{{brand.name}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                <button class="btn btn-primary btn-sm rounded-0 bg-gradient bg-primary" type="button" id="add_brand"><i class="fa fa-plus"></i> Add Brand</button>
+                            </div>
+                        </div>
+                        <div class="clear-fix mt-2"></div>
+                        <table class="table table-bordered" id="brand_list">
+                            <colgroup>
+                                <col width="5%">
+                                <col width="40%">
+                                <col width="30%">
+<!--                                <col width="15%">-->
+                                <col width="35%">
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th class="p-1 text-center"></th>
+                                    <th class="p-1 text-center">Brand Name</th>
+                                    <th class="p-1 text-center">Commission</th>
+<!--                                    <th class="p-1 text-center">Paid</th>-->
+                                    <th class="p-1 text-center">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in bitems %}
+                                <tr>
+                                    <td class="px-2 py-1 align-middle text-center">
+                                        <input type="hidden" name="brand_id[]" value="{{item.brand.id}}">
+                                        <button class="btn btn-outline-danger btn-sm rounded-0 rem-brand" type="button"><i class="fa fa-times"></i></button>
+                                    </td>
+                                    <td class="px-2 py-1 align-middle brand_type">{{item.brand.name}}</td>
+                                    <td class="px-2 py-1 align-middle">
+                                        <input type="number" min="0"  step="any" class="form-control form-control-sm rounded-0 text-center" name="brand_price[]" value="{{item.commission|floatformat}}" required>
+                                    </td>
+                                    <td class="px-2 py-1 align-middle brand_total text-end">{{item.total_amount|floatformat}}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th class="text-center" colspan="3">Total</th>
+                                    <th class="text-end sub-total-brand">0.00</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
             <div class="card rounded-0 mb-3">
                 <div class="card-body">
+<!--                    <div class="d-flex w-100 justify-content-end align-items-center">-->
+<!--                        <div class="col-auto">-->
+<!--                            <h4 class="fw-bolder text-muted pe-2">Grand Total:</h4>-->
+<!--                        </div>-->
+<!--                        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 text-end">-->
+<!--                            <h4 class="fw-bolder pe-2 gtotal">{% if sale.total_amount %}{{sale.total_amount|floatformat:2|intcomma}}{% else %}0.00{% endif %}</h4>-->
+<!--                        </div>-->
+<!--                    </div>-->
                     <div class="d-flex w-100 justify-content-end align-items-center">
                         <div class="col-auto">
-                            <h4 class="fw-bolder text-muted pe-2">Grand Total:</h4>
+                            <h4 class="fw-bolder text-muted pe-2">Extra Amount:</h4>
                         </div>
                         <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 text-end">
-                            <h4 class="fw-bolder pe-2 gtotal">{% if sale.total_amount %}{{sale.total_amount|floatformat:2|intcomma}}{% else %}0.00{% endif %}</h4>
+                            <input type="number" step="any" class="form-control form-control-lg rounded-0 text-end" id="extra_amount" name="extra" value="{% if sale.extra %}{{sale.extra|floatformat:2}}{% else %}0{% endif %}" required>
                         </div>
                     </div>
+                    <div class="d-flex w-100 justify-content-end align-items-center">
+                        <div class="col-auto">
+                            <h4 class="fw-bolder text-muted pe-2">Cost Amount:</h4>
+                        </div>
+                        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 text-end">
+                            <input type="number" step="any" class="form-control form-control-lg rounded-0 text-end" id="cost_amount" name="cost" value="{% if sale.cost %}{{sale.cost|floatformat:2}}{% else %}0{% endif %}" required>
+                        </div>
+                    </div>
+
                     <div class="d-flex w-100 justify-content-end align-items-center">
                         <div class="col-auto">
                             <h4 class="fw-bolder text-muted pe-2">Paid Amount:</h4>
@@ -188,34 +502,72 @@
                     </div>
                     <div class="d-flex w-100 justify-content-end align-items-center">
                         <div class="col-auto">
-                            <h4 class="fw-bolder text-muted pe-2">Due Amount:</h4>
+                            <h4 class="fw-bolder text-muted pe-2">Grand Total:</h4>
                         </div>
                         <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 text-end">
-                            <h4 class="fw-bolder pe-2 " id="change">{% if sale.change %}{{sale.change|floatformat:2|intcomma}}{% else %}0.00{% endif %}</h4>
+                            <h4 class="fw-bolder pe-2 gtotal">{% if sale.total_amount %}{{sale.total_amount|floatformat:2|intcomma}}{% else %}0.00{% endif %}</h4>
                         </div>
                     </div>
+
+<!--                    <div class="d-flex w-100 justify-content-end align-items-center">-->
+<!--                        <div class="col-auto">-->
+<!--                            <h4 class="fw-bolder text-muted pe-2">Due Amount:</h4>-->
+<!--                        </div>-->
+<!--                        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 text-end">-->
+<!--                            <h4 class="fw-bolder pe-2 change" id="change">{% if sale.short %}{{sale.short|floatformat:2|intcomma}}{% else %}0.00{% endif %}</h4>-->
+<!--                        </div>-->
+<!--                    </div>-->
                 </div>
                 <div class="card-footer py-1 text-center">
                     <button class="btn btn-primary btn-sm rounded-0" type="button" id="pay_later">Pay Later</button>
-                    <button class="btn btn-success btn-sm rounded-0" id="laundry-submit-btn" form="laundry-form"><i class="fa fa-save"></i> Pay</button>
+                    <button class="btn btn-success btn-sm rounded-0" id="laundry-submit-btn" form="laundry-form"><i class="fa fa-save"></i> Pay Now</button>
                 </div>
             </div>
         </form>
     </div>
 </section>
 
+<noscript id="laundry-clone">
+    <tr>
+        <td class="px-2 py-1 align-middle text-center">
+            <input type="hidden" name="price_id[]" value="">
+<!--            <input type="hidden" name="laundry_price[]" value="">-->
+            <button class="btn btn-outline-danger btn-sm rounded-0 rem-laundry" type="button"><i class="fa fa-times"></i></button>
+        </td>
+        <td class="px-2 py-1 align-middle laundry_type"></td>
+        <td class="px-2 py-1 align-middle text-start">
+            <select type="text" name="laundry_brand[]" class="form-select form-control-sm rounded-0" required>
+                <option value="" disabled selected>Please Select Brand Here</option>
+                {% for item in brands %}
+                <option value="{{item.name}}">{{item.name}}</option>
+                {% endfor %}
+            </select>
+        </td>
+        <td class="px-2 py-1 align-middle">
+            <input type="text" class="form-control form-control-sm rounded-0 text-center" name="laundry_note[]">
+        </td>
+        <td class="px-2 py-1 align-middle">
+            <input type="number" step="any" min="0" value="0" class="form-control form-control-sm rounded-0 text-center" name="laundry_price[]" required>
+        </td>
+        <td class="px-2 py-1 align-middle">
+            <input type="number" step="any" min="0" value="0" class="form-control form-control-sm rounded-0 text-center" name="laundry_weight[]" required>
+        </td>
+        <td class="px-2 py-1 align-middle laundry_total text-end">0.00</td>
+    </tr>
+</noscript>
+
 <noscript id="product-clone">
     <tr>
         <td class="px-2 py-1 align-middle text-center">
             <input type="hidden" name="product_id[]" value="">
             <input type="hidden" name="product_buy[]" value="">
-
+            <input type="hidden" name="product_brand[]" value="">
             <button class="btn btn-outline-danger btn-sm rounded-0 rem-product" type="button"><i class="fa fa-times"></i></button>
         </td>
         <td class="px-2 py-1 align-middle product_type"></td>
         <td class="px-2 py-1 align-middle text-end product_buy">0.00</td>
         <td class="px-2 py-1 align-middle text-end">
-            <input type="number" name="product_price[]" value="">
+            <input type="number" step="0.01" name="product_price[]" value="">
         </td>
         <td class="px-2 py-1 align-middle text-end product_available"></td>
         <td class="px-2 py-1 align-middle">
@@ -223,6 +575,62 @@
         </td>
         <td class="px-2 py-1 align-middle">
             <input type="number" min="0" value="0" class="form-control form-control-sm rounded-0 text-center" name="product_free_quantity[]" required>
+        </td>
+        <td class="px-2 py-1 align-middle">
+            <input type="number" min="0" value="0" class="form-control form-control-sm rounded-0 text-center" name="product_good_quantity[]" required>
+        </td>
+        <td class="px-2 py-1 align-middle">
+            <input type="number" min="0" value="0" class="form-control form-control-sm rounded-0 text-center" name="product_damage_quantity[]" required>
+        </td>
+        <td class="px-2 py-1 align-middle">
+            <input type="hidden" min="0" value="0" class="form-control form-control-sm rounded-0 text-center" name="product_sign[]" required>
+        </td>
+        <td class="px-2 py-1 align-middle product_total text-end">0.00</td>
+    </tr>
+</noscript>
+
+<noscript id="brand-clone">
+    <tr>
+        <td class="px-2 py-1 align-middle text-center">
+            <input type="hidden" name="brand_id[]" value="">
+            <button class="btn btn-outline-danger btn-sm rounded-0 rem-brand" type="button"><i class="fa fa-times"></i></button>
+        </td>
+        <td class="px-2 py-1 align-middle brand_type"></td>
+        <td class="px-2 py-1 align-middle">
+            <input type="number" step="any" min="0" value="0" class="form-control form-control-sm rounded-0 text-center" name="brand_price[]" required>
+        </td>
+        <td class="px-2 py-1 align-middle brand_total text-end">0.00</td>
+    </tr>
+</noscript>
+
+<noscript id="return-clone">
+    <tr>
+        <td class="px-2 py-1 align-middle text-center">
+            <input type="hidden" name="return_id[]" value="">
+            <input type="hidden" name="return_buy[]" value="">
+
+            <button class="btn btn-outline-danger btn-sm rounded-0 rem-return" type="button"><i class="fa fa-times"></i></button>
+        </td>
+        <td class="px-2 py-1 align-middle product_type"></td>
+<!--        <td class="px-2 py-1 align-middle text-end product_buy">0.00</td>-->
+        <td class="px-2 py-1 align-middle text-end">
+            <input type="number" name="return_price[]" value="">
+        </td>
+<!--        <td class="px-2 py-1 align-middle text-end product_available"></td>-->
+        <td class="px-2 py-1 align-middle">
+            <input type="number" min="1" value="1" class="form-control form-control-sm rounded-0 text-center" name="return_quantity[]" required>
+        </td>
+        <td class="px-2 py-1 align-middle">
+            <input type="hidden" min="0" value="0" class="form-control form-control-sm rounded-0 text-center" name="return_free_quantity[]" required>
+        </td>
+        <td class="px-2 py-1 align-middle">
+            <input type="hidden" min="0" value="0" class="form-control form-control-sm rounded-0 text-center" name="return_good_quantity[]" required>
+        </td>
+        <td class="px-2 py-1 align-middle">
+            <input type="hidden" min="0" value="0" class="form-control form-control-sm rounded-0 text-center" name="return_damage_quantity[]" required>
+        </td>
+        <td class="px-2 py-1 align-middle">
+            <input type="hidden" min="0" value="1" class="form-control form-control-sm rounded-0 text-center" name="return_sign[]" required>
         </td>
         <td class="px-2 py-1 align-middle product_total text-end">0.00</td>
     </tr>
@@ -232,15 +640,17 @@
     function calc_total() {
         var sub_laundry = 0
         var sub_product = 0
+        var sub_return = 0
+        var sub_brand = 0
         var gtotal = 0
         $('#laundry_list tbody tr').each(function() {
             var price = $(this).find('[name="laundry_price[]"]').val()
             var weight = $(this).find('[name="laundry_weight[]"]').val()
             weight = weight > 0 ? weight : 0;
             price = price > 0 ? price : 0;
-            sub_laundry += parseFloat(parseFloat(weight) * parseFloat(price))
-            gtotal += parseFloat(parseFloat(weight) * parseFloat(price))
-            $(this).find('.laundry_total').text(parseFloat(parseFloat(weight) * parseFloat(price)).toLocaleString('en-US'))
+            sub_laundry += parseFloat(parseFloat(weight) - parseFloat(price))
+            gtotal += parseFloat(parseFloat(weight) - parseFloat(price))
+            $(this).find('.laundry_total').text(parseFloat(parseFloat(weight) - parseFloat(price)).toLocaleString('en-US'))
         })
         $('.sub-total-laundry').text(parseFloat(sub_laundry).toLocaleString('en-US', {
             style: 'decimal',
@@ -253,17 +663,71 @@
             var max = $(this).find('[name="product_available[]"]').val()
             var qty = $(this).find('[name="product_quantity[]"]').val()
             var free = $(this).find('[name="product_free_quantity[]"]').val()
+            var good = $(this).find('[name="product_good_quantity[]"]').val()
+            var damage = $(this).find('[name="product_damage_quantity[]"]').val()
+            var sign = $(this).find('[name="product_sign[]"]').val()
             qty = qty > 0 ? qty : 0;
             price = price > 0 ? price : 0;
-            sub_product += parseFloat(parseFloat(qty) * parseFloat(price))
-            gtotal += parseFloat(parseFloat(qty) * parseFloat(price))
-            $(this).find('.product_total').text(parseFloat(parseFloat(qty) * parseFloat(price)).toLocaleString('en-US'))
+            sub_product += parseFloat((parseFloat(qty) - parseFloat(good) - parseFloat(damage)) * parseFloat(price))
+            gtotal += parseFloat((parseFloat(qty) - parseFloat(good) - parseFloat(damage)) * parseFloat(price))
+            $(this).find('.product_total').text(parseFloat((parseFloat(qty) - parseFloat(good) - parseFloat(damage)) * parseFloat(price)).toLocaleString('en-US'))
         })
         $('.sub-total-product').text(parseFloat(sub_product).toLocaleString('en-US', {
             style: 'decimal',
             maximumFractionDigits: 2,
             minimumFractionDigits: 2
         }))
+        $('#return_list tbody tr').each(function() {
+            var buy = $(this).find('[name="return_buy[]"]').val()
+            var price = $(this).find('[name="return_price[]"]').val()
+            var max = $(this).find('[name="product_available[]"]').val()
+            var qty = $(this).find('[name="return_quantity[]"]').val()
+            var free = $(this).find('[name="return_free_quantity[]"]').val()
+            var good = $(this).find('[name="return_good_quantity[]"]').val()
+            var damage = $(this).find('[name="return_damage_quantity[]"]').val()
+            var sign = $(this).find('[name="return_sign[]"]').val()
+            qty = qty > 0 ? qty : 0;
+            price = price > 0 ? price : 0;
+            sub_return += parseFloat(parseFloat(qty) * parseFloat(-price))
+            gtotal += parseFloat(parseFloat(qty) * parseFloat(-price))
+            $(this).find('.product_total').text(parseFloat(parseFloat(qty) * parseFloat(-price)).toLocaleString('en-US'))
+        })
+        $('.sub-total-return').text(parseFloat(sub_return).toLocaleString('en-US', {
+            style: 'decimal',
+            maximumFractionDigits: 2,
+            minimumFractionDigits: 2
+        }))
+        $('#brand_list tbody tr').each(function() {
+            var price = $(this).find('[name="brand_price[]"]').val()
+            price = price > 0 ? price : 0;
+            sub_brand += parseFloat(parseFloat(-price))
+            gtotal += parseFloat(parseFloat(-price))
+            $(this).find('.brand_total').text(parseFloat(parseFloat(-price)).toLocaleString('en-US'))
+        })
+        $('.sub-total-brand').text(parseFloat(sub_brand).toLocaleString('en-US', {
+            style: 'decimal',
+            maximumFractionDigits: 2,
+            minimumFractionDigits: 2
+        }))
+        $('#extra_amount').on('change input', function() {
+            var extra = $(this).val()
+            var total = $('[name="total_amount"]').val()
+            var cost = $('[name="cost"]').val()
+            extra = extra > 0 ? extra : 0;
+            total = total > 0 ? total : 0;
+            gtotal += parseFloat(parseFloat(total) - parseFloat(cost) + parseFloat(extra))
+
+            $('.change').text(parseFloat(gtotal).toLocaleString('en-US', {
+                style: 'decimal',
+                maximumFractionDigits: 2,
+                minimumFractionDigits: 2
+            }))
+
+        })
+        extra = $('[name="extra"]').val()
+        var extra_amount = parseFloat(extra);
+        $('#extra_amount').text(parseFloat(extra_amount).toLocaleString('en-US'))
+
         $('[name="total_amount"]').val(gtotal)
         $('.gtotal').text(parseFloat(gtotal).toLocaleString('en-US', {
             style: 'decimal',
@@ -280,7 +744,7 @@
             selectionCssClass: "form-control form-control-sm rounded-0"
         })
         $('#category').select2({
-            placeholder: "Please Select Road Name Here",
+            placeholder: "Please Select Brand Here",
             width: "100%",
             selectionCssClass: "form-control form-control-sm rounded-0"
         })
@@ -299,6 +763,61 @@
             width: "100%",
             selectionCssClass: "form-control form-control-sm rounded-0"
         })
+        $('#rproducts').select2({
+            placeholder: "Please Select Products Here",
+            width: "100%",
+            selectionCssClass: "form-control form-control-sm rounded-0"
+        })
+        $('#rcategory').select2({
+            placeholder: "Please Select Category Here",
+            width: "100%",
+            selectionCssClass: "form-control form-control-sm rounded-0"
+        })
+        $('#prices').select2({
+            placeholder: "Please Select Client Here",
+            width: "100%",
+            selectionCssClass: "form-control form-control-sm rounded-0"
+        })
+        $('#brands').select2({
+            placeholder: "Please Select Brand Here",
+            width: "100%",
+            selectionCssClass: "form-control form-control-sm rounded-0"
+        })
+
+        $('#add_laundry').click(function() {
+            var pid = $('#prices').val()
+            if (pid < '1') {
+                return false
+            }
+            var price = $('#prices option[value="' + pid + '"]').attr('data-price')
+            var laundry_type = $('#prices option[value="' + pid + '"]').text()
+            var tr = $($('noscript#laundry-clone').html()).clone()
+            tr.find('.laundry_type').text(laundry_type)
+            tr.find('.laundry_price').text(parseFloat(price).toLocaleString('en-US'))
+            tr.find('.laundry_total').text(parseFloat(price).toLocaleString('en-US'))
+            tr.find('[name="price_id[]"]').val(pid)
+            tr.find('[name="laundry_brand[]"]').val()
+            tr.find('[name="laundry_note[]"]').val()
+            tr.find('[name="laundry_price[]"]').val(price)
+            $('#laundry_list tbody').append(tr)
+            calc_total()
+            $('#prices').val('').trigger('change')
+            tr.find('[name="laundry_weight[]"]').on('input change', function() {
+                calc_total()
+            })
+            calc_total()
+            $('#prices').val('').trigger('change')
+            tr.find('[name="laundry_price[]"]').on('input change', function() {
+                calc_total()
+            })
+
+            tr.find('.rem-laundry').click(function() {
+                if (confirm("Are you sure to remove this item?") == true) {
+                    tr.remove()
+                    calc_total()
+                }
+            })
+        })
 
 
         $('#add_product').click(function() {
@@ -306,6 +825,7 @@
             if (pid < '1') {
                 return false
             }
+            var brand = $('#products option[value="' + pid + '"]').attr('data-brand')
             var buy = $('#products option[value="' + pid + '"]').attr('data-buy')
             var price = $('#products option[value="' + pid + '"]').attr('data-price')
             var max = $('#products option[value="' + pid + '"]').attr('data-available')
@@ -317,11 +837,15 @@
             tr.find('.product_total').text(parseFloat(price).toLocaleString('en-US'))
             tr.find('.product_available').text(parseFloat(max).toLocaleString('en-US'))
             tr.find('[name="product_id[]"]').val(pid)
+            tr.find('[name="product_brand[]"]').val(brand)
             tr.find('[name="product_buy[]"]').val(buy)
             tr.find('[name="product_price[]"]').val(price)
             tr.find('[name="product_available[]"]').val(max)
             tr.find('[name="product_quantity[]"]').attr('max', max)
             tr.find('[name="product_free_quantity[]"]').attr('max', max)
+            tr.find('[name="product_good_quantity[]"]').val()
+            tr.find('[name="product_damage_quantity[]"]').val()
+            tr.find('[name="product_sign[]"]').attr('max', max)
             $('#product_list tbody').append(tr)
             calc_total()
             $('#products').val('').trigger('change')
@@ -333,6 +857,16 @@
             tr.find('[name="product_price[]"]').on('input change', function() {
                 calc_total()
             })
+            calc_total()
+            $('#products').val('').trigger('change')
+            tr.find('[name="product_good_quantity[]"]').on('input change', function() {
+                calc_total()
+            })
+            calc_total()
+            $('#products').val('').trigger('change')
+            tr.find('[name="product_damage_quantity[]"]').on('input change', function() {
+                calc_total()
+            })
             tr.find('.rem-product').click(function() {
                 if (confirm("Are you sure to remove this item?") == true) {
                     tr.remove()
@@ -340,6 +874,75 @@
                 }
             })
         })
+        $('#add_return').click(function() {
+            var pid = $('#rproducts').val()
+            if (pid < '1') {
+                return false
+            }
+            var buy = $('#rproducts option[value="' + pid + '"]').attr('data-buy')
+            var price = $('#rproducts option[value="' + pid + '"]').attr('data-price')
+            var max = $('#rproducts option[value="' + pid + '"]').attr('data-available')
+            var product_name = $('#rproducts option[value="' + pid + '"]').text()
+            var tr = $($('noscript#return-clone').html()).clone()
+            tr.find('.product_type').text(product_name)
+            tr.find('.product_buy').text(parseFloat(buy).toLocaleString('en-US'))
+            tr.find('.product_price').text(parseFloat(price).toLocaleString('en-US'))
+            tr.find('.product_total').text(parseFloat(price).toLocaleString('en-US'))
+            tr.find('.product_available').text(parseFloat(max).toLocaleString('en-US'))
+            tr.find('[name="return_id[]"]').val(pid)
+            tr.find('[name="return_buy[]"]').val(buy)
+            tr.find('[name="return_price[]"]').val(price)
+            tr.find('[name="product_available[]"]').val(max)
+            tr.find('[name="return_quantity[]"]').attr('max', max)
+            tr.find('[name="return_free_quantity[]"]').attr('max', max)
+            tr.find('[name="return_good_quantity[]"]').val()
+            tr.find('[name="return_damage_quantity[]"]').val()
+            tr.find('[name="return_sign[]"]').attr('max', max)
+            $('#return_list tbody').append(tr)
+            calc_total()
+            $('#rproducts').val('').trigger('change')
+            tr.find('[name="return_quantity[]"]').on('input change', function() {
+                calc_total()
+            })
+            calc_total()
+            $('#rproducts').val('').trigger('change')
+            tr.find('[name="return_price[]"]').on('input change', function() {
+                calc_total()
+            })
+            tr.find('.rem-return').click(function() {
+                if (confirm("Are you sure to remove this item?") == true) {
+                    tr.remove()
+                    calc_total()
+                }
+            })
+        })
+        $('#add_brand').click(function() {
+            var pid = $('#brands').val()
+            if (pid < '1') {
+                return false
+            }
+            var price = $('#brands option[value="' + pid + '"]').attr('data-price')
+            var brand_type = $('#brands option[value="' + pid + '"]').text()
+            var tr = $($('noscript#brand-clone').html()).clone()
+            tr.find('.brand_type').text(brand_type)
+            tr.find('.brand_price').text(parseFloat(price).toLocaleString('en-US'))
+            tr.find('.brand_total').text(parseFloat(price).toLocaleString('en-US'))
+            tr.find('[name="brand_id[]"]').val(pid)
+            tr.find('[name="brand_price[]"]').val(price)
+            $('#brand_list tbody').append(tr)
+            calc_total()
+            $('#brands').val('').trigger('change')
+            tr.find('[name="brand_price[]"]').on('input change', function() {
+                calc_total()
+            })
+            tr.find('.rem-brand').click(function() {
+                if (confirm("Are you sure to remove this item?") == true) {
+                    tr.remove()
+                    calc_total()
+                }
+            })
+        })
+
         $('#laundry-form').submit(function(e) {
             e.preventDefault();
             var _this = $(this)
@@ -399,17 +1002,19 @@
     // this one is for fetching product data
     $("#category").change(function () {
       var url = $("#laundry-form").attr("data-product-url");  // get the url of the `load_product` view
-      var categoryId = $(this).val();  // get the selected country ID from the HTML input
+      var brandId = $(this).val();  // get the selected category ID from the HTML input
 
       $.ajax({                       // initialize an AJAX request
         url: '{% url 'ajax_load_product' %}',                    // set the url of the request (= localhost:8000/hr/ajax/load-cities/)
         data: {
-          'category': categoryId       // add the category id to the GET parameters
+          'brand': brandId       // add the category id to the GET parameters
         },
         success: function (data) {   // `data` is the return of the `load_cities` view function
           $("#products").html(data);  // replace the contents of the city input with the data that came from the server
         }
       });
+
+
 
       $('#tendered_amount').on('change input', function() {
             var tender = $(this).val()
@@ -418,6 +1023,34 @@
             total = total > 0 ? total : 0;
             change = parseFloat(total) - parseFloat(tender)
             $('#change').text(parseFloat(change).toLocaleString('en-US', {
+                style: 'decimal',
+                maximumFractionDigits: 2,
+                minimumFractionDigits: 2
+            }))
+
+        })
+        $('#cost_amount').on('change input', function() {
+            var cost = $(this).val()
+            var total = $('[name="total_amount"]').val()
+            var extra = $('[name="extra"]').val()
+            cost = cost > 0 ? cost : 0;
+            total = total > 0 ? total : 0;
+            change = parseFloat(total) - parseFloat(cost) + parseFloat(extra)
+            $('.gtotal').text(parseFloat(change).toLocaleString('en-US', {
+                style: 'decimal',
+                maximumFractionDigits: 2,
+                minimumFractionDigits: 2
+            }))
+
+        })
+        $('#extra_amount').on('change input', function() {
+            var extra = $(this).val()
+            var total = $('[name="total_amount"]').val()
+            var cost = $('[name="cost"]').val()
+            extra = extra > 0 ? extra : 0;
+            total = total > 0 ? total : 0;
+            change = parseFloat(total) - parseFloat(cost) + parseFloat(extra)
+            $('.gtotal').text(parseFloat(change).toLocaleString('en-US', {
                 style: 'decimal',
                 maximumFractionDigits: 2,
                 minimumFractionDigits: 2
@@ -443,12 +1076,57 @@
         $('#product_list tbody').find('[name="product_quantity[]"]').on('input change', function() {
             calc_total()
         })
+        $('#product_list tbody').find('[name="product_good_quantity[]"]').on('input change', function() {
+            calc_total()
+        })
+        $('#product_list tbody').find('[name="product_damage_quantity[]"]').on('input change', function() {
+            calc_total()
+        })
         $('#product_list tbody').find('.rem-product').click(function() {
             if (confirm("Are you sure to remove this item?") == true) {
                 $(this).closest('tr').remove()
                 calc_total()
             }
         })
+
+        $('#return_list tbody').find('[name="return_price[]"]').on('input change', function() {
+            calc_total()
+        })
+        $('#return_list tbody').find('.rem-return').click(function() {
+            if (confirm("Are you sure to remove this item?") == true) {
+                $(this).closest('tr').remove()
+                calc_total()
+            }
+        })
+        $('#return_list tbody').find('[name="return_quantity[]"]').on('input change', function() {
+            calc_total()
+        })
+
+        $('#laundry_list tbody').find('[name="laundry_price[]"]').on('input change', function() {
+            calc_total()
+        })
+
+        $('#laundry_list tbody').find('[name="laundry_weight[]"]').on('input change', function() {
+            calc_total()
+        })
+
+        $('#brand').select2({
+            placeholder: "Please Select Brand Here",
+            width: "100%",
+            selectionCssClass: "form-control form-control-sm rounded-0"
+            })
+
+        $('#brand_list tbody').find('[name="brand_price[]"]').on('input change', function() {
+            calc_total()
+        })
+
+        $('#brand_list tbody').find('.rem-brand').click(function() {
+            if (confirm("Are you sure to remove this item?") == true) {
+                $(this).closest('tr').remove()
+                calc_total()
+            }
+        })
+
 
 
 
