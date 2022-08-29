@@ -898,6 +898,22 @@ def save_employee(request):
 
 
 @login_required
+def view_employee(request, pk=None):
+    context = context_data(request)
+    context['page'] = 'view_employee'
+    context['page_title'] = 'View Employee'
+    if pk is None:
+        context['employee'] = {}
+        #context['loan'] = {}
+    else:
+        context['employee'] = models.Employee.objects.get(id=pk)
+        #context['loan'] = models.Loan.objects.filter(loan__id=pk)
+        #context['stockouts'] = models.SaleProducts.objects.filter(product__id=pk).order_by('sale__code')
+
+    return render(request, 'view_employee.html', context)
+
+
+@login_required
 def delete_employee(request, pk=None):
     resp = {'status': 'failed', 'msg': ''}
     if pk is None:
@@ -1764,6 +1780,97 @@ def free_report(request):
 
     return render(request, 'free_report.html', context)
 
+
+@login_required
+def loan(request):
+    context = context_data(request)
+    context['page'] = 'loan'
+    context['page_title'] = "Loan List"
+    context['loan'] = models.Loan.objects.order_by('-date_added').all()
+    return render(request, 'loan.html', context)
+
+
+@login_required
+def manage_loan(request, pk=None):
+    context = context_data(request)
+    context['page'] = 'manage_loan'
+    context['page_title'] = 'Manage Loan'
+    context['employee'] = models.Employee.objects.filter(delete_flag=0, status=1).all()
+    context['debit'] = models.Debit.objects.filter(delete_flag=0).all()
+    context['credit'] = models.Credit.objects.filter(delete_flag=0).all()
+    if pk is None:
+        context['loan'] = {}
+        context['items'] = {}
+        context['pitems'] = {}
+    else:
+        context['loan'] = models.Loan.objects.get(id=pk)
+        context['items'] = models.LoanDebit.objects.filter(loan__id=pk).all()
+        context['pitems'] = models.LoanCredit.objects.filter(loan__id=pk).all()
+
+    return render(request, 'manage_loan.html', context)
+
+
+@login_required
+def save_loan(request):
+    resp = {'status': 'failed', 'msg': ''}
+    if request.method == 'POST':
+        post = request.POST
+        if not post['id'] == '':
+            loan = models.Loan.objects.get(id=post['id'])
+            form = forms.SaveLoan(request.POST, instance=loan)
+        else:
+            form = forms.SaveLoan(request.POST)
+
+        if form.is_valid():
+            form.save()
+            if post['id'] == '':
+                messages.success(request, "Loan Entry has been saved successfully.")
+            else:
+                messages.success(request, "Loan Entry has been updated successfully.")
+            resp['status'] = 'success'
+        else:
+            for field in form:
+                for error in field.errors:
+                    if not resp['msg'] == '':
+                        resp['msg'] += str('<br/>')
+                    resp['msg'] += str(f'[{field.name}] {error}')
+    else:
+        resp['msg'] = "There's no data sent on the request"
+
+    return HttpResponse(json.dumps(resp), content_type="application/json")
+
+
+@login_required
+def view_loan(request, pk=None):
+    context = context_data(request)
+    context['page'] = 'view_loan'
+    context['page_title'] = 'View Loan'
+    if pk is None:
+        context['loan'] = {}
+        context['items'] = {}
+        context['pitems'] = {}
+    else:
+        context['loan'] = models.Loan.objects.get(id=pk)
+        context['items'] = models.LoanDebit.objects.filter(loan__id=pk).all()
+        context['pitems'] = models.LoanCredit.objects.filter(loan__id=pk).all()
+
+    return render(request, 'view_loan.html', context)
+
+
+@login_required
+def delete_loan(request, pk=None):
+    resp = {'status': 'failed', 'msg': ''}
+    if pk is None:
+        resp['msg'] = 'Loan ID is invalid'
+    else:
+        try:
+            models.Loan.objects.filter(pk=pk).delete()
+            messages.success(request, "Loan Entry Details has been deleted successfully.")
+            resp['status'] = 'success'
+        except:
+            resp['msg'] = "Deleting Loan Info Failed"
+
+    return HttpResponse(json.dumps(resp), content_type="application/json")
 
 
 
