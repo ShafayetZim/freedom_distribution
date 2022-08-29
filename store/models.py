@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils import timezone
 from django.db.models import Sum
+from datetime import date
+
 
 # Create your models here.
 class Employee(models.Model):
@@ -50,23 +52,8 @@ class Client(models.Model):
         return str(f"{self.name}")
 
 
-class Category(models.Model):
-    name = models.CharField(max_length=250)
-    status = models.CharField(max_length=2, choices=(('1','Active'), ('2','Inactive')), default = 1)
-    delete_flag = models.IntegerField(default = 0)
-    date_added = models.DateTimeField(default = timezone.now)
-    date_updated = models.DateTimeField(auto_now = True)
-
-    class Meta:
-        verbose_name_plural = "List of Category"
-
-    def __str__(self):
-        return str(f"{self.name}")
-
-
 class Brand(models.Model):
     name = models.CharField(max_length=250)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, )
     delete_flag = models.IntegerField(default=0)
     date_added = models.DateTimeField(default=timezone.now)
     date_updated = models.DateTimeField(auto_now=True)
@@ -80,10 +67,12 @@ class Brand(models.Model):
 
 class Products(models.Model):
     name = models.CharField(max_length=250)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True, blank=True)
+    code = models.CharField(max_length=250, default=0)
+    brand = models.ForeignKey(Brand, on_delete=models.CASCADE, null=True, blank=True)
     description = models.TextField(blank= True, null= True)
     buy = models.FloatField(max_length=15, default=0)
     price = models.FloatField(max_length=15, default=0)
+    mrp = models.FloatField(max_length=15, default=0)
     status = models.CharField(max_length=2, choices=(('1','Active'), ('2','Inactive')), default = 1)
     delete_flag = models.IntegerField(default = 0)
     date_added = models.DateTimeField(default = timezone.now)
@@ -111,11 +100,41 @@ class Products(models.Model):
             free = free['free_quantity__sum']
         except:
             free = 0
+        try:
+            good = SaleProducts.objects.filter(product__id = self.id).aggregate(Sum('good_quantity'))
+            good = good['good_quantity__sum']
+        except:
+            good = 0
+
         stockin = stockin if not stockin is None else 0
         stockout = stockout if not stockout is None else 0
         free = free if not free is None else 0
-        
-        return float(stockin - stockout - free)
+        good = good if not good is None else 0
+
+        return float(stockin + good - stockout - free)
+
+    def damage(self):
+        try:
+            damage = SaleProducts.objects.filter(product__id = self.id).aggregate(Sum('damage_quantity'))
+            damage = damage['damage_quantity__sum']
+        except:
+            damage = 0
+        try:
+            restore = SaleReturn.objects.filter(product__id = self.id).aggregate(Sum('quantity'))
+            restore = restore['quantity__sum']
+        except:
+            restore = 0
+        try:
+            out = DamageProduct.objects.filter(product__id = self.id).aggregate(Sum('quantity'))
+            out = out['quantity__sum']
+        except:
+            out = 0
+
+        damage = damage if not damage is None else 0
+        restore = restore if not restore is None else 0
+        out = out if not out is None else 0
+
+        return float(damage + restore - out)
 
 
 class StockIn(models.Model):
@@ -138,13 +157,16 @@ class Sales(models.Model):
     road = models.ForeignKey(Road, on_delete=models.CASCADE, null=True, blank=True, related_name='road_fk')
     salesman = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True, blank=True, related_name='deliveryman_fk')
     deliveryman = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True, blank=True, related_name='salesman_fk')
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name="category_fk")
+    brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, null=True, related_name="brand_fk")
     total_amount = models.FloatField(max_length=15)
     tendered = models.FloatField(max_length=15)
+    cost = models.FloatField(max_length=15, default=0)
+    extra = models.FloatField(max_length=15, default=0)
     status = models.CharField(max_length=2, choices=(('0','Pending'), ('1', 'In-progress'), ('2', 'Done'), ('3', 'Picked Up')), default = 0)
     payment = models.CharField(max_length=2, choices=(('0','Unpaid'), ('1', 'Paid')), default = 0)
     date_added = models.DateTimeField(default = timezone.now)
     date_updated = models.DateTimeField(auto_now = True)
+    date = models.DateField(default=date.today)
 
     class Meta:
         verbose_name_plural = "List of Sales"
@@ -155,6 +177,10 @@ class Sales(models.Model):
     def change(self):
         change = float(self.total_amount) - float(self.tendered)
         return change
+
+    def short(self):
+        short = float(self.total_amount) + float(self.extra) - float(self.cost)
+        return short
         
     def totalProducts(self):
         try:
@@ -164,21 +190,99 @@ class Sales(models.Model):
             Products = 0
         return float(Products)
 
+    def totalItems(self):
+        try:
+            Items = SaleDue.objects.filter(sale = self).aggregate(Sum('balance'))
+            Items = Items['balance__sum']
+        except:
+            Items = 0
+        return float(Items)
+
+    def totalReturns(self):
+        try:
+            Returns = SaleReturn.objects.filter(sale = self).aggregate(Sum('total_amount'))
+            Returns = Returns['total_amount__sum']
+        except:
+            Returns = 0
+        return float(Returns)
+
+    def totalCommissions(self):
+        try:
+            Commissions = SaleCommission.objects.filter(sale = self).aggregate(Sum('total_amount'))
+            Commissions = Commissions['total_amount__sum']
+        except:
+            Commissions = 0
+        return float(Commissions)
+
 
 class SaleProducts(models.Model):
     sale = models.ForeignKey(Sales, on_delete=models.CASCADE,related_name="sale_fk2")
     product = models.ForeignKey(Products, on_delete=models.CASCADE,related_name="product_fk")
+    brand = models.CharField(max_length=100, null=True)
     buy = models.FloatField(max_length=15, default=0)
     price = models.FloatField(max_length=15, default=0)
     quantity = models.FloatField(max_length=15, default=0)
     free_quantity = models.FloatField(max_length=15, default=0)
+    good_quantity = models.FloatField(max_length=15, default=0)
+    damage_quantity = models.FloatField(max_length=15, default=0)
+    sign = models.FloatField(max_length=15, default=0)
     total_amount = models.FloatField(max_length=15)
+    date = models.DateField(default=date.today)
 
     class Meta:
         verbose_name_plural = "List of Sale Products"
 
     def __str__(self):
         return str(f"{self.sale.code} - {self.product.name}")
+
+
+class SaleReturn(models.Model):
+    sale = models.ForeignKey(Sales, on_delete=models.CASCADE,related_name="sale_fk3")
+    product = models.ForeignKey(Products, on_delete=models.CASCADE,related_name="product_fk2")
+    buy = models.FloatField(max_length=15, default=0)
+    price = models.FloatField(max_length=15, default=0)
+    quantity = models.FloatField(max_length=15, default=0)
+    free_quantity = models.FloatField(max_length=15, default=0)
+    good_quantity = models.FloatField(max_length=15, default=0)
+    damage_quantity = models.FloatField(max_length=15, default=0)
+    sign = models.FloatField(max_length=15, default=0)
+    total_amount = models.FloatField(max_length=15)
+
+    class Meta:
+        verbose_name_plural = "List of Sale Returns"
+
+    def __str__(self):
+        return str(f"{self.sale.code} - {self.product.name}")
+
+
+class SaleDue(models.Model):
+    sale = models.ForeignKey(Sales, on_delete=models.CASCADE, related_name="sale_fk4")
+    client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name="client_fk")
+    brand = models.CharField(max_length=250, blank=True, null=True)
+    note = models.CharField(max_length=250, blank=True, null=True)
+    due = models.FloatField(max_length=15, default=0)
+    paid = models.FloatField(max_length=15, default=0)
+    balance = models.FloatField(max_length=15, default=0)
+
+    class Meta:
+        verbose_name_plural = "List of Sale Due"
+
+    def __str__(self):
+        return str(f"{self.sale.code} - {self.client.name}")
+
+
+class SaleCommission(models.Model):
+    sale = models.ForeignKey(Sales, on_delete=models.CASCADE, related_name="sale_fk5")
+    brand = models.ForeignKey(Brand, on_delete=models.CASCADE, related_name="brand_fk2")
+    commission = models.FloatField(max_length=15, default=0)
+    total_amount = models.FloatField(max_length=15, default=0)
+    date = models.DateField(default=date.today)
+
+    class Meta:
+        verbose_name_plural = "List of Sale Commission"
+
+    def __str__(self):
+        return str(f"{self.sale.code} - {self.brand.name}")
 
 
 class Purchase(models.Model):
@@ -222,3 +326,163 @@ class PurchaseProducts(models.Model):
 
     def __str__(self):
         return str(f"{self.purchase.code} - {self.product.name}")
+
+
+class CommissionBill(models.Model):
+    brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
+    month = models.CharField(max_length=12, choices=(('1','January'), ('2','February'), ('3','March'),
+                                                     ('4','April'), ('5','May'), ('6','June'), ('7','July'),
+                                                     ('8','August'), ('9','September'), ('10','October'),
+                                                     ('11','November'), ('12','December')), default = 1)
+    bill = models.FloatField(max_length=15, default=0)
+    collect = models.FloatField(max_length=15, default=0)
+    status = models.CharField(max_length=2, choices=(('1','Unpaid'), ('2','Paid')), default = 1)
+    delete_flag = models.IntegerField(default = 0)
+    date_added = models.DateTimeField(default = timezone.now)
+    date_updated = models.DateTimeField(auto_now = True)
+
+    class Meta:
+        verbose_name_plural = "List of Commission Bills"
+
+    def __str__(self):
+        return str(f"{self.month} - {self.brand.name}")
+
+    def due(self):
+        due = float(self.bill) - float(self.collect)
+        return due
+
+
+class Online(models.Model):
+    code = models.CharField(max_length=100)
+    status = models.CharField(max_length=2,
+                              choices=(('0', 'Pending'), ('1', 'In-progress'), ('2', 'Done')),
+                              default=0)
+    date_added = models.DateTimeField(default=timezone.now)
+    date_updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name_plural = "List of Advance"
+
+    def __str__(self):
+        return str(f"{self.code}")
+
+    def totalDue(self):
+        try:
+            brands = OnlineAdvance.objects.filter(online=self).aggregate(Sum('due'))
+            brands = brands['due__sum']
+        except:
+            brands = 0
+        return float(brands)
+
+
+class OnlineAdvance(models.Model):
+    online = models.ForeignKey(Online, on_delete=models.CASCADE, related_name="online_fk")
+    brand = models.ForeignKey(Brand, on_delete=models.CASCADE, related_name="brand_fk3")
+    advance = models.FloatField(max_length=15, default=0)
+    receive = models.FloatField(max_length=15, default=0)
+    due = models.FloatField(max_length=15)
+    date = models.DateField(default=date.today)
+
+    class Meta:
+        verbose_name_plural = "List of Advance Brand"
+
+    def __str__(self):
+        return str(f"{self.online.code} - {self.brand.name}")
+
+
+class DamageSale(models.Model):
+    code = models.CharField(max_length=100)
+    total_amount = models.FloatField(max_length=15)
+    status = models.CharField(max_length=2,
+                              choices=(('0', 'Pending'), ('1', 'In-progress'), ('2', 'Done')),
+                              default=0)
+    date_added = models.DateTimeField(default=timezone.now)
+    date_updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name_plural = "List of Damage Sale"
+
+    def __str__(self):
+        return str(f"{self.code}")
+
+    def totalProducts(self):
+        try:
+            products = DamageProduct.objects.filter(online=self).aggregate(Sum('total_amount'))
+            products = products['total_amount__sum']
+        except:
+            products = 0
+        return float(products)
+
+
+class DamageProduct(models.Model):
+    damage = models.ForeignKey(DamageSale, on_delete=models.CASCADE, related_name="damage_fk")
+    product = models.ForeignKey(Products, on_delete=models.CASCADE, related_name="product_fk3")
+    brand = models.CharField(max_length=100)
+    price = models.FloatField(max_length=15, default=0)
+    quantity = models.FloatField(max_length=15, default=0)
+    total_amount = models.FloatField(max_length=15)
+    date = models.DateField(default=date.today)
+
+    class Meta:
+        verbose_name_plural = "List of Damage Sale Product"
+
+    def __str__(self):
+        return str(f"{self.damage.code} - {self.product.name}")
+
+
+class Expense(models.Model):
+    name = models.CharField(max_length=100)
+    delete_flag = models.IntegerField(default = 0)
+    date_added = models.DateTimeField(default = timezone.now)
+    date_updated = models.DateTimeField(auto_now = True)
+
+    class Meta:
+        verbose_name_plural = "List of Expense"
+
+    def __str__(self):
+        return str(f"{self.name}")
+
+
+class Surplus(models.Model):
+    code = models.CharField(max_length=100)
+    month = models.CharField(max_length=12, choices=(('1', 'January'), ('2', 'February'), ('3', 'March'),
+                                                     ('4', 'April'), ('5', 'May'), ('6', 'June'), ('7', 'July'),
+                                                     ('8', 'August'), ('9', 'September'), ('10', 'October'),
+                                                     ('11', 'November'), ('12', 'December')), default=1)
+    total_sale = models.FloatField(max_length=15)
+    total_cost = models.FloatField(max_length=15)
+    total_extra = models.FloatField(max_length=15, null=True)
+    total_damage = models.FloatField(max_length=15, null=True)
+    total_expense = models.FloatField(max_length=15)
+    margin = models.FloatField(max_length=15, default=0)
+    date_added = models.DateTimeField(default=timezone.now)
+    date_updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name_plural = "List of Surplus"
+
+    def __str__(self):
+        return str(f"{self.code}")
+
+    def totalExpense(self):
+        try:
+            expense = Charge.objects.filter(online=self).aggregate(Sum('total_amount'))
+            expense = expense['total_amount__sum']
+        except:
+            expense = 0
+        return float(expense)
+
+
+class Charge(models.Model):
+    surplus = models.ForeignKey(Surplus, on_delete=models.CASCADE, related_name="surplus_fk")
+    expense = models.ForeignKey(Expense, on_delete=models.CASCADE, related_name="expense_fk")
+    note = models.CharField(max_length=250, blank=True, null=True)
+    amount = models.CharField(max_length=100)
+    total_amount = models.FloatField(max_length=15)
+    date = models.DateField(default=date.today)
+
+    class Meta:
+        verbose_name_plural = "List of Surplus Charges"
+
+    def __str__(self):
+        return str(f"{self.surplus.code} - {self.expense.name}")
