@@ -566,3 +566,74 @@ class SaveSurplus(forms.ModelForm):
             print(err)
             return False
 
+
+class SaveLoan(forms.ModelForm):
+    code = forms.CharField(max_length=250)
+    note = forms.CharField(max_length=250, required=False)
+    employee = forms.Select(
+        attrs={'class': 'form-control form-control-sm rounded-0', 'value': '', 'id': 'id_employee'}
+    )
+    due_amount = forms.CharField(max_length=250)
+
+    class Meta:
+        model = models.Loan
+        fields = ('code', 'note', 'employee', 'due_amount',)
+
+    def clean_code(self):
+        code = self.cleaned_data['code']
+
+        if code == 'generate':
+            pref = datetime.datetime.now().strftime('%y%m%d')
+            code = 1
+            while True:
+                try:
+                    check = models.Loan.objects.get(code=f"{pref}{code:04d}")
+                    code = code + 1
+                except:
+                    return f"{pref}{code:04d}"
+                    break
+        else:
+            return code
+
+    def save(self):
+        instance = self.instance
+        Debits = []
+        Credits = []
+
+        if 'debit_id[]' in self.data:
+            for k, val in enumerate(self.data.getlist('debit_id[]')):
+                debit = models.Debit.objects.get(id=val)
+                amount = self.data.getlist('debit_amount[]')[k]
+                total = float(amount)
+
+                try:
+                    Debits.append(models.LoanDebit(loan=instance, debit=debit, amount=amount, total_amount=total))
+                    print("LoanDebits..")
+                except Exception as err:
+                    print(err)
+                    return False
+
+        if 'credit_id[]' in self.data:
+            for k, val in enumerate(self.data.getlist('credit_id[]')):
+                credit = models.Credit.objects.get(id=val)
+                amount = self.data.getlist('credit_amount[]')[k]
+                total = float(amount)
+
+                try:
+                    Credits.append(models.LoanCredit(loan=instance, credit=credit, amount=amount, total_amount=total))
+                    print("LoanCredits..")
+                except Exception as err:
+                    print(err)
+                    return False
+
+        try:
+            instance.save()
+            models.LoanDebit.objects.filter(loan=instance).delete()
+            models.LoanDebit.objects.bulk_create(Debits)
+            models.LoanCredit.objects.filter(loan=instance).delete()
+            models.LoanCredit.objects.bulk_create(Credits)
+
+        except Exception as err:
+            print(err)
+            return False
+
