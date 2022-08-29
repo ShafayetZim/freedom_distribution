@@ -90,36 +90,12 @@ class UpdatePasswords(PasswordChangeForm):
         fields = ('old_password','new_password1', 'new_password2')
 
 
-class SaveCategory(forms.ModelForm):
-    name = forms.CharField(max_length=250)
-    status = forms.CharField(max_length=2)
-
-    class Meta:
-        model = models.Category
-        fields = ('name', 'status', )
-
-    def clean_name(self):
-        id = self.data['id'] if (self.data['id']).isnumeric() else 0
-        name = self.cleaned_data['name']
-        try:
-            if id > 0:
-                price = models.Category.objects.exclude(id = id).get(name = name, delete_flag = 0)
-            else:
-                price = models.Category.objects.get(name = name, delete_flag = 0)
-        except:
-            return name
-        raise forms.ValidationError("Category Type already exists.")
-
-
 class SaveBrand(forms.ModelForm):
     name = forms.CharField(max_length=250)
-    category = forms.Select(
-        attrs={'class': 'form-control form-control-sm rounded-0', 'value': '', 'id': 'id_category'}
-    )
 
     class Meta:
         model = models.Brand
-        fields = ('name', 'category')
+        fields = ('name',)
 
     def clean_name(self):
         id = self.data['id'] if (self.data['id']).isnumeric() else 0
@@ -136,29 +112,31 @@ class SaveBrand(forms.ModelForm):
 
 class SaveProducts(forms.ModelForm):
     name = forms.CharField(max_length=250)
-    category = forms.Select(
-        attrs={'class': 'form-control form-control-sm rounded-0', 'value': '', 'id': 'id_category'}
+    code = forms.CharField(max_length=250)
+    brand = forms.Select(
+        attrs={'class': 'form-control form-control-sm rounded-0', 'value': '', 'id': 'id_brand'}
     )
     description = forms.CharField(max_length=250, required=False)
     buy = forms.CharField(max_length=250)
     price = forms.CharField(max_length=250)
+    mrp = forms.CharField(max_length=250)
     status = forms.CharField(max_length=2)
 
     class Meta:
         model = models.Products
-        fields = ('name', 'description', 'category', 'buy', 'price', 'status', )
+        fields = ('name', 'code', 'description', 'brand', 'buy', 'price', 'mrp', 'status', )
 
-    def clean_name(self):
+    def clean_code(self):
         id = self.data['id'] if (self.data['id']).isnumeric() else 0
-        name = self.cleaned_data['name']
+        code = self.cleaned_data['code']
         try:
             if id > 0:
-                product = models.Products.objects.exclude(id = id).get(name = name, delete_flag = 0)
+                product = models.Products.objects.exclude(id = id).get(code = code, delete_flag = 0)
             else:
-                product = models.Products.objects.get(name = name, delete_flag = 0)
+                product = models.Products.objects.get(code = code, delete_flag = 0)
         except:
-            return name
-        raise forms.ValidationError("Product Name already exists.")
+            return code
+        raise forms.ValidationError("Product code already exists.")
 
 
 class SaveStockIn(forms.ModelForm):
@@ -198,10 +176,12 @@ class SaveSale(forms.ModelForm):
     payment = forms.CharField(max_length=2)
     total_amount = forms.CharField(max_length=250)
     tendered = forms.CharField(max_length=250)
+    cost = forms.CharField(max_length=250)
+    extra = forms.CharField(max_length=250)
 
     class Meta:
         model = models.Sales
-        fields = ('code', 'client', 'contact', 'road', 'salesman', 'deliveryman', 'category', 'status', 'payment', 'total_amount', 'tendered',)
+        fields = ('code', 'client', 'contact', 'road', 'salesman', 'deliveryman', 'brand', 'status', 'payment', 'total_amount', 'tendered', 'cost', 'extra',)
 
     def clean_code(self):
         code = self.cleaned_data['code']
@@ -229,19 +209,72 @@ class SaveSale(forms.ModelForm):
     def save(self):
         instance = self.instance
         Products = []
+        Returns = []
+        Clients = []
+        Brands = []
 
         if 'product_id[]' in self.data:
             for k, val in enumerate(self.data.getlist('product_id[]')):
                 product = models.Products.objects.get(id=val)
+                brand = self.data.getlist('product_brand[]')[k]
                 buy = self.data.getlist('product_buy[]')[k]
                 price = self.data.getlist('product_price[]')[k]
                 qty = self.data.getlist('product_quantity[]')[k]
                 freeqty = self.data.getlist('product_free_quantity[]')[k]
+                goodqty = self.data.getlist('product_good_quantity[]')[k]
+                damageqty = self.data.getlist('product_damage_quantity[]')[k]
+                sign = self.data.getlist('product_sign[]')[k]
+                total = float(price) * (float(qty) - float(goodqty) - float(damageqty))
+                # free = self.cleaned_data['free_quantity']
+                try:
+                    Products.append(models.SaleProducts(sale=instance, product=product, brand=brand, buy=buy, price=price, quantity=qty, total_amount=total, free_quantity=freeqty, good_quantity=goodqty, damage_quantity=damageqty, sign=sign))
+                    print("SaleProducts..")
+                except Exception as err:
+                    print(err)
+                    return False
+
+        if 'return_id[]' in self.data:
+            for k, val in enumerate(self.data.getlist('return_id[]')):
+                product = models.Products.objects.get(id=val)
+                buy = self.data.getlist('return_buy[]')[k]
+                price = self.data.getlist('return_price[]')[k]
+                qty = self.data.getlist('return_quantity[]')[k]
+                freeqty = self.data.getlist('return_free_quantity[]')[k]
+                goodqty = self.data.getlist('return_good_quantity[]')[k]
+                damageqty = self.data.getlist('return_damage_quantity[]')[k]
+                sign = self.data.getlist('return_sign[]')[k]
                 total = float(price) * float(qty)
                 # free = self.cleaned_data['free_quantity']
                 try:
-                    Products.append(models.SaleProducts(sale=instance, product=product, buy=buy, price=price, quantity=qty, total_amount=total, free_quantity=freeqty))
-                    print("SaleProducts..")
+                    Returns.append(models.SaleReturn(sale=instance, product=product, buy=buy, price=price, quantity=qty, total_amount=total, free_quantity=freeqty, good_quantity=goodqty, damage_quantity=damageqty, sign=sign))
+                    print("SaleReturns..")
+                except Exception as err:
+                    print(err)
+                    return False
+
+        if 'price_id[]' in self.data:
+            for k, val in enumerate(self.data.getlist('price_id[]')):
+                prices = models.Client.objects.get(id= val)
+                brand = self.data.getlist('laundry_brand[]')[k]
+                note = self.data.getlist('laundry_note[]')[k]
+                price = self.data.getlist('laundry_price[]')[k]
+                weight = self.data.getlist('laundry_weight[]')[k]
+                total = float(price) - float(weight)
+                try:
+                    Clients.append(models.SaleDue(sale=instance, client=prices, brand=brand, note=note, due=price, paid=weight, balance=total))
+                    print("ClientDues..")
+                except Exception as err:
+                    print(err)
+                    return False
+
+        if 'brand_id[]' in self.data:
+            for k, val in enumerate(self.data.getlist('brand_id[]')):
+                brand = models.Brand.objects.get(id= val)
+                commission = self.data.getlist('brand_price[]')[k]
+                total = float(commission)
+                try:
+                    Brands.append(models.SaleCommission(sale=instance, brand=brand, commission=commission, total_amount=total))
+                    print("BrandCommissions..")
                 except Exception as err:
                     print(err)
                     return False
@@ -249,8 +282,12 @@ class SaveSale(forms.ModelForm):
             instance.save()
             models.SaleProducts.objects.filter(sale=instance).delete()
             models.SaleProducts.objects.bulk_create(Products)
-            # models.LaundryItems.objects.filter(laundry=instance).delete()
-            # models.LaundryItems.objects.bulk_create(Items)
+            models.SaleReturn.objects.filter(sale=instance).delete()
+            models.SaleReturn.objects.bulk_create(Returns)
+            models.SaleDue.objects.filter(sale=instance).delete()
+            models.SaleDue.objects.bulk_create(Clients)
+            models.SaleCommission.objects.filter(sale=instance).delete()
+            models.SaleCommission.objects.bulk_create(Brands)
         except Exception as err:
             print(err)
             return False
@@ -345,3 +382,187 @@ class SaveClient(forms.ModelForm):
     class Meta:
         model = models.Client
         fields = ('name', 'shop', 'mobile', 'address', 'road')
+
+
+class SaveCommissionBill(forms.ModelForm):
+    brand = forms.Select(
+        attrs={'class': 'form-control form-control-sm rounded-0', 'value': '', 'id': 'id_brand'}
+    )
+    month = forms.CharField(max_length=12)
+    bill = forms.CharField(max_length=250)
+    collect = forms.CharField(max_length=250)
+    status = forms.CharField(max_length=2)
+
+    class Meta:
+        model = models.CommissionBill
+        fields = ('brand', 'month', 'bill', 'collect', 'status', )
+
+
+class SaveAdvance(forms.ModelForm):
+    code = forms.CharField(max_length=250)
+    status = forms.CharField(max_length=2)
+
+    class Meta:
+        model = models.Online
+        fields = ('code', 'status', )
+
+    def clean_code(self):
+        code = self.cleaned_data['code']
+
+        if code == 'generate':
+            pref = datetime.datetime.now().strftime('%y%m%d')
+            code = 1
+            while True:
+                try:
+                    check = models.Online.objects.get(code=f"{pref}{code:04d}")
+                    code = code + 1
+                except:
+                    return f"{pref}{code:04d}"
+                    break
+        else:
+            return code
+
+    def save(self):
+        instance = self.instance
+        Brands = []
+
+        if 'brand_id[]' in self.data:
+            for k, val in enumerate(self.data.getlist('brand_id[]')):
+                brand = models.Brand.objects.get(id=val)
+                advance = self.data.getlist('brand_advance[]')[k]
+                receive = self.data.getlist('brand_receive[]')[k]
+                total = float(advance) - float(receive)
+
+                try:
+                    Brands.append(models.OnlineAdvance(online=instance, brand=brand, advance=advance, receive=receive, due=total))
+                    print("Advance Brand..")
+                except Exception as err:
+                    print(err)
+                    return False
+        try:
+            instance.save()
+            models.OnlineAdvance.objects.filter(online=instance).delete()
+            models.OnlineAdvance.objects.bulk_create(Brands)
+
+        except Exception as err:
+            print(err)
+            return False
+
+
+class SaveDamage(forms.ModelForm):
+    code = forms.CharField(max_length=250)
+    status = forms.CharField(max_length=2)
+    total_amount = forms.CharField(max_length=250)
+
+    class Meta:
+        model = models.DamageSale
+        fields = ('code', 'status', 'total_amount', )
+
+    def clean_code(self):
+        code = self.cleaned_data['code']
+
+        if code == 'generate':
+            pref = datetime.datetime.now().strftime('%y%m%d')
+            code = 1
+            while True:
+                try:
+                    check = models.DamageSale.objects.get(code=f"{pref}{code:04d}")
+                    code = code + 1
+                except:
+                    return f"{pref}{code:04d}"
+                    break
+        else:
+            return code
+
+    def save(self):
+        instance = self.instance
+        Products = []
+
+        if 'product_id[]' in self.data:
+            for k, val in enumerate(self.data.getlist('product_id[]')):
+                product = models.Products.objects.get(id=val)
+                brand = self.data.getlist('product_brand[]')[k]
+                price = self.data.getlist('product_price[]')[k]
+                qty = self.data.getlist('product_quantity[]')[k]
+                total = float(price) * float(qty)
+
+                try:
+                    Products.append(models.DamageProduct(damage=instance, product=product, brand=brand, price=price, quantity=qty, total_amount=total))
+                    print("SaleDamageProducts..")
+                except Exception as err:
+                    print(err)
+                    return False
+        try:
+            instance.save()
+            models.DamageProduct.objects.filter(damage=instance).delete()
+            models.DamageProduct.objects.bulk_create(Products)
+
+        except Exception as err:
+            print(err)
+            return False
+
+
+class SaveExpense(forms.ModelForm):
+    name = forms.CharField(max_length=250)
+
+    class Meta:
+        model = models.Expense
+        fields = ('name',)
+
+
+class SaveSurplus(forms.ModelForm):
+    code = forms.CharField(max_length=250)
+    month = forms.CharField(max_length=12)
+    total_sale = forms.CharField(max_length=250)
+    total_cost = forms.CharField(max_length=250)
+    total_extra = forms.CharField(max_length=250)
+    total_damage = forms.CharField(max_length=250)
+    total_expense = forms.CharField(max_length=250)
+    margin = forms.CharField(max_length=250)
+
+    class Meta:
+        model = models.Surplus
+        fields = ('code', 'month', 'total_sale', 'total_cost', 'total_extra', 'total_damage', 'total_expense', 'margin', )
+
+    def clean_code(self):
+        code = self.cleaned_data['code']
+
+        if code == 'generate':
+            pref = datetime.datetime.now().strftime('%y%m%d')
+            code = 1
+            while True:
+                try:
+                    check = models.Surplus.objects.get(code=f"{pref}{code:04d}")
+                    code = code + 1
+                except:
+                    return f"{pref}{code:04d}"
+                    break
+        else:
+            return code
+
+    def save(self):
+        instance = self.instance
+        Expenses = []
+
+        if 'expense_id[]' in self.data:
+            for k, val in enumerate(self.data.getlist('expense_id[]')):
+                expense = models.Expense.objects.get(id=val)
+                note = self.data.getlist('expense_note[]')[k]
+                amount = self.data.getlist('expense_amount[]')[k]
+                total = float(amount)
+
+                try:
+                    Expenses.append(models.Charge(surplus=instance, expense=expense, note=note, amount=amount, total_amount=total))
+                    print("SurplusCharges..")
+                except Exception as err:
+                    print(err)
+                    return False
+        try:
+            instance.save()
+            models.Charge.objects.filter(surplus=instance).delete()
+            models.Charge.objects.bulk_create(Expenses)
+
+        except Exception as err:
+            print(err)
+            return False
+
