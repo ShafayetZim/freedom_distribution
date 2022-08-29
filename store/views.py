@@ -220,7 +220,7 @@ def home(request):
     year = date.strftime('%Y')
     month = date.strftime('%m')
     day = date.strftime('%d')
-    context['category'] = models.Category.objects.count()
+    context['brand'] = models.Brand.objects.count()
     context['products'] = models.Products.objects.count()
     context['stocks'] = models.Products.objects.all()
     context['todays_transaction'] = models.Sales.objects.filter(
@@ -259,9 +259,9 @@ def save_category(request):
         if form.is_valid():
             form.save()
             if post['id'] == '':
-                messages.success(request, "Category has been saved successfully.")
+                messages.success(request, "Group has been saved successfully.")
             else:
-                messages.success(request, "Category has been updated successfully.")
+                messages.success(request, "Group has been updated successfully.")
             resp['status'] = 'success'
         else:
             for field in form:
@@ -305,14 +305,14 @@ def manage_category(request, pk = None):
 def delete_category(request, pk = None):
     resp = { 'status' : 'failed', 'msg':''}
     if pk is None:
-        resp['msg'] = 'Category ID is invalid'
+        resp['msg'] = 'Group ID is invalid'
     else:
         try:
             models.Category.objects.filter(pk = pk).update(delete_flag = 1)
-            messages.success(request, "Category has been deleted successfully.")
+            messages.success(request, "Group has been deleted successfully.")
             resp['status'] = 'success'
         except:
-            resp['msg'] = "Deleting Category Failed"
+            resp['msg'] = "Deleting Group Failed"
 
     return HttpResponse(json.dumps(resp), content_type="application/json")
 
@@ -374,7 +374,6 @@ def manage_brand(request, pk=None):
     context = context_data(request)
     context['page'] = 'manage_brand'
     context['page_title'] = 'Manage Brand'
-    context['category'] = models.Category.objects.all()
     if pk is None:
         context['brand'] = {}
     else:
@@ -462,7 +461,7 @@ def manage_product(request, pk = None):
     context = context_data(request)
     context['page'] = 'manage_product'
     context['page_title'] = 'Manage product'
-    context['category'] = models.Category.objects.all()
+    context['brand'] = models.Brand.objects.filter(delete_flag=0).all()
     if pk is None:
         context['product'] = {}
     else:
@@ -598,12 +597,16 @@ def view_sale(request, pk=None):
     context['page_title'] = 'View Sale'
     if pk is None:
         context['sale'] = {}
-        # context['items'] = {}
+        context['items'] = {}
         context['pitems'] = {}
+        context['ritems'] = {}
+        context['bitems'] = {}
     else:
         context['sale'] = models.Sales.objects.get(id=pk)
-        # context['items'] = models.LaundryItems.objects.filter(laundry__id=pk).all()
+        context['items'] = models.SaleDue.objects.filter(sale__id=pk).all()
         context['pitems'] = models.SaleProducts.objects.filter(sale__id=pk).all()
+        context['ritems'] = models.SaleReturn.objects.filter(sale__id=pk).all()
+        context['bitems'] = models.SaleCommission.objects.filter(sale__id=pk).all()
 
     return render(request, 'view_sale.html', context)
 
@@ -613,20 +616,25 @@ def manage_sale(request, pk=None):
     context = context_data(request)
     context['page'] = 'manage_sale'
     context['page_title'] = 'Manage sale'
-    context['category'] = models.Category.objects.all()
+    context['brand'] = models.Brand.objects.filter(delete_flag=0).all()
     context['products'] = models.Products.objects.filter(delete_flag=0, status=1).all()
-    # context['prices'] = models.Prices.objects.filter(delete_flag=0, status=1).all()
+    context['prices'] = models.Client.objects.filter(delete_flag=0).all()
+    context['brands'] = models.Brand.objects.filter(delete_flag=0).all()
     context['road'] = models.Road.objects.all()
     context['salesman'] = models.Employee.objects.filter(type=1).all()
     context['deliveryman'] = models.Employee.objects.filter(type=2).all()
     if pk is None:
         context['sale'] = {}
-        # context['items'] = {}
+        context['items'] = {}
         context['pitems'] = {}
+        context['ritems'] = {}
+        context['bitems'] = {}
     else:
         context['sale'] = models.Sales.objects.get(id=pk)
-        # context['items'] = models.LaundryItems.objects.filter(laundry__id=pk).all()
+        context['items'] = models.SaleDue.objects.filter(sale__id=pk).all()
         context['pitems'] = models.SaleProducts.objects.filter(sale__id=pk).all()
+        context['ritems'] = models.SaleReturn.objects.filter(sale__id=pk).all()
+        context['bitems'] = models.SaleCommission.objects.filter(sale__id=pk).all()
 
     return render(request, 'manage_sale.html', context)
 
@@ -655,7 +663,7 @@ def update_transaction_status(request):
             messages.success(request, "Transaction Status has been updated successfully.")
             resp['status'] = 'success'
         except:
-            resp['msg'] = "Deleting Transaction Failed"
+            resp['msg'] = "Updating Transaction Failed"
 
     return HttpResponse(json.dumps(resp), content_type="application/json")
 
@@ -700,9 +708,18 @@ def daily_report(request, date=None):
         date_added__day=day,
     )
     grand_total = 0
+    extra = 0
+    cost = 0
+    sum = 0
     for sale in context['sales']:
         grand_total += float(sale.total_amount)
+        extra += float(sale.extra)
+        cost += float(sale.cost)
+    sum = grand_total + extra - cost
     context['grand_total'] = grand_total
+    context['extra'] = extra
+    context['cost'] = cost
+    context['sum'] = sum
 
     return render(request, 'report.html', context)
 
@@ -1012,8 +1029,10 @@ def view_client(request, pk=None):
     context['page_title'] = 'View Client'
     if pk is None:
         context['client'] = {}
+        context['stockouts'] = {}
     else:
         context['client'] = models.Client.objects.get(id=pk)
+        context['stockouts'] = models.SaleDue.objects.filter(client__id=pk).order_by('-sale__code')
 
     return render(request, 'view_client.html', context)
 
@@ -1053,6 +1072,8 @@ def print_sales(request, id=None):
     print(id)
     invoice = get_object_or_404(models.Sales, id=id)
     invoice_item = models.SaleProducts.objects.filter(sale=id)
+    return_item = models.SaleReturn.objects.filter(sale=id)
+    due_item = models.SaleDue.objects.filter(sale=id)
     print(invoice_item)
     total_qty = invoice_item.aggregate(Sum('quantity'))
     total_qty = total_qty.get('quantity__sum')
@@ -1061,16 +1082,18 @@ def print_sales(request, id=None):
     context = {
         'page-title': "invoice print",
         'sales_item': invoice_item,
+        'sales_return': return_item,
+        'sales_due': due_item,
         'total_qty': total_qty,
         'invoice_info': invoice,
     }
-    pdf = render_to_pdf('sales_print.html', context)
+    pdf = render_to_pdf('invoice_print.html', context)
     return HttpResponse(pdf, content_type='application/pdf')
 
 
 def load_product(request):
-    category_id = request.GET.get('category')
-    products = models.Products.objects.filter(category_id=category_id).order_by('name')
+    brand_id = request.GET.get('brand')
+    products = models.Products.objects.filter(brand_id=brand_id).order_by('name')
     context = {'products': products}
     return render(request, 'dropdown_sales.html', context)
 
@@ -1084,3 +1107,663 @@ def low_stock(request):
     context['products'] = models.Products.objects.all()
 
     return render(request, 'low_stock.html', context)
+
+
+def commission_preview(request):
+    context = context_data(request)
+    context['page'] = 'commission_list'
+    context['page_title'] = 'Commission List'
+
+    request_data = request.GET
+    check_brand = request_data.get("check_brand")
+    start_date = request_data.get("start_date")
+    end_date = request_data.get("end_date")
+
+    brand = models.Brand.objects.filter(delete_flag=0).all()
+    if check_brand == "All":
+        commission = models.SaleCommission.objects.filter(date__range=[start_date, end_date])
+    else:
+        commission = models.SaleCommission.objects.filter(brand=check_brand, date__range=[start_date, end_date])
+
+    context['check_brand'] = 'check_brand'
+    context['start_date'] = start_date
+    context['end_date'] = end_date
+    context['brand'] = brand
+    context['commission'] = commission
+
+    grand_total = 0
+    for item in context['commission']:
+        grand_total += float(item.total_amount)
+    context['grand_total'] = grand_total
+
+    return render(request, 'commission_preview.html', context)
+
+
+def all_commission(request):
+    context = context_data(request)
+    context['page'] = 'commission'
+    context['page_title'] = 'All Commisssion'
+    context['items'] = models.SaleCommission.objects.all()
+
+    return render(request, 'all_commission.html', context)
+
+
+@login_required
+def commission_bill(request):
+    context = context_data(request)
+    context['page'] = 'commission bill'
+    context['page_title'] = "Commission Bill"
+    context['bills'] = models.CommissionBill.objects.filter(delete_flag=0).all()
+    return render(request, 'commission_bill.html', context)
+
+
+@login_required
+def save_commission_bill(request):
+    resp = {'status': 'failed', 'msg': '', 'id': ''}
+    if request.method == 'POST':
+        post = request.POST
+        if not post['id'] == '':
+            bill = models.CommissionBill.objects.get(id=post['id'])
+            form = forms.SaveCommissionBill(request.POST, instance=bill)
+        else:
+            form = forms.SaveCommissionBill(request.POST)
+
+        if form.is_valid():
+            form.save()
+            if post['id'] == '':
+                messages.success(request, "Bill has been saved successfully.")
+                pid = models.CommissionBill.objects.last().id
+                resp['id'] = pid
+            else:
+                messages.success(request, "Bill has been updated successfully.")
+                resp['id'] = post['id']
+            resp['status'] = 'success'
+        else:
+            for field in form:
+                for error in field.errors:
+                    if not resp['msg'] == '':
+                        resp['msg'] += str('<br/>')
+                    resp['msg'] += str(f'[{field.name}] {error}')
+    else:
+        resp['msg'] = "There's no data sent on the request"
+
+    return HttpResponse(json.dumps(resp), content_type="application/json")
+
+
+@login_required
+def view_commission_bill(request, pk=None):
+    context = context_data(request)
+    context['page'] = 'view_bill'
+    context['page_title'] = 'View Bill'
+    if pk is None:
+        context['bills'] = {}
+        # context['stockins'] = {}
+    else:
+        context['bills'] = models.CommissionBill.objects.get(id=pk)
+        # context['stockins'] = models.StockIn.objects.filter(product__id=pk)
+        # context['stockouts'] = models.SaleProducts.objects.filter(product__id=pk).order_by('sale__code')
+
+    return render(request, 'view_commission_bill.html', context)
+
+
+@login_required
+def manage_commission_bill(request, pk=None):
+    context = context_data(request)
+    context['page'] = 'manage_bill'
+    context['page_title'] = 'Manage Bill'
+    # context['category'] = models.Category.objects.all()
+    context['brand'] = models.Brand.objects.filter(delete_flag=0).all()
+    if pk is None:
+        context['bills'] = {}
+    else:
+        context['bills'] = models.CommissionBill.objects.get(id=pk)
+
+    return render(request, 'manage_commission_bill.html', context)
+
+
+@login_required
+def delete_commission_bill(request, pk=None):
+    resp = {'status': 'failed', 'msg': ''}
+    if pk is None:
+        resp['msg'] = 'Bill ID is invalid'
+    else:
+        try:
+            models.CommissionBill.objects.filter(pk=pk).update(delete_flag=1)
+            messages.success(request, "Bill has been deleted successfully.")
+            resp['status'] = 'success'
+        except:
+            resp['msg'] = "Deleting Bill Failed"
+
+    return HttpResponse(json.dumps(resp), content_type="application/json")
+
+
+def free_product_report(request):
+    context = context_data(request)
+    context['page'] = 'free_product_report'
+    context['page_title'] = 'Free Product Report'
+
+    request_data = request.GET
+    check_product = request_data.get("check_product")
+    start_date = request_data.get("start_date")
+    end_date = request_data.get("end_date")
+
+    product = models.Products.objects.filter(delete_flag=0).all()
+
+    free = models.SaleProducts.objects.filter(product=check_product, date__range=[start_date, end_date])
+
+    context['check_product'] = 'check_product'
+    context['start_date'] = start_date
+    context['end_date'] = end_date
+    context['product'] = product
+    context['free'] = free
+
+    grand_total = 0
+    quantity = 0
+    price = 0
+    for item in context['free']:
+        quantity += float(item.free_quantity)
+        price = float(item.price)
+    grand_total = price * quantity
+    context['quantity'] = quantity
+    context['price'] = price
+    context['grand_total'] = grand_total
+
+    return render(request, 'free_product_report.html', context)
+
+
+@login_required
+def advance(request):
+    context = context_data(request)
+    context['page'] = 'advance'
+    context['page_title'] = "Advance List"
+    context['online'] = models.Online.objects.order_by('-date_added').all()
+    return render(request, 'advance.html', context)
+
+
+@login_required
+def save_advance(request):
+    resp = { 'status': 'failed', 'msg' : '', 'id': '' }
+    if request.method == 'POST':
+        post = request.POST
+        if not post['id'] == '':
+            online = models.Online.objects.get(id = post['id'])
+            form = forms.SaveAdvance(request.POST, instance=online)
+        else:
+            form = forms.SaveAdvance(request.POST)
+        if form.is_valid():
+            form.save()
+            if post['id'] == '':
+                messages.success(request, "Advance has been saved successfully.")
+                pid = models.Online.objects.last().id
+                resp['id'] = pid
+            else:
+                messages.success(request, "Advance has been updated successfully.")
+                resp['id'] = post['id']
+            resp['status'] = 'success'
+        else:
+            for field in form:
+                for error in field.errors:
+                    if not resp['msg'] == '':
+                        resp['msg'] += str('<br/>')
+                    resp['msg'] += str(f'[{field.name}] {error}')
+    else:
+         resp['msg'] = "There's no data sent on the request"
+
+    return HttpResponse(json.dumps(resp), content_type="application/json")
+
+
+@login_required
+def view_advance(request, pk=None):
+    context = context_data(request)
+    context['page'] = 'view_advance'
+    context['page_title'] = 'View Advance'
+    if pk is None:
+        context['online'] = {}
+        context['pitems'] = {}
+    else:
+        context['online'] = models.Online.objects.get(id=pk)
+        context['pitems'] = models.OnlineAdvance.objects.filter(online__id=pk).all()
+
+    return render(request, 'view_advance.html', context)
+
+
+@login_required
+def manage_advance(request, pk=None):
+    context = context_data(request)
+    context['page'] = 'manage_advance'
+    context['page_title'] = 'Manage Advance'
+    context['brand'] = models.Brand.objects.filter(delete_flag=0).all()
+    if pk is None:
+        context['online'] = {}
+        context['pitems'] = {}
+    else:
+        context['online'] = models.Online.objects.get(id=pk)
+        context['pitems'] = models.OnlineAdvance.objects.filter(online__id=pk).all()
+
+    return render(request, 'manage_advance.html', context)
+
+
+def delete_advance(request, pk = None):
+    resp = { 'status' : 'failed', 'msg':''}
+    if pk is None:
+        resp['msg'] = 'Advance ID is invalid'
+    else:
+        try:
+            models.Online.objects.filter(pk = pk).delete()
+            messages.success(request, "Advance has been deleted successfully.")
+            resp['status'] = 'success'
+        except:
+            resp['msg'] = "Deleting Advance Failed"
+
+    return HttpResponse(json.dumps(resp), content_type="application/json")
+
+
+def advance_report(request):
+    context = context_data(request)
+    context['page'] = 'advance_report'
+    context['page_title'] = 'Advance Report'
+
+    request_data = request.GET
+    check_brand = request_data.get("check_brand")
+    start_date = request_data.get("start_date")
+    end_date = request_data.get("end_date")
+
+    brand = models.Brand.objects.filter(delete_flag=0).all()
+    if check_brand == "All":
+        online = models.OnlineAdvance.objects.filter(date__range=[start_date, end_date])
+    else:
+        online = models.OnlineAdvance.objects.filter(brand=check_brand, due=0, date__range=[start_date, end_date])
+
+    context['check_brand'] = check_brand
+    context['start_date'] = start_date
+    context['end_date'] = end_date
+    context['brand'] = brand
+    context['online'] = online
+
+    advance = 0
+    receive = 0
+    due = 0
+    for item in context['online']:
+        advance += float(item.advance)
+        receive += float(item.receive)
+        due += float(item.due)
+
+    context['advance'] = advance
+    context['receive'] = receive
+    context['due'] = due
+
+    return render(request, 'advance_report.html', context)
+
+
+@login_required
+def damage(request):
+    context = context_data(request)
+    context['page'] = 'damage'
+    context['page_title'] = "Damage List"
+    context['damage'] = models.DamageSale.objects.order_by('-date_added').all()
+    return render(request, 'damage.html', context)
+
+
+@login_required
+def save_damage(request):
+    resp = { 'status': 'failed', 'msg' : '', 'id': '' }
+    if request.method == 'POST':
+        post = request.POST
+        if not post['id'] == '':
+            damage = models.DamageSale.objects.get(id=post['id'])
+            form = forms.SaveDamage(request.POST, instance=damage)
+        else:
+            form = forms.SaveDamage(request.POST)
+        if form.is_valid():
+            form.save()
+            if post['id'] == '':
+                messages.success(request, "Damage Sale has been saved successfully.")
+                pid = models.DamageSale.objects.last().id
+                resp['id'] = pid
+            else:
+                messages.success(request, "Damage Sale has been updated successfully.")
+                resp['id'] = post['id']
+            resp['status'] = 'success'
+        else:
+            for field in form:
+                for error in field.errors:
+                    if not resp['msg'] == '':
+                        resp['msg'] += str('<br/>')
+                    resp['msg'] += str(f'[{field.name}] {error}')
+    else:
+         resp['msg'] = "There's no data sent on the request"
+
+    return HttpResponse(json.dumps(resp), content_type="application/json")
+
+
+@login_required
+def view_damage(request, pk=None):
+    context = context_data(request)
+    context['page'] = 'view_damage'
+    context['page_title'] = 'View Damage'
+    if pk is None:
+        context['damage'] = {}
+        context['pitems'] = {}
+    else:
+        context['damage'] = models.DamageSale.objects.get(id=pk)
+        context['pitems'] = models.DamageProduct.objects.filter(damage__id=pk).all()
+
+    return render(request, 'view_damage.html', context)
+
+
+@login_required
+def manage_damage(request, pk=None):
+    context = context_data(request)
+    context['page'] = 'manage_damage'
+    context['page_title'] = 'Manage Damage'
+    context['products'] = models.Products.objects.filter(delete_flag=0, status=1).all()
+    if pk is None:
+        context['damage'] = {}
+        context['pitems'] = {}
+    else:
+        context['damage'] = models.DamageSale.objects.get(id=pk)
+        context['pitems'] = models.DamageProduct.objects.filter(damage__id=pk).all()
+
+    return render(request, 'manage_damage.html', context)
+
+
+def delete_damage(request, pk = None):
+    resp = { 'status' : 'failed', 'msg':''}
+    if pk is None:
+        resp['msg'] = 'Damage Sale ID is invalid'
+    else:
+        try:
+            models.DamageSale.objects.filter(pk = pk).delete()
+            messages.success(request, "Damage Sale has been deleted successfully.")
+            resp['status'] = 'success'
+        except:
+            resp['msg'] = "Deleting Damage Sale Failed"
+
+    return HttpResponse(json.dumps(resp), content_type="application/json")
+
+
+@login_required
+def update_damage_form(request, pk=None):
+    context = context_data(request)
+    context['page'] = 'update_damage'
+    context['page_title'] = 'Update Damage Transaction'
+    if pk is None:
+        context['damage'] = {}
+    else:
+        context['damage'] = models.DamageSale.objects.get(id=pk)
+
+    return render(request, 'update_damage.html', context)
+
+
+@login_required
+def update_damage_status(request):
+    resp = { 'status' : 'failed', 'msg':''}
+    if request.POST['id'] is None:
+        resp['msg'] = 'Transaction ID is invalid'
+    else:
+        try:
+            models.DamageSale.objects.filter(pk=request.POST['id']).update(status=request.POST['status'])
+            messages.success(request, "Transaction Status has been updated successfully.")
+            resp['status'] = 'success'
+        except:
+            resp['msg'] = "Updating Transaction Failed"
+
+    return HttpResponse(json.dumps(resp), content_type="application/json")
+
+
+@login_required
+def expense(request):
+    context = context_data(request)
+    context['page'] = 'expense'
+    context['page_title'] = "Expense List"
+    context['expense'] = models.Expense.objects.order_by('-date_added').all()
+    return render(request, 'expense.html', context)
+
+
+@login_required
+def manage_expense(request, pk=None):
+    context = context_data(request)
+    context['page'] = 'manage_expense'
+    context['page_title'] = 'Manage Expense'
+    if pk is None:
+        context['expense'] = {}
+    else:
+        context['expense'] = models.Expense.objects.get(id=pk)
+
+    return render(request, 'manage_expense.html', context)
+
+
+@login_required
+def save_expense(request):
+    resp = {'status': 'failed', 'msg': ''}
+    if request.method == 'POST':
+        post = request.POST
+        if not post['id'] == '':
+            expense = models.Expense.objects.get(id=post['id'])
+            form = forms.SaveExpense(request.POST, instance=expense)
+        else:
+            form = forms.SaveExpense(request.POST)
+
+        if form.is_valid():
+            form.save()
+            if post['id'] == '':
+                messages.success(request, "Expense Entry has been saved successfully.")
+            else:
+                messages.success(request, "Expense Entry has been updated successfully.")
+            resp['status'] = 'success'
+        else:
+            for field in form:
+                for error in field.errors:
+                    if not resp['msg'] == '':
+                        resp['msg'] += str('<br/>')
+                    resp['msg'] += str(f'[{field.name}] {error}')
+    else:
+        resp['msg'] = "There's no data sent on the request"
+
+    return HttpResponse(json.dumps(resp), content_type="application/json")
+
+
+@login_required
+def delete_expense(request, pk=None):
+    resp = {'status': 'failed', 'msg': ''}
+    if pk is None:
+        resp['msg'] = 'Expense ID is invalid'
+    else:
+        try:
+            models.Expense.objects.filter(pk=pk).delete()
+            messages.success(request, "Expense Entry Details has been deleted successfully.")
+            resp['status'] = 'success'
+        except:
+            resp['msg'] = "Deleting Expense Failed"
+
+    return HttpResponse(json.dumps(resp), content_type="application/json")
+
+
+@login_required
+def surplus(request):
+    context = context_data(request)
+    context['page'] = 'surplus'
+    context['page_title'] = "Surplus List"
+    context['surplus'] = models.Surplus.objects.order_by('-date_added').all()
+    return render(request, 'surplus.html', context)
+
+
+@login_required
+def save_surplus(request):
+    resp = { 'status': 'failed', 'msg' : '', 'id': '' }
+    if request.method == 'POST':
+        post = request.POST
+        if not post['id'] == '':
+            surplus = models.Surplus.objects.get(id=post['id'])
+            form = forms.SaveSurplus(request.POST, instance=surplus)
+        else:
+            form = forms.SaveSurplus(request.POST)
+        if form.is_valid():
+            form.save()
+            if post['id'] == '':
+                messages.success(request, "Surplus operation has been saved successfully.")
+                pid = models.Surplus.objects.last().id
+                resp['id'] = pid
+            else:
+                messages.success(request, "Surplus operation has been updated successfully.")
+                resp['id'] = post['id']
+            resp['status'] = 'success'
+        else:
+            for field in form:
+                for error in field.errors:
+                    if not resp['msg'] == '':
+                        resp['msg'] += str('<br/>')
+                    resp['msg'] += str(f'[{field.name}] {error}')
+    else:
+         resp['msg'] = "There's no data sent on the request"
+
+    return HttpResponse(json.dumps(resp), content_type="application/json")
+
+
+@login_required
+def view_surplus(request, pk=None):
+    context = context_data(request)
+    context['page'] = 'view_surplus'
+    context['page_title'] = 'View Surplus'
+    if pk is None:
+        context['surplus'] = {}
+        context['pitems'] = {}
+    else:
+        context['surplus'] = models.Surplus.objects.get(id=pk)
+        context['pitems'] = models.Charge.objects.filter(surplus__id=pk).all()
+
+    return render(request, 'view_surplus.html', context)
+
+
+@login_required
+def manage_surplus(request, pk=None):
+    context = context_data(request)
+    context['page'] = 'manage_damage'
+    context['page_title'] = 'Manage Surplus'
+
+    request_data = request.GET
+    check_brand = request_data.get("check_brand")
+    start_date = request_data.get("start_date")
+    end_date = request_data.get("end_date")
+
+    brand = models.Brand.objects.filter(delete_flag=0).all()
+    if check_brand == "All":
+        online = models.SaleProducts.objects.filter(date__range=[start_date, end_date])
+        other = models.Sales.objects.filter(date__range=[start_date, end_date])
+    else:
+        other = models.Sales.objects.filter(brand=check_brand, date__range=[start_date, end_date])
+        online = models.SaleProducts.objects.filter(sale__in=other, date__range=[start_date, end_date])
+
+    context['check_brand'] = check_brand
+    context['start_date'] = start_date
+    context['end_date'] = end_date
+    context['brand'] = brand
+    context['online'] = online
+    context['other'] = other
+
+    gross = 0
+    knockout = 0
+
+    for item in context['online']:
+        gross += float(item.total_amount)
+        damage = float(item.damage_quantity)
+        price = float(item.price)
+        knockout += damage * price
+    gross = (5*gross)/100
+    knockout = (5*knockout)/100
+
+    cost = 0
+    extra = 0
+    for item in context['other']:
+        cost += float(item.cost)
+        extra += float(item.extra)
+
+    context['gross'] = gross
+    context['knockout'] = knockout
+    context['cost'] = cost
+    context['extra'] = extra
+
+    context['expense'] = models.Expense.objects.filter(delete_flag=0).all()
+    if pk is None:
+        context['surplus'] = {}
+        context['pitems'] = {}
+    else:
+        context['surplus'] = models.Surplus.objects.get(id=pk)
+        context['pitems'] = models.Charge.objects.filter(surplus__id=pk).all()
+
+    return render(request, 'manage_surplus.html', context)
+
+
+def delete_surplus(request, pk = None):
+    resp = { 'status' : 'failed', 'msg':''}
+    if pk is None:
+        resp['msg'] = 'Surplus ID is invalid'
+    else:
+        try:
+            models.Surplus.objects.filter(pk = pk).delete()
+            messages.success(request, "Surplus has been deleted successfully.")
+            resp['status'] = 'success'
+        except:
+            resp['msg'] = "Deleting Surplus Sale Failed"
+
+    return HttpResponse(json.dumps(resp), content_type="application/json")
+
+
+@login_required
+def update_surplus_form(request, pk=None):
+    context = context_data(request)
+    context['page'] = 'update_month'
+    context['page_title'] = 'Update Surplus Month'
+    if pk is None:
+        context['surplus'] = {}
+    else:
+        context['surplus'] = models.Surplus.objects.get(id=pk)
+
+    return render(request, 'update_month.html', context)
+
+
+@login_required
+def update_surplus_month(request):
+    resp = { 'status' : 'failed', 'msg':''}
+    if request.POST['id'] is None:
+        resp['msg'] = 'Transaction ID is invalid'
+    else:
+        try:
+            models.Surplus.objects.filter(pk=request.POST['id']).update(month=request.POST['month'])
+            messages.success(request, "Surplus Month has been updated successfully.")
+            resp['status'] = 'success'
+        except:
+            resp['msg'] = "Updating Month Failed"
+
+    return HttpResponse(json.dumps(resp), content_type="application/json")
+
+
+def free_report(request):
+    context = context_data(request)
+    context['page'] = 'free_report'
+    context['page_title'] = 'Free Report'
+
+    request_data = request.GET
+    check_brand = request_data.get("check_brand")
+    start_date = request_data.get("start_date")
+    end_date = request_data.get("end_date")
+
+    brand = models.Brand.objects.filter(delete_flag=0).all()
+
+    if check_brand != "All":
+        free = models.SaleProducts.objects.filter(brand=check_brand,date__range=[start_date, end_date]).values('brand', 'product', 'product__name', 'price').annotate(sum=Sum('free_quantity'))
+    else:
+        free = models.SaleProducts.objects.filter(date__range=[start_date, end_date]).values('brand', 'product', 'product__name', 'price').annotate(
+            sum=Sum('free_quantity'))
+
+    context['check_brand'] = 'check_brand'
+    context['start_date'] = start_date
+    context['end_date'] = end_date
+    context['brand'] = brand
+    context['free'] = free
+
+    return render(request, 'free_report.html', context)
+
+
+
+
