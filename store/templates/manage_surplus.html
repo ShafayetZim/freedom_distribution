@@ -100,6 +100,10 @@
                                 <th class="text-end fw-bolder">{{gross|floatformat:2|intcomma}}</th>
                             </tr>
                             <tr>
+                                <th colspan="3" class="text-center">Total Extra</th>
+                                <th class="text-end fw-bolder">{{extra|floatformat:2|intcomma}}</th>
+                            </tr>
+                            <tr>
                                 <th colspan="3" class="text-center">Total Cost</th>
                                 <th class="text-end fw-bolder">{{cost|floatformat:2|intcomma}}</th>
                             </tr>
@@ -194,6 +198,12 @@
                                     {% endif %}
                                   </select>
                             </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                <label for="costs" class="control-label">Total Cost</label>
+                                <input type="text" onblur="findTotal()" class="form-control form-control-sm rounded-0 out" name="total_cost" id="costs" value="{{cost}}" required>
+                            </div>
                             <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                                 <label for="damage" class="control-label">Total Damage</label>
                                 <input type="text" onblur="findTotal()" class="form-control form-control-sm rounded-0 out" name="total_damage" id="damage" value="{{knockout}}" required>
@@ -201,21 +211,21 @@
                         </div>
                         <div class="row">
                             <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                                <label for="client" class="control-label">Total Cost</label>
-                                <input type="text" onblur="findTotal()" class="form-control form-control-sm rounded-0 out" name="total_cost" id="costs" value="{{cost}}" required>
+                                <label for="extra" class="control-label">Total Extra</label>
+                                <input type="text" onblur="findTotal()" class="form-control form-control-sm rounded-0 in" name="total_extra" id="extra" value="{{extra}}" required>
                             </div>
                             <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                                <label for="contact" class="control-label">Total Expense</label>
+                                <label for="expense" class="control-label">Total Expense</label>
                                 <input type="text" onblur="findTotal()" class="form-control form-control-sm rounded-0 out" name="total_expense" id="total_expense" value="{{surplus.total_expense}}">
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                                <label for="client" class="control-label">Total Sale</label>
+                                <label for="sale" class="control-label">Total Sale</label>
                                 <input type="text" onblur="findTotal()" class="form-control form-control-sm rounded-0 in" name="total_sale" id="total_sale" value="{{gross}}" required>
                             </div>
                             <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                                <label for="contact" class="control-label">Profit Margin</label>
+                                <label for="profit" class="control-label">Profit Margin</label>
                                 <input type="text" class="form-control form-control-sm rounded-0 margin" name="margin" id="margin" value="{{surplus.margin}}">
                             </div>
                         </div>
