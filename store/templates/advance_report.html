@@ -38,7 +38,7 @@
 
                         <div class="col">
                             <div class="form-group">
-                                <label for="WorkName">Check Brand</label>
+                                <label for="brand">Check Brand</label>
                                 <select class="form-control" id="check_brand" name="check_brand">
                                     <option value="All">All</option>
                                     {% for item in brand %}
@@ -59,24 +59,21 @@
             </div>
     </div>
 
-      <br>
-    <div class="card rounded-0 shadow">
+
+    <div class="card rounded-0 shadow mb-3">
             <div class="card-body">
                 <div class="container-fluid">
                     <table style="width: 100%; border-collapse: collapse;">
                         <tbody>
                         <tr>
-
-                        </tr>
-
-                        <tr>
                             <td style="width: 30%;"><h6>Date Range: {{start_date }} To {{end_date}}</h6></td>
                             <td style="width: 30%;">&nbsp;</td>
                             <td style="width: 30%;  text-align: right;">
-                                {% if commission %}
 
-                                {% endif %}
                             </td>
+                        </tr>
+                        <tr>
+                            <td><h6>Advance Item List</h6></td>
                         </tr>
                         </tbody>
                     </table>
@@ -89,7 +86,6 @@
                             <td style="width: 15%;text-align:center;"><strong>Code</strong></td>
                             <td style="width: 35%;text-align:center;"><strong>Brand</strong></td>
                             <td style="width: 10%;text-align:center;"><strong>Advance</strong></td>
-                            <td style="width: 10%;text-align:center;"><strong>Received</strong></td>
                             <td style="width: 10%;text-align:center;"><strong>Due</strong></td>
 
                         </tr>
@@ -108,13 +104,10 @@
                                 {{item.brand.name}}
                             </td>
                             <td style="width: 10%; text-align: center;">
-                                 {{item.advance}}
+                                {{item.advance}}
                             </td>
                             <td style="width: 10%; text-align: center;">
-                                {{item.receive}}
-                            </td>
-                            <td style="width: 10%; text-align: center;">
-                                {{item.due}}
+                                {{item.total_amount}}
                             </td>
 
                         </tr>
@@ -122,18 +115,91 @@
                         </tbody>
                         <tfoot>
                             <tr>
-                                <th colspan="6" class="text-center">Total Advance</th>
+                                <th colspan="5" class="text-end">Total Advance</th>
                                 <th class="text-end fw-bolder">{{advance|floatformat:2|intcomma}}</th>
                             </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+    </div>
+    <div class="card rounded-0 shadow mb-3">
+            <div class="card-body">
+                <div class="container-fluid">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <tbody>
+                        <tr>
+
+                        </tr>
+
+                        <tr>
+                            <td style="width: 30%;"><h6>Receive Item List</h6></td>
+                            <td style="width: 30%;">&nbsp;</td>
+                            <td style="width: 30%;  text-align: right;">
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <br>
+                    <table class="table table-bordered table-striped" style="border-collapse: collapse; width: 100%;" border="1" cellpadding="8">
+                        <tbody>
+                        <tr>
+                            <td style="width: 5%;text-align:center;"><strong>SL</strong></td>
+                            <td style="width: 15%;text-align:center;"><strong>Date</strong></td>
+                            <td style="width: 15%;text-align:center;"><strong>Code</strong></td>
+                            <td style="width: 35%;text-align:center;"><strong>Brand</strong></td>
+                            <td style="width: 10%;text-align:center;"><strong>Advance</strong></td>
+                            <td style="width: 10%;text-align:center;"><strong>Due</strong></td>
+
+                        </tr>
+                         {% for item in credit %}
+                        <tr>
+                            <td style="width: 5%;">
+                                {{forloop.counter}}
+                            </td>
+                            <td style="width: 15%; text-align:center;">
+                                {{item.date}}
+                            </td>
+                            <td style="width: 15%; text-align:center;">
+                                {{item.online.code}}
+                            </td>
+                            <td style="width: 35%;">
+                                {{item.brand.name}}
+                            </td>
+                            <td style="width: 10%; text-align: center;">
+                                {{item.amount}}
+                            </td>
+                            <td style="width: 10%; text-align: center;">
+                                {{item.total_amount}}
+                            </td>
+
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                        <tfoot>
                             <tr>
-                                <th colspan="6" class="text-center">Total Received</th>
+                                <th colspan="5"  class="text-end">Total Received</th>
                                 <th class="text-end fw-bolder">{{receive|floatformat:2|intcomma}}</th>
                             </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+    </div>
+    <div class="card rounded-0 shadow mb-3">
+            <div class="card-body">
+                <div class="container-fluid">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <h6>Total Dues</h6>
+                    </table>
+                    <br>
+                    <table class="table table-bordered table-striped" style="border-collapse: collapse; width: 100%;" border="1" cellpadding="8">
+                        <tbody>
                             <tr>
-                                <th colspan="6" class="text-center">Total Dues</th>
+                                <th style="width: 90%" class="text-end">Total Dues</th>
                                 <th class="text-end fw-bolder">{{due|floatformat:2|intcomma}}</th>
                             </tr>
-                        </tfoot>
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -165,6 +231,11 @@
         "'" + $(this).attr("data-url") + "'",
       ]);
     });
+    $('#check_brand').select2({
+        placeholder: "Please Select brand Here",
+        width: "100%",
+        selectionCssClass: "form-control form-control-sm rounded-2"
+    })
     $("#product-tbl").find("td, th").addClass("px-2 py-1 align-middle");
     $("#product-tbl").DataTable({
       columnDefs: [
