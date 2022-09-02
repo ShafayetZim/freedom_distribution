@@ -11,7 +11,7 @@
                     <div class="text-end mb-3">
                         <a class="btn btn-sm btn-primary rounded-0 bg-gradient-primary" href="{% url 'manage-advance' %}" id="create_new"><i class="fa fa-plus"></i> Add New</a>
                     </div>
-                    <table class="table table-bordered table-striped" id="laundry-tbl">
+                    <table class="table table-bordered table-striped" id="advance-tbl">
                         <colgroup>
                             <col width="10%">
                             <col width="25%">
@@ -24,6 +24,7 @@
                                 <th class="text-center">#</th>
                                 <th class="text-center">Date Added</th>
                                 <th class="text-center">Code</th>
+                                <th class="text-center">Due</th>
                                 <th class="text-center">Status</th>
                                 <th class="text-center">Action</th>
                             </tr>
@@ -40,8 +41,19 @@
                                 </td>
                                 <td class="text-center">
                                     <div class="lh-1">
-                                        <div>{{ item.get_status_display}}</div>
+                                        <div>{{ item.due_amount}}</div>
                                     </div>
+                                </td>
+                                <td class="text-center">
+                                    {% if item.status == '0' %}
+                                    <span class="badge badge-secondary bg-gradient bg-secondary px-3 rounded-pill bg-opacity-75 text-sm py-1">Pending</span>
+                                    {% elif item.status == '1' %}
+                                    <span class="badge badge-primary bg-gradient bg-primary px-3 rounded-pill bg-opacity-75 text-sm py-1">In-Progress</span>
+                                    {% elif item.status == '2' %}
+                                    <span class="badge badge-success bg-gradient bg-success px-3 rounded-pill bg-opacity-75 text-sm py-1">Done</span>
+                                    {% else %}
+                                    <span class="badge badge-light bg-gradient bg-light px-3 border rounded-pill bg-opacity-75 text-sm py-1">N/A</span>
+                                    {% endif %}
                                 </td>
                                 <td class="text-center">
                                     <div class="dropdown">
@@ -70,8 +82,8 @@
         $('.delete-data').click(function() {
             _conf("Are you sure to delete this Advance Transaction?", 'delete_advance', ["'" + $(this).attr('data-url') + "'"])
         })
-        $('#laundry-tbl').find('td, th').addClass('px-2 py-1 align-middle')
-        $('#laundry-tbl').DataTable({
+        $('#advance-tbl').find('td, th').addClass('px-2 py-1 align-middle')
+        $('#advance-tbl').DataTable({
             columnDefs: [{
                 orderable: false,
                 targets: [4]
