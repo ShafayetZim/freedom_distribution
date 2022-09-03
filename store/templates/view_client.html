@@ -1,76 +1,255 @@
-{% load static %} {% load humanize %}
-<style>
-  #uni_modal .modal-footer {
-    display: none;
-  }
-
-  #uni_modal .modal-sub-footer {
-    display: flex;
-  }
-</style>
-<div class="container-fluid" id="e-details">
-  <div class="lh-1">
-    <dl>
-      <dt>Name</dt>
-      <dd class="ps-4">{{client.name}}</dd>
-      <dt>Shop</dt>
-      <dd class="ps-4">{{client.shop}}</dd>
-      <dt>Mobile</dt>
-      <dd class="ps-4">{{client.mobile}}</dd>
-      <dt>Address</dt>
-      <dd class="ps-4">{{client.address}}</dd>
-      <dt>Road</dt>
-      <dd class="ps-4">
-        {{client.road}}
-      </dd>
-    </dl>
-  </div>
-</div>
-
-<div class="container-fluid">
-
-    <div class="card-body">
+{% extends 'base.html' %} {% load static %} {% load humanize %} {% block pageContent %}
+<section class="py-4">
+  <div class="container">
+    <div class="card rounded-0 shadow">
+      <div class="card-header py -1">
+        <div class="d-flex w-100 align-items-center">
+          <div class="card-title mb-0 col-auto flex-shrink-1 flex-grow-1">
+            Client Details
+          </div>
+          <div class="col-auto">
+            <button
+              class="btn btn-primary btn-sm rounded-0 bg-gradient bg-primary"
+              type="button"
+              id="manage-client"
+            >
+              <i class="fa fa-edit"></i> Edit Details
+            </button>
+            <button
+              class="btn btn-danger btn-sm rounded-0 bg-gradient bg-danger"
+              type="button"
+              id="delete-client"
+            >
+              <i class="fa fa-trash"></i> Delete Client
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="container-fluid" id="e-details">
+          <div class="lh-1">
+            <dl>
+              <dt>Name</dt>
+              <dd class="ps-4">{{client.name}}</dd>
+              <dt>Shop</dt>
+              <dd class="ps-4">{{client.shop}}</dd>
+              <dt>Phone</dt>
+              <dd class="ps-4">{{client.mobile}}</dd>
+              <dt>Address</dt>
+              <dd class="ps-4">{{client.address}}</dd>
+              <dt>Road</dt>
+              <dd class="ps-4">
+                {{ client.road }}
+              </dd>
+              <dt class="h5 fw-bolder">Due Amount</dt>
+              <dd class="ps-4 h4 fw-bolder">
+                {{client.totalDue|floatformat}}
+              </dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row mx-0 my-3">
+<!--      <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">-->
+<!--        <div class="card rounded-0 shadow">-->
+<!--          <div class="card-header py -1">-->
+<!--            <div class="d-flex w-100">-->
+<!--              <div class="col-auto flex-shrink-1 flex-grow-1">-->
+<!--                <div class="card-title mb-0">Stock-In History</div>-->
+<!--              </div>-->
+<!--              <div class="col-auto">-->
+<!--                <button-->
+<!--                  class="btn btn-primary btn-sm rounded-0 bg-gradient bg-primary"-->
+<!--                  type="button"-->
+<!--                  id="add_stock"-->
+<!--                >-->
+<!--                  <i class="far fa-plus-square"></i> New Entry-->
+<!--                </button>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--          <div class="card-body">-->
+<!--            <div class="container-fluid">-->
+<!--              <table class="table table-stripped table-bordered">-->
+<!--                <thead>-->
+<!--                  <tr>-->
+<!--                    <th class="px-1 py-1 text-center">#</th>-->
+<!--                    <th class="px-1 py-1 text-center">Date Added</th>-->
+<!--                    <th class="px-1 py-1 text-center">Quantity</th>-->
+<!--                    <th class="px-1 py-1 text-center">Action</th>-->
+<!--                  </tr>-->
+<!--                </thead>-->
+<!--                <tbody>-->
+<!--                  {% for stockin in stockins %}-->
+<!--                  <tr>-->
+<!--                    <td class="px-1 py-1 align-middle text-center">-->
+<!--                      {{ forloop.counter }}-->
+<!--                    </td>-->
+<!--                    <td class="px-1 py-1 align-middle">-->
+<!--                      {{ stockin.date_added|date:"F d, Y" }}-->
+<!--                    </td>-->
+<!--                    <td class="px-1 py-1 align-middle text-end">-->
+<!--                      {{ stockin.quantity|floatformat|intcomma }}-->
+<!--                    </td>-->
+<!--                    <td class="px-1 py-1 align-middle text-center">-->
+<!--                      <div class="btn-group">-->
+<!--                        <button-->
+<!--                          class="btn btn-sm btn-primary rounded-0 bg-gradient bg-primary edit-si"-->
+<!--                          type="button"-->
+<!--                          data-url="{% url 'manage-stockin-pid-pk' stockin.product_id stockin.id %}"-->
+<!--                          title="Edit Stock-In"-->
+<!--                        >-->
+<!--                          <i class="fa fa-edit"></i>-->
+<!--                        </button>-->
+<!--                        <button-->
+<!--                          class="btn btn-sm btn-danger rounded-0 bg-gradient bg-danger delete-si"-->
+<!--                          type="button"-->
+<!--                          data-url="{% url 'delete-stockin' stockin.pk %}"-->
+<!--                          title="Delete Stock-In"-->
+<!--                        >-->
+<!--                          <i class="fa fa-trash"></i>-->
+<!--                        </button>-->
+<!--                      </div>-->
+<!--                    </td>-->
+<!--                  </tr>-->
+<!--                  {% endfor %}-->
+<!--                </tbody>-->
+<!--              </table>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </div>-->
+      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="card rounded-0 shadow">
+          <div class="card-header py -1">
+            <div class="d-flex w-100">
+              <div class="col-auto flex-shrink-1 flex-grow-1">
+                <div class="card-title mb-0">Due History</div>
+              </div>
+              <div class="col-auto">
+                <a href="{% url 'manage-sale' %}">
+                <button
+                  class="btn btn-primary btn-sm rounded-0 bg-gradient bg-primary"
+                  type="button"
+                  id="add_stock"
+                >
+                  <i class="far fa-plus-square"></i> New Entry
+                </button>
+                  </a>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
             <div class="container-fluid">
-              <div class="card-title mb-0">Dues History</div>
-              <table class="table table-stripped table-bordered">
+              <table class="table table-stripped table-bordered" id="client-tbl">
                 <thead>
                   <tr>
                     <th class="px-1 py-1 text-center">#</th>
                     <th class="px-1 py-1 text-center">Date Added</th>
                     <th class="px-1 py-1 text-center">Transaction Code</th>
                     <th class="px-1 py-1 text-center">Brand</th>
-                    <th class="px-1 py-1 text-center">Balance</th>
+                    <th class="px-1 py-1 text-center">Dues Amount</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {% for stockout in stockouts %}
-                  {% if stockout.balance != 0 %}
-                  <tr>
-                    <td class="px-1 py-1 align-middle text-center">
-                      {{ forloop.counter }}
-                    </td>
-                    <td class="px-1 py-1 align-middle">
-                      {{ stockout.sale.date_added|date:"F d, Y" }}
-                    </td>
-                    <td class="px-1 py-1 align-middle">
-                      <a
-                        href="{% url 'manage-sale-pk' stockout.sale.pk %}"
-                        target="_blank"
-                        >{{ stockout.sale.code }}</a
-                      >
-                    </td>
-                    <td class="px-1 py-1 align-middle text-end">
-                      {{ stockout.brand }}
-                    </td>
-                    <td class="px-1 py-1 align-middle text-end">
-                      {{ stockout.balance|floatformat|intcomma }}
-                    </td>
-                  </tr>
-                  {% endif %}
+                  {% for item in dues %}
+                    {% if item.balance != 0 %}
+                    <tr>
+                      <td class="px-1 py-1 align-middle text-center">
+                        {{ forloop.counter }}
+                      </td>
+                      <td class="px-1 py-1 align-middle text-center">
+                        {{ item.sale.date_added|date:"F d, Y" }}
+                      </td>
+                      <td class="px-1 py-1 align-middle text-center">
+                        <a
+                          href="{% url 'view-sale-pk' item.pk %}"
+                          target="_blank"
+                          >{{ item.sale.code }}</a
+                        >
+                      </td>
+                      <td class="px-1 py-1 align-middle text-center">
+                        {{ item.brand }}
+                      </td>
+                      <td class="px-1 py-1 align-middle text-end">
+                        {{ item.balance|floatformat|intcomma }}
+                      </td>
+                    </tr>
+                    {% endif %}
                   {% endfor %}
                 </tbody>
               </table>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock pageContent %} {% block ScriptBlock %}
+<script>
+  $(function () {
+    $("#manage-client").click(function () {
+      uni_modal(
+        "<i class='fa fa-edit'></i> Edit Client Details",
+        "{% url 'manage-client-pk' client.pk %}"
+      );
+    });
 
-</div>
+    $("#delete-client").click(function () {
+      _conf("Are you sure to delete this Client?", "delete_client", [
+        "'" + '{% url "delete-client" client.pk %}' + "'",
+      ]);
+    });
+    $("#client-tbl").find("td, th").addClass("px-2 py-1 align-middle");
+    $("#client-tbl").DataTable({
+      columnDefs: [
+        {
+          orderable: false,
+          targets: [3],
+        },
+      ],
+      lengthMenu: [
+        [25, 50, 100, -1],
+        [25, 50, 100, "All"],
+      ],
+    });
+  });
+
+  function delete_client(url) {
+    var _this = $("#confirm_modal .modal-body");
+    $(".err-msg").remove();
+    var el = $("<div>");
+    el.addClass("alert alert-danger err-msg");
+    el.hide();
+    start_loader();
+    $.ajax({
+      headers: {
+        "X-CSRFToken": "{{csrf_token}}",
+      },
+      url: url,
+      dataType: "JSON",
+      error: (err) => {
+        console.log(err);
+        alert("an error occurred.");
+        end_loader();
+      },
+      success: function (resp) {
+        if (resp.status == "success") {
+          location.replace("{% url 'client-page' %}");
+        } else if (!!resp.msg) {
+          el.html(resp.msg);
+          _this.prepend(el);
+          el.show();
+        } else {
+          el.html("An error occurred");
+          _this.prepend(el);
+          el.show();
+        }
+        end_loader();
+      },
+    });
+  }
+</script>
+{% endblock ScriptBlock %}
