@@ -25,45 +25,67 @@
           </div>
         </div>
       </div>
-      <div class="card-body">
-        <div class="container-fluid" id="e-details">
-          <div class="lh-1">
-            <dl>
-              <dt>Name</dt>
-              <dd class="ps-4">{{product.name}}</dd>
-              <dt>Code</dt>
-              <dd class="ps-4">{{product.code}}</dd>
-              <dt>Brand</dt>
-              <dd class="ps-4">{{product.brand}}</dd>
-              <dt>Status</dt>
-              <dd class="ps-4">
-                {% if product.status == '1' %}
-                <span
-                  class="badge badge-success bg-gradient bg-success px-3 rounded-pill bg-opacity-75 text-sm py-1"
-                  >Active</span
-                >
-                {% else %}
-                <span
-                  class="badge badge-secondary bg-gradient bg-secondary px-3 rounded-pill bg-opacity-75 text-sm py-1"
-                  >Inactive</span
-                >
-                {% endif %}
-              </dd>
-              <dt>Buy Price</dt>
-              <dd class="ps-4">{{product.buy}}</dd>
-              <dt>Sale Price</dt>
-              <dd class="ps-4">{{product.price|floatformat:2}}</dd>
-              <dt>Mrp Price</dt>
-              <dd class="ps-4">{{product.mrp}}</dd>
-              <dt class="h5 fw-bolder">Available Stock</dt>
-              <dd class="ps-4 h4 fw-bolder">
-                {{product.available|floatformat}}
-              </dd>
-              <dt class="h5 fw-bolder">Damage Stock</dt>
-              <dd class="ps-4 h4 fw-bolder">
-                {{product.damage|floatformat}}
-              </dd>
-            </dl>
+      <div class="row">
+        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 px-1 pb-2">
+          <div class="card-body">
+            <div class="container-fluid" id="e-details">
+              <div class="lh-1">
+                <dl>
+                  <dt>Name</dt>
+                  <dd class="ps-4">{{product.name}}</dd>
+                  <dt>Code</dt>
+                  <dd class="ps-4">{{product.code}}</dd>
+                  <dt>Brand</dt>
+                  <dd class="ps-4">{{product.brand}}</dd>
+                  <dt>Status</dt>
+                  <dd class="ps-4">
+                    {% if product.status == '1' %}
+                    <span
+                      class="badge badge-success bg-gradient bg-success px-3 rounded-pill bg-opacity-75 text-sm py-1"
+                      >Active</span
+                    >
+                    {% else %}
+                    <span
+                      class="badge badge-secondary bg-gradient bg-secondary px-3 rounded-pill bg-opacity-75 text-sm py-1"
+                      >Inactive</span
+                    >
+                    {% endif %}
+                  </dd>
+                  <dt>Buy Price</dt>
+                  <dd class="ps-4">{{product.buy}}</dd>
+                  <dt>Sale Price</dt>
+                  <dd class="ps-4">{{product.price|floatformat:2}}</dd>
+                  <dt>Mrp Price</dt>
+                  <dd class="ps-4">{{product.mrp}}</dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 px-1 pb-2">
+          <div class="card-body">
+            <div class="container-fluid" id="stock-details">
+              <div class="lh-1">
+                <dl>
+                  <dt class="h5 fw-bolder">Available Fresh Stock</dt>
+                  <dd class="ps-4 h4 fw-bolder">
+                    {{product.available|floatformat}}
+                  </dd>
+                  <dt class="h5 fw-bolder">Fresh Stock Value</dt>
+                  <dd class="ps-4 h4 fw-bolder">
+                    {% widthratio product.buy 1 product.available %}
+                  </dd>
+                  <dt class="h5 fw-bolder">Available Damage Stock</dt>
+                  <dd class="ps-4 h4 fw-bolder">
+                    {{product.damage|floatformat}}
+                  </dd>
+                  <dt class="h5 fw-bolder">Damage Stock Value</dt>
+                  <dd class="ps-4 h4 fw-bolder">
+                    {{product.value|floatformat}}
+                  </dd>
+                </dl>
+              </div>
+            </div>
           </div>
         </div>
       </div>
