@@ -163,6 +163,7 @@
                 </thead>
                 <tbody>
                   {% for item in loan %}
+                  {% if item.due_amount != 0 %}
                   <tr>
                     <td class="px-1 py-1 align-middle text-center">
                       {{ forloop.counter }}
@@ -181,6 +182,7 @@
                       {{ item.due_amount|floatformat|intcomma }}
                     </td>
                   </tr>
+                  {% endif %}
                   {% endfor %}
                 </tbody>
               </table>
