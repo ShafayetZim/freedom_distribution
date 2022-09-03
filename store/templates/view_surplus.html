@@ -33,35 +33,39 @@
                             <label for="" class="control-label">Transaction Code</label>
                             <div class="h5"><b>{{surplus.code}}</b></div>
                         </div>
-                    </div>
-                    {% endif %}
-                    <div class="row">
                         <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                             <label for="" class="control-label">Month</label>
                             <div class="h5"><b>{{surplus.get_month_display}}</b></div>
                         </div>
-                        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                            <label for="contact" class="control-label">Total Expense</label>
-                            <div class=""><b>{{surplus.total_expense}}</b></div>
-                        </div>
                     </div>
+                    {% endif %}
                     <div class="row">
                         <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                            <label for="client" class="control-label">Total Cost</label>
+                            <label for="cost" class="control-label">Total Cost</label>
                             <div class=""><b>{{surplus.total_cost}}</b></div>
                         </div>
                         <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                            <label for="contact" class="control-label">Total Damage</label>
+                            <label for="damage" class="control-label">Total Damage</label>
                             <div class=""><b>{{surplus.total_damage}}</b></div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                            <label for="client" class="control-label">Total Sale</label>
+                            <label for="extra" class="control-label">Total Extra</label>
+                            <div class=""><b>{{surplus.total_extra}}</b></div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                            <label for="expense" class="control-label">Total Expense</label>
+                            <div class=""><b>{{surplus.total_expense}}</b></div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                            <label for="sale" class="control-label">Total Sale</label>
                             <div class=""><b>{{surplus.total_sale}}</b></div>
                         </div>
                         <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                            <label for="contact" class="control-label">Profit Margin</label>
+                            <label for="profit" class="control-label">Profit Margin</label>
                             <div class=""><b>{{surplus.margin}}</b></div>
                         </div>
                     </div>
