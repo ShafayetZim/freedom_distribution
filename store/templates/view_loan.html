@@ -73,7 +73,7 @@
                         <tbody>
                             {% for pitem in items %}
                             <tr>
-                                <td class="px-2 py-1 align-middle text-center">{{pitem.date|date}}</td>
+                                <td class="px-2 py-1 align-middle text-center">{{pitem.day}}</td>
                                 <td class="px-2 py-1 align-middle text-center loan_type">{{pitem.debit.name}}</td>
                                 <td class="px-2 py-1 align-middle text-center">{{pitem.amount|floatformat}}</td>
                             </tr>
@@ -112,7 +112,7 @@
                         <tbody>
                             {% for pitem in pitems %}
                             <tr>
-                                <td class="px-2 py-1 align-middle text-center">{{pitem.date|date}}</td>
+                                <td class="px-2 py-1 align-middle text-center">{{pitem.day}}</td>
                                 <td class="px-2 py-1 align-middle text-center loan_type">{{pitem.credit.name}}</td>
                                 <td class="px-2 py-1 align-middle text-center">{{pitem.amount|floatformat}}</td>
                             </tr>
