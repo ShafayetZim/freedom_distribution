@@ -38,7 +38,7 @@
             </thead>
             <tbody>
               {% for product in products %}
-              {% if product.available < 10 %}
+              {% if product.available < 50 %}
               <tr>
                 <td class="text-center">{{ forloop.counter }}</td>
                 <td class="text-center">{{ product.name }}</td>
