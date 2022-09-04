@@ -1,0 +1,12 @@
+<option value="">---------</option>
+{% for product in products %} {% if product.damage > 0 %}
+<option
+  value="{{ product.pk }}"
+  data-buy="{{product.buy}}"
+  data-price="{{product.price}}"
+  data-available="{{product.damage}}"
+  data-brand ="{{product.brand}}"
+>
+  {{ product.name }}
+</option>
+{% endif %} {% endfor %}
