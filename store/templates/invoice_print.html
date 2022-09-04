@@ -259,6 +259,7 @@ td {
     <tr>
         <th>Sl. No.</th>
         <th>Client</th>
+        <th>Brand</th>
         <th>Due</th>
         <th>Paid</th>
         <th>Remaining</th>
@@ -267,14 +268,48 @@ td {
     <tr>
         <td>{{forloop.counter}}</td>
         <td>{{item.client}}</td>
+        <td>{{item.brand}}</td>
         <td>{{item.due}}</td>
         <td>{{item.paid}}</td>
         <td>{{item.balance}}</td>
     </tr>
   {% endfor %}
     <tr>
-        <td colspan="4" style="text-align: right">&nbsp;Dues Total: &nbsp;</td>
+        <td colspan="5" style="text-align: right">&nbsp;Dues Total: &nbsp;</td>
         <td colspan="1" style="text-align: right">{{invoice_info.totalItems}} /- &nbsp;</td>
+    </tr>
+</table>
+
+<br />
+{% endif %}
+
+{% if sales_commission %}
+<table>
+    <tr>
+        <th colspan="4" style="border-right: none;">Brand Commission</th>
+    </tr>
+</table>
+
+<br />
+
+<table>
+    <tr>
+        <th>Sl. No.</th>
+        <th>Brand</th>
+        <th>Commission</th>
+        <th>Total</th>
+    </tr>
+  {% for item in sales_commission %}
+    <tr>
+        <td>{{forloop.counter}}</td>
+        <td>{{item.brand}}</td>
+        <td>{{item.commission}}</td>
+        <td>{{item.total_amount}}</td>
+    </tr>
+  {% endfor %}
+    <tr>
+        <td colspan="3" style="text-align: right">&nbsp;Commission Total: &nbsp;</td>
+        <td colspan="1" style="text-align: right">{{invoice_info.totalCommissions}} /- &nbsp;</td>
     </tr>
 </table>
 
@@ -288,13 +323,11 @@ td {
     </tr>
     <tr>
         <td colspan="4" style="text-align: right">
-            Grand Total: {{invoice_info.total_amount}} /- &nbsp;<br />
+            Sub Total: {{invoice_info.total_amount}} /- &nbsp;<br />
             Extra Amount: {{invoice_info.extra}} /- &nbsp;<br />
             Cost Amount: {{invoice_info.cost}} /- &nbsp;<br />
-            General Commission: {{invoice_info.display_commission}} /- &nbsp;<br />
-            Display Commission: {{invoice_info.general_commission}} /- &nbsp;<br />
             Paid Amount: {{invoice_info.tendered}} /- &nbsp;<br />
-            Short Amount: {{invoice_info.short}} /- &nbsp;<br />
+            Grand Amount: {{invoice_info.short}} /- &nbsp;<br />
 
         </td>
     </tr>
