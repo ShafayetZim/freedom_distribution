@@ -11,16 +11,18 @@
                     <div class="text-end mb-3">
                         <a class="btn btn-sm btn-primary rounded-0 bg-gradient-primary" href="{% url 'manage-surplus' %}" id="create_new"><i class="fa fa-plus"></i> Add New</a>
                     </div>
-                    <table class="table table-bordered table-striped" id="laundry-tbl">
+                    <table class="table table-bordered table-striped" id="surplus-tbl">
                         <colgroup>
                             <col width="5%">
                             <col width="10%">
-                            <col width="25%">
                             <col width="10%">
-                            <col width="10%">
-                            <col width="10%">
-                            <col width="10%">
-                            <col width="10%">
+                            <col width="9%">
+                            <col width="9%">
+                            <col width="9%">
+                            <col width="9%">
+                            <col width="9%">
+                            <col width="9%">
+                            <col width="11%">
                             <col width="10%">
                         </colgroup>
                         <thead>
@@ -30,9 +32,11 @@
                                 <th class="text-center">Code</th>
                                 <th class="text-center">Month</th>
                                 <th class="text-center">Sale</th>
+                                <th class="text-center">Extra</th>
                                 <th class="text-center">Cost</th>
+                                <th class="text-center">Damage</th>
                                 <th class="text-center">Expense</th>
-                                <th class="text-center">Margin</th>
+                                <th class="text-center">Profit</th>
                                 <th class="text-center">Action</th>
                             </tr>
                         </thead>
@@ -51,10 +55,12 @@
                                         <div>{{ item.get_month_display}}</div>
                                     </div>
                                 </td>
-                                <td>{{ item.total_sale}}</td>
-                                <td>{{ item.total_cost}}</td>
-                                <td>{{ item.total_expense}}</td>
-                                <td>{{ item.margin}}</td>
+                                <td class="text-center">{{ item.total_sale}}</td>
+                                <td class="text-center">{{ item.total_extra}}</td>
+                                <td class="text-center">{{ item.total_cost}}</td>
+                                <td class="text-center">{{ item.total_damage}}</td>
+                                <td class="text-center">{{ item.total_expense}}</td>
+                                <td class="text-center">{{ item.margin}}</td>
                                 <td class="text-center">
                                     <div class="dropdown">
                                         <button class="btn btn-light btn-sm rounded-0 border dropdown-toggle" type="button" id="abtn{{item.pk}}" data-bs-toggle="dropdown" aria-expanded="false">
@@ -82,8 +88,8 @@
         $('.delete-data').click(function() {
             _conf("Are you sure to delete this Surplus?", 'delete_surplus', ["'" + $(this).attr('data-url') + "'"])
         })
-        $('#laundry-tbl').find('td, th').addClass('px-2 py-1 align-middle')
-        $('#laundry-tbl').DataTable({
+        $('#surplus-tbl').find('td, th').addClass('px-2 py-1 align-middle')
+        $('#surplus-tbl').DataTable({
             columnDefs: [{
                 orderable: false,
                 targets: [4]
