@@ -57,7 +57,7 @@
                             <div class="form-group">
                                 <label for="WorkName">Check Brand</label>
                                 <select class="form-control" id="check_brand" name="check_brand">
-                                    <option value="" disabled selected>Select Brand Here</option>
+                                    <option value="All">All</option>
                                     {% for item in brand %}
                                     <option value="{{item.name}}">{{item.name}}</option>
                                     {% endfor %}
@@ -175,6 +175,11 @@
         "'" + $(this).attr("data-url") + "'",
       ]);
     });
+    $('#check_brand').select2({
+        placeholder: "Please Select Brands Here",
+        width: "100%",
+        selectionCssClass: "form-control form-control-sm rounded-2"
+    })
     $("#product-tbl").find("td, th").addClass("px-2 py-1 align-middle");
     $("#product-tbl").DataTable({
       columnDefs: [
