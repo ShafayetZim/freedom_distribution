@@ -13,6 +13,7 @@
             <input type="hidden" name="id" value="{{online.id}}">
             <input type="hidden" name="code" value="{% if online.code  %}{{online.code}}{% else %}generate{% endif %}">
             <input type="hidden" name="status" value="{% if online.status  %}{{online.status}}{% else %}0{% endif %}">
+            <input type="hidden" name="due_amount" value="{% if online.due_amount  %}{{online.due_amount}}{% else %}0{% endif %}">
             <div class="card rounded-0 mb-3">
 <!--                <div class="card-header">-->
 <!--                    <div class="card-title py-1">Client Details</div>-->
@@ -62,7 +63,7 @@
                             </div>
                         </div>
                         <div class="clear-fix mt-2"></div>
-                        <table class="table table-bordered" id="product_list">
+                        <table class="table table-bordered" id="advance_list">
                             <colgroup>
                                 <col width="5%">
                                 <col width="35%">
@@ -74,9 +75,9 @@
                                 <tr>
                                     <th class="p-1 text-center"></th>
                                     <th class="p-1 text-center">Brand Name</th>
+                                    <th class="p-1 text-center">Date</th>
                                     <th class="p-1 text-center">Advance</th>
-                                    <th class="p-1 text-center">Received</th>
-                                    <th class="p-1 text-center">Dues</th>
+                                    <th class="p-1 text-center">Total</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -88,12 +89,12 @@
                                     </td>
                                     <td class="px-2 py-1 align-middle brand_type">{{pitem.brand.name}}</td>
                                     <td class="px-2 py-1 align-middle">
-                                        <input type="number" min="1" value="{{pitem.advance|floatformat}}" class="form-control form-control-sm rounded-0 text-center" name="brand_advance[]" required>
+                                        <input type="date" value="{{pitem.day}}" class="form-control form-control-sm rounded-0 text-center" name="brand_day[]" required>
                                     </td>
                                     <td class="px-2 py-1 align-middle">
-                                        <input type="number" min="1" value="{{pitem.receive|floatformat}}" class="form-control form-control-sm rounded-0 text-center" name="brand_receive[]" required>
+                                        <input type="number" min="1" value="{{pitem.advance|floatformat}}" class="form-control form-control-sm rounded-0 text-center" name="brand_advance[]" required>
                                     </td>
-                                    <td class="px-2 py-1 align-middle brand_total text-end">{{pitem.due|floatformat}}</td>
+                                    <td class="px-2 py-1 align-middle brand_total text-end">{{pitem.total_amount|floatformat}}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -108,13 +109,79 @@
                 </div>
             </div>
             <div class="card rounded-0 mb-3">
+                <div class="card-header">
+                    <div class="card-title py-1">Advance credit List</div>
+                </div>
+                <div class="card-body">
+                    <div class="container-fluid">
+                        <div class="row align-items-end">
+                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                <label for="brands" class="control-label">Brand</label>
+                                <select id="brand" class="form-control form-control-sm rounded-0">
+                                    <option value="" disabled selected></option>
+                                    {% for item in brand %}
+                                    <option value="{{item.pk}}">{{item.name}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                <button class="btn btn-primary btn-sm rounded-0 bg-gradient bg-primary" type="button" id="add_credit"><i class="fa fa-plus"></i> Add brand</button>
+                            </div>
+                        </div>
+                        <div class="clear-fix mt-2"></div>
+                        <table class="table table-bordered" id="credit_list">
+                            <colgroup>
+                                <col width="5%">
+                                <col width="35%">
+                                <col width="20%">
+                                <col width="20%">
+                                <col width="20%">
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th class="p-1 text-center"></th>
+                                    <th class="p-1 text-center">Brand Name</th>
+                                    <th class="p-1 text-center">Date</th>
+                                    <th class="p-1 text-center">Amount</th>
+                                    <th class="p-1 text-center">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for pitem in items %}
+                                <tr>
+                                    <td class="px-2 py-1 align-middle text-center">
+                                        <input type="hidden" name="credit_id[]" value="{{pitem.brand.id}}">
+                                        <button class="btn btn-outline-danger btn-sm rounded-0 rem-credit" type="button"><i class="fa fa-times"></i></button>
+                                    </td>
+                                    <td class="px-2 py-1 align-middle credit_type">{{pitem.brand.name}}</td>
+                                    <td class="px-2 py-1 align-middle">
+                                        <input type="date" value="{{pitem.day}}" class="form-control form-control-sm rounded-0 text-center" name="credit_day[]" required>
+                                    </td>
+                                    <td class="px-2 py-1 align-middle">
+                                        <input type="number" min="1" value="{{pitem.amount|floatformat}}" class="form-control form-control-sm rounded-0 text-center" name="credit_amount[]" required>
+                                    </td>
+                                    <td class="px-2 py-1 align-middle credit_total text-end">{{pitem.total_amount|floatformat}}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th class="text-end" colspan="4">Total</th>
+                                    <th class="text-end sub-total-credit">0.00</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="card rounded-0 mb-3">
                 <div class="card-body">
                     <div class="d-flex w-100 justify-content-end align-items-center">
                         <div class="col-auto">
                             <h4 class="fw-bolder text-muted pe-2">Dues total:</h4>
                         </div>
                         <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 text-end">
-                            <h4 class="fw-bolder pe-2 gtotal">{% if onlone.total_amount %}{{online.total_amount|floatformat:2|intcomma}}{% else %}0.00{% endif %}</h4>
+                            <h4 class="fw-bolder pe-2 gtotal">{% if onlone.due_amount %}{{online.due_amount|floatformat:2|intcomma}}{% else %}0.00{% endif %}</h4>
                         </div>
                     </div>
 <!--                    <div class="d-flex w-100 justify-content-end align-items-center">-->
@@ -143,6 +210,22 @@
     </div>
 </section>
 
+<noscript id="credit-clone">
+    <tr>
+        <td class="px-2 py-1 align-middle text-center">
+            <input type="hidden" name="credit_id[]" value="">
+            <button class="btn btn-outline-danger btn-sm rounded-0 rem-credit" type="button"><i class="fa fa-times"></i></button>
+        </td>
+        <td class="px-2 py-1 align-middle credit_type"></td>
+        <td class="px-2 py-1 align-middle">
+            <input type="date" class="form-control form-control-sm rounded-0 text-center" name="credit_date[]" required>
+        </td>
+        <td class="px-2 py-1 align-middle">
+            <input type="number" min="0" value="0" class="form-control form-control-sm rounded-0 text-center" name="credit_amount[]" required>
+        </td>
+        <td class="px-2 py-1 align-middle credit_total text-end">0.00</td>
+    </tr>
+</noscript>
 <noscript id="product-clone">
     <tr>
         <td class="px-2 py-1 align-middle text-center">
@@ -151,10 +234,10 @@
         </td>
         <td class="px-2 py-1 align-middle brand_type"></td>
         <td class="px-2 py-1 align-middle">
-            <input type="number" min="0" value="0" class="form-control form-control-sm rounded-0 text-center" name="brand_advance[]" required>
+            <input type="date" id="day" class="form-control form-control-sm rounded-0 text-center" name="brand_date[]" required>
         </td>
         <td class="px-2 py-1 align-middle">
-            <input type="number" min="0" value="0" class="form-control form-control-sm rounded-0 text-center" name="brand_receive[]" required>
+            <input type="number" min="0" value="0" class="form-control form-control-sm rounded-0 text-center" name="brand_advance[]" required>
         </td>
         <td class="px-2 py-1 align-middle brand_total text-end">0.00</td>
     </tr>
@@ -164,35 +247,32 @@
         var sub_laundry = 0
         var sub_product = 0
         var gtotal = 0
-        $('#laundry_list tbody tr').each(function() {
-            var price = $(this).find('[name="laundry_price[]"]').val()
-            var weight = $(this).find('[name="laundry_weight[]"]').val()
-            weight = weight > 0 ? weight : 0;
+        $('#credit_list tbody tr').each(function() {
+            var price = $(this).find('[name="credit_amount[]"]').val()
+
             price = price > 0 ? price : 0;
-            sub_laundry += parseFloat(parseFloat(weight) * parseFloat(price))
-            gtotal += parseFloat(parseFloat(weight) * parseFloat(price))
-            $(this).find('.laundry_total').text(parseFloat(parseFloat(weight) * parseFloat(price)).toLocaleString('en-US'))
+            sub_laundry += parseFloat(parseFloat(price))
+            gtotal += parseFloat(parseFloat(-price))
+            $(this).find('.credit_total').text(parseFloat(parseFloat(price)).toLocaleString('en-US'))
         })
-        $('.sub-total-laundry').text(parseFloat(sub_laundry).toLocaleString('en-US', {
+        $('.sub-total-credit').text(parseFloat(sub_laundry).toLocaleString('en-US', {
             style: 'decimal',
             maximumFractionDigits: 2,
             minimumFractionDigits: 2
         }))
-        $('#product_list tbody tr').each(function() {
+        $('#advance_list tbody tr').each(function() {
             var buy = $(this).find('[name="brand_advance[]"]').val()
-            var qty = $(this).find('[name="brand_receive[]"]').val()
-            qty = qty > 0 ? qty : 0;
             buy = buy > 0 ? buy : 0;
-            sub_product += parseFloat(parseFloat(buy) - parseFloat(qty))
-            gtotal += parseFloat(parseFloat(buy) - parseFloat(qty))
-            $(this).find('.brand_total').text(parseFloat(parseFloat(buy) - parseFloat(qty)).toLocaleString('en-US'))
+            sub_product += parseFloat(parseFloat(buy))
+            gtotal += parseFloat(parseFloat(buy))
+            $(this).find('.brand_total').text(parseFloat(parseFloat(buy)).toLocaleString('en-US'))
         })
         $('.sub-total-product').text(parseFloat(sub_product).toLocaleString('en-US', {
             style: 'decimal',
             maximumFractionDigits: 2,
             minimumFractionDigits: 2
         }))
-        $('[name="total_amount"]').val(gtotal)
+        $('[name="due_amount"]').val(gtotal)
         $('.gtotal').text(parseFloat(gtotal).toLocaleString('en-US', {
             style: 'decimal',
             maximumFractionDigits: 2,
@@ -212,6 +292,11 @@
             width: "100%",
             selectionCssClass: "form-control form-control-sm rounded-0"
         })
+        $('#brand').select2({
+            placeholder: "Please Select Brands Here",
+            width: "100%",
+            selectionCssClass: "form-control form-control-sm rounded-0"
+        })
 
         $('#pay_later').click(function() {
 
@@ -220,47 +305,46 @@
         $('#laundry-submit-btn').click(function() {
             $('#tendered_amount').attr('required', true)
         })
-        $('#laundry_list tbody').find('[name="laundry_weight[]"]').on('input change', function() {
+        $('#credit_list tbody').find('[name="credit_amount[]"]').on('input change', function() {
             calc_total()
         })
-        $('#laundry_list tbody').find('.rem-laundry').click(function() {
+        $('#credit_list tbody').find('.rem-credit').click(function() {
             if (confirm("Are you sure to remove this item?") == true) {
                 $(this).closest('tr').remove()
                 calc_total()
             }
         })
-        $('#product_list tbody').find('[name="brand_receive[]"]').on('input change', function() {
+        $('#advance_list tbody').find('[name="brand_receive[]"]').on('input change', function() {
             calc_total()
         })
-        $('#product_list tbody').find('[name="brand_advance[]"]').on('input change', function() {
+        $('#advance_list tbody').find('[name="brand_advance[]"]').on('input change', function() {
             calc_total()
         })
-        $('#product_list tbody').find('.rem-brand').click(function() {
+        $('#advance_list tbody').find('.rem-brand').click(function() {
             if (confirm("Are you sure to remove this item?") == true) {
                 $(this).closest('tr').remove()
                 calc_total()
             }
         })
-        $('#add_laundry').click(function() {
-            var pid = $('#prices').val()
+        $('#add_credit').click(function() {
+            var pid = $('#brand').val()
             if (pid < '1') {
                 return false
             }
-            var price = $('#prices option[value="' + pid + '"]').attr('data-price')
-            var laundry_type = $('#prices option[value="' + pid + '"]').text()
-            var tr = $($('noscript#laundry-clone').html()).clone()
-            tr.find('.laundry_type').text(laundry_type)
-            tr.find('.laundry_price').text(parseFloat(price).toLocaleString('en-US'))
-            tr.find('.laundry_total').text(parseFloat(price).toLocaleString('en-US'))
-            tr.find('[name="price_id[]"]').val(pid)
-            tr.find('[name="laundry_price[]"]').val(price)
-            $('#laundry_list tbody').append(tr)
+
+            var brand_name = $('#brands option[value="' + pid + '"]').text()
+            var tr = $($('noscript#credit-clone').html()).clone()
+            tr.find('.credit_type').text(brand_name)
+            tr.find('[name="credit_id[]"]').val(pid)
+            tr.find('[name="credit_date[]"]').val()
+
+            $('#credit_list tbody').append(tr)
             calc_total()
-            $('#prices').val('').trigger('change')
-            tr.find('[name="laundry_weight[]"]').on('input change', function() {
+            $('#brand').val('').trigger('change')
+            tr.find('[name="credit_amount[]"]').on('input change', function() {
                 calc_total()
             })
-            tr.find('.rem-laundry').click(function() {
+            tr.find('.rem-credit').click(function() {
                 if (confirm("Are you sure to remove this item?") == true) {
                     tr.remove()
                     calc_total()
@@ -278,13 +362,9 @@
             var tr = $($('noscript#product-clone').html()).clone()
             tr.find('.brand_type').text(brand_name)
             tr.find('[name="brand_id[]"]').val(pid)
+            tr.find('[name="brand_date[]"]').val()
 
-            $('#product_list tbody').append(tr)
-            calc_total()
-            $('#brands').val('').trigger('change')
-            tr.find('[name="brand_receive[]"]').on('input change', function() {
-                calc_total()
-            })
+            $('#advance_list tbody').append(tr)
             calc_total()
             $('#brands').val('').trigger('change')
             tr.find('[name="brand_advance[]"]').on('input change', function() {
