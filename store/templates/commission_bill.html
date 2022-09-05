@@ -25,7 +25,7 @@
               <i class="fa fa-plus"></i> Add New
             </button>
           </div>
-          <table class="table table-bordered table-striped" id="product-tbl">
+          <table class="table table-bordered table-striped" id="commission-tbl">
             <colgroup>
               <col width="5%" />
               <col width="25%" />
@@ -145,8 +145,8 @@
         "'" + $(this).attr("data-url") + "'",
       ]);
     });
-    $("#product-tbl").find("td, th").addClass("px-2 py-1 align-middle");
-    $("#product-tbl").DataTable({
+    $("#commission-tbl").find("td, th").addClass("px-2 py-1 align-middle");
+    $("#commission-tbl").DataTable({
       columnDefs: [
         {
           orderable: false,
