@@ -55,7 +55,7 @@
 
                         <div class="col">
                             <div class="form-group">
-                                <label for="WorkName">Check Brand</label>
+                                <label for="brand">Check Brand</label>
                                 <select class="form-control" id="check_brand" name="check_brand">
                                     <option value="All">All</option>
                                     {% for item in brand %}
@@ -170,6 +170,11 @@
         "'" + $(this).attr("data-url") + "'",
       ]);
     });
+    $('#check_brand').select2({
+        placeholder: "Please Select Brand Here",
+        width: "100%",
+        selectionCssClass: "form-control form-control-sm rounded-2"
+    })
     $("#product-tbl").find("td, th").addClass("px-2 py-1 align-middle");
     $("#product-tbl").DataTable({
       columnDefs: [
