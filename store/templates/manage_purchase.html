@@ -1,15 +1,8 @@
 {% extends 'base.html' %}{% load static %}{% load humanize %}{% block pageContent %}
-<style>
-    #laundry-img {
-        max-width: 100%;
-        max-height: 10em;
-        object-fit: scale-down;
-        object-position: center center;
-    }
-</style>
+
 <section class="py-4">
     <div class="container">
-        <form action="" id="laundry-form">
+        <form action="" id="purchase-form" data-product-url="{% url 'ajax_load_damage_product' %}">
             <input type="hidden" name="id" value="{{purchase.id}}">
             <input type="hidden" name="code" value="{% if purchase.code  %}{{purchase.code}}{% else %}generate{% endif %}">
             <input type="hidden" name="status" value="{% if purchase.status  %}{{purchase.status}}{% else %}0{% endif %}">
@@ -29,16 +22,6 @@
                             </div>
                         </div>
                         {% endif %}
-<!--                        <div class="row">-->
-<!--                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">-->
-<!--                                <label for="client" class="control-label">Fullname</label>-->
-<!--                                <input type="text" class="form-control form-control-sm rounded-0" name="client" id="client" value="{{purchase.client}}" required>-->
-<!--                            </div>-->
-<!--                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">-->
-<!--                                <label for="contact" class="control-label">Contact #</label>-->
-<!--                                <input type="text" class="form-control form-control-sm rounded-0" name="contact" id="contact" value="{{purchase.contact}}">-->
-<!--                            </div>-->
-<!--                        </div>-->
                     </div>
                 </div>
             </div>
@@ -50,7 +33,20 @@
                 <div class="card-body">
                     <div class="container-fluid">
                         <div class="row align-items-end">
-                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                                <label for="brand" class="control-label">Brand</label>
+                                  <select name="brand" id="brand" class="form-select form-control-sm rounded-0">
+                                      <option value="" disabled selected></option>
+                                      {% if purchase.brand %}
+                                      <option selected value="{{purchase.brand.pk}}">{{purchase.brand}}</option>
+                                      <option>-----Please Select From Below-----</option>
+                                      {% endif %}
+                                      {% for item in brand %}
+                                      <option value="{{item.pk}}">{{item.name}}</option>
+                                      {% endfor %}
+                                  </select>
+                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
                                 <label for="products" class="control-label">Products</label>
                                 <select id="products" class="form-control form-control-sm rounded-0">
                                     <option value="" disabled selected></option>
@@ -59,7 +55,7 @@
                                     {% endfor %}
                                 </select>
                             </div>
-                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
                                 <button class="btn btn-primary btn-sm rounded-0 bg-gradient bg-primary" type="button" id="add_product"><i class="fa fa-plus"></i> Add Product</button>
                             </div>
                         </div>
@@ -123,26 +119,9 @@
                             <h4 class="fw-bolder pe-2 gtotal">{% if purchase.total_amount %}{{purchase.total_amount|floatformat:2|intcomma}}{% else %}0.00{% endif %}</h4>
                         </div>
                     </div>
-<!--                    <div class="d-flex w-100 justify-content-end align-items-center">-->
-<!--                        <div class="col-auto">-->
-<!--                            <h4 class="fw-bolder text-muted pe-2">Paid Amount:</h4>-->
-<!--                        </div>-->
-<!--                        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 text-end">-->
-<!--                            <input type="number" step="any" class="form-control form-control-lg rounded-0 text-end" id="tendered_amount" name="tendered" value="{% if purchase.tendered %}{{purchase.tendered|floatformat:2}}{% else %}0{% endif %}" required>-->
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                    <div class="d-flex w-100 justify-content-end align-items-center">-->
-<!--                        <div class="col-auto">-->
-<!--                            <h4 class="fw-bolder text-muted pe-2">Change:</h4>-->
-<!--                        </div>-->
-<!--                        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 text-end">-->
-<!--                            <h4 class="fw-bolder pe-2 " id="change">{% if purchase.change %}{{purchase.change|floatformat:2|intcomma}}{% else %}0.00{% endif %}</h4>-->
-<!--                        </div>-->
-<!--                    </div>-->
                 </div>
                 <div class="card-footer py-1 text-center">
                     <button class="btn btn-primary btn-sm rounded-0" type="button" id="pay_later">Save</button>
-<!--                    <button class="btn btn-success btn-sm rounded-0" id="laundry-submit-btn" form="laundry-form"><i class="fa fa-save"></i> Pay</button>-->
                 </div>
             </div>
         </form>
@@ -169,23 +148,8 @@
 </noscript> {% endblock pageContent %} {% block ScriptBlock %}
 <script>
     function calc_total() {
-        var sub_laundry = 0
         var sub_product = 0
         var gtotal = 0
-        $('#laundry_list tbody tr').each(function() {
-            var price = $(this).find('[name="laundry_price[]"]').val()
-            var weight = $(this).find('[name="laundry_weight[]"]').val()
-            weight = weight > 0 ? weight : 0;
-            price = price > 0 ? price : 0;
-            sub_laundry += parseFloat(parseFloat(weight) * parseFloat(price))
-            gtotal += parseFloat(parseFloat(weight) * parseFloat(price))
-            $(this).find('.laundry_total').text(parseFloat(parseFloat(weight) * parseFloat(price)).toLocaleString('en-US'))
-        })
-        $('.sub-total-laundry').text(parseFloat(sub_laundry).toLocaleString('en-US', {
-            style: 'decimal',
-            maximumFractionDigits: 2,
-            minimumFractionDigits: 2
-        }))
         $('#product_list tbody tr').each(function() {
             var buy = $(this).find('[name="product_price[]"]').val()
             var qty = $(this).find('[name="product_quantity[]"]').val()
@@ -211,8 +175,8 @@
     }
     $(function() {
         calc_total()
-        $('#prices').select2({
-            placeholder: "Please Select Laundry Type Here",
+        $('#brand').select2({
+            placeholder: "Please Select Brand Here",
             width: "100%",
             selectionCssClass: "form-control form-control-sm rounded-0"
         })
@@ -224,20 +188,9 @@
 
         $('#pay_later').click(function() {
 
-            $('#laundry-form').submit()
+            $('#purchase-form').submit()
         })
-        $('#laundry-submit-btn').click(function() {
-            $('#tendered_amount').attr('required', true)
-        })
-        $('#laundry_list tbody').find('[name="laundry_weight[]"]').on('input change', function() {
-            calc_total()
-        })
-        $('#laundry_list tbody').find('.rem-laundry').click(function() {
-            if (confirm("Are you sure to remove this item?") == true) {
-                $(this).closest('tr').remove()
-                calc_total()
-            }
-        })
+
         $('#product_list tbody').find('[name="product_quantity[]"]').on('input change', function() {
             calc_total()
         })
@@ -246,32 +199,6 @@
                 $(this).closest('tr').remove()
                 calc_total()
             }
-        })
-        $('#add_laundry').click(function() {
-            var pid = $('#prices').val()
-            if (pid < '1') {
-                return false
-            }
-            var price = $('#prices option[value="' + pid + '"]').attr('data-price')
-            var laundry_type = $('#prices option[value="' + pid + '"]').text()
-            var tr = $($('noscript#laundry-clone').html()).clone()
-            tr.find('.laundry_type').text(laundry_type)
-            tr.find('.laundry_price').text(parseFloat(price).toLocaleString('en-US'))
-            tr.find('.laundry_total').text(parseFloat(price).toLocaleString('en-US'))
-            tr.find('[name="price_id[]"]').val(pid)
-            tr.find('[name="laundry_price[]"]').val(price)
-            $('#laundry_list tbody').append(tr)
-            calc_total()
-            $('#prices').val('').trigger('change')
-            tr.find('[name="laundry_weight[]"]').on('input change', function() {
-                calc_total()
-            })
-            tr.find('.rem-laundry').click(function() {
-                if (confirm("Are you sure to remove this item?") == true) {
-                    tr.remove()
-                    calc_total()
-                }
-            })
         })
 
         $('#add_product').click(function() {
@@ -302,7 +229,7 @@
                 }
             })
         })
-        $('#laundry-form').submit(function(e) {
+        $('#purchase-form').submit(function(e) {
             e.preventDefault();
             var _this = $(this)
             $('.err-msg').remove();
@@ -350,5 +277,22 @@
             })
         })
     })
+
+    // this one is for fetching product data
+    $("#brand").change(function () {
+      var url = $("#purchase-form").attr("data-product-url");  // get the url of the `load_damage_product` view
+      var brandId = $(this).val();  // get the selected brand ID from the HTML input
+
+      $.ajax({                       // initialize an AJAX request
+        url: '{% url 'ajax_load_purchase_product' %}',                    // set the url of the request (= localhost:8000/hr/ajax/load-cities/)
+        data: {
+          'brand': brandId       // add the brand id to the GET parameters
+        },
+        success: function (data) {   // `data` is the return of the `load_cities` view function
+          $("#products").html(data);  // replace the contents of the city input with the data that came from the server
+        }
+      });
+
+    });
 </script>
 {% endblock ScriptBlock %}
