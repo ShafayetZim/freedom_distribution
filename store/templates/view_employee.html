@@ -179,7 +179,9 @@
                       >
                     </td>
                     <td class="px-1 py-1 align-middle text-end">
-                      {{ item.due_amount|floatformat|intcomma }}
+                      {% if employee.due != 0 %}
+                      {{employee.due|floatformat}}
+                      {% else %} 0 {% endif %}
                     </td>
                   </tr>
                   {% endif %}
