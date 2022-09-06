@@ -118,7 +118,7 @@
         </div>
 
 
-        <form action="" id="advance-form">
+        <form action="" id="profit-form">
             <input type="hidden" name="id" value="{{surplus.id}}">
             <input type="hidden" name="code" value="{% if surplus.code  %}{{surplus.code}}{% else %}generate{% endif %}">
             <input type="hidden" name="status" value="{% if surplus.status  %}{{surplus.status}}{% else %}0{% endif %}">
@@ -235,7 +235,7 @@
 
             <div class="card rounded-0 mb-3">
                 <div class="card-header">
-                    <div class="card-title py-1">Advance List</div>
+                    <div class="card-title py-1">Expense List</div>
                 </div>
                 <div class="card-body">
                     <div class="container-fluid">
@@ -254,7 +254,7 @@
                             </div>
                         </div>
                         <div class="clear-fix mt-2"></div>
-                        <table class="table table-bordered" id="product_list">
+                        <table class="table table-bordered" id="expense_list">
                             <colgroup>
                                 <col width="5%">
                                 <col width="30%">
@@ -292,7 +292,7 @@
                             <tfoot>
                                 <tr>
                                     <th class="text-end" colspan="4">Total</th>
-                                    <th class="text-end sub-total-product">0.00</th>
+                                    <th class="text-end sub-total-expense">0.00</th>
                                 </tr>
                             </tfoot>
                         </table>
@@ -309,22 +309,6 @@
                             <h4 class="fw-bolder pe-2 gtotal">{% if surplus.total_expense %}{{surplus.total_expense|floatformat:2|intcomma}}{% else %}0.00{% endif %}</h4>
                         </div>
                     </div>
-<!--                    <div class="d-flex w-100 justify-content-end align-items-center">-->
-<!--                        <div class="col-auto">-->
-<!--                            <h4 class="fw-bolder text-muted pe-2">Paid Amount:</h4>-->
-<!--                        </div>-->
-<!--                        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 text-end">-->
-<!--                            <input type="number" step="any" class="form-control form-control-lg rounded-0 text-end" id="tendered_amount" name="tendered" value="{% if purchase.tendered %}{{purchase.tendered|floatformat:2}}{% else %}0{% endif %}" required>-->
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                    <div class="d-flex w-100 justify-content-end align-items-center">-->
-<!--                        <div class="col-auto">-->
-<!--                            <h4 class="fw-bolder text-muted pe-2">Change:</h4>-->
-<!--                        </div>-->
-<!--                        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 text-end">-->
-<!--                            <h4 class="fw-bolder pe-2 " id="change">{% if purchase.change %}{{purchase.change|floatformat:2|intcomma}}{% else %}0.00{% endif %}</h4>-->
-<!--                        </div>-->
-<!--                    </div>-->
                 </div>
                 <div class="card-footer py-1 text-center">
                     <button class="btn btn-primary btn-sm rounded-0" type="button" id="pay_later">Save</button>
@@ -353,32 +337,18 @@
 </noscript> {% endblock pageContent %} {% block ScriptBlock %}
 <script>
     function calc_total() {
-        var sub_laundry = 0
-        var sub_product = 0
+        var sub_expense = 0
         var gtotal = 0
-        $('#laundry_list tbody tr').each(function() {
-            var price = $(this).find('[name="laundry_price[]"]').val()
-            var weight = $(this).find('[name="laundry_weight[]"]').val()
-            weight = weight > 0 ? weight : 0;
-            price = price > 0 ? price : 0;
-            sub_laundry += parseFloat(parseFloat(weight) * parseFloat(price))
-            gtotal += parseFloat(parseFloat(weight) * parseFloat(price))
-            $(this).find('.laundry_total').text(parseFloat(parseFloat(weight) * parseFloat(price)).toLocaleString('en-US'))
-        })
-        $('.sub-total-laundry').text(parseFloat(sub_laundry).toLocaleString('en-US', {
-            style: 'decimal',
-            maximumFractionDigits: 2,
-            minimumFractionDigits: 2
-        }))
-        $('#product_list tbody tr').each(function() {
+
+        $('#expense_list tbody tr').each(function() {
             var buy = $(this).find('[name="expense_amount[]"]').val()
 
             buy = buy > 0 ? buy : 0;
-            sub_product += parseFloat(parseFloat(buy))
+            sub_expense += parseFloat(parseFloat(buy))
             gtotal += parseFloat(parseFloat(buy))
             $(this).find('.expense_total').text(parseFloat(parseFloat(buy)).toLocaleString('en-US'))
         })
-        $('.sub-total-product').text(parseFloat(sub_product).toLocaleString('en-US', {
+        $('.sub-total-expense').text(parseFloat(sub_expense).toLocaleString('en-US', {
             style: 'decimal',
             maximumFractionDigits: 2,
             minimumFractionDigits: 2
@@ -395,70 +365,31 @@
     }
     $(function() {
         calc_total()
-        $('#prices').select2({
-            placeholder: "Please Select Laundry Type Here",
-            width: "100%",
-            selectionCssClass: "form-control form-control-sm rounded-0"
-        })
         $('#expenses').select2({
             placeholder: "Please Select Expenses Here",
             width: "100%",
             selectionCssClass: "form-control form-control-sm rounded-0"
         })
+        $('#check_brand').select2({
+            placeholder: "Please Select Brand Here",
+            width: "100%",
+            selectionCssClass: "form-control form-control-sm rounded-2"
+        })
 
         $('#pay_later').click(function() {
 
-            $('#advance-form').submit()
+            $('#profit-form').submit()
         })
-        $('#laundry-submit-btn').click(function() {
-            $('#tendered_amount').attr('required', true)
-        })
-        $('#laundry_list tbody').find('[name="laundry_weight[]"]').on('input change', function() {
+
+        $('#expense_list tbody').find('[name="expense_amount[]"]').on('input change', function() {
             calc_total()
         })
-        $('#laundry_list tbody').find('.rem-laundry').click(function() {
+
+        $('#expense_list tbody').find('.rem-expense').click(function() {
             if (confirm("Are you sure to remove this item?") == true) {
                 $(this).closest('tr').remove()
                 calc_total()
             }
-        })
-        $('#product_list tbody').find('[name="expense_amount[]"]').on('input change', function() {
-            calc_total()
-        })
-        $('#product_list tbody').find('[name="brand_advance[]"]').on('input change', function() {
-            calc_total()
-        })
-        $('#product_list tbody').find('.rem-expense').click(function() {
-            if (confirm("Are you sure to remove this item?") == true) {
-                $(this).closest('tr').remove()
-                calc_total()
-            }
-        })
-        $('#add_laundry').click(function() {
-            var pid = $('#prices').val()
-            if (pid < '1') {
-                return false
-            }
-            var price = $('#prices option[value="' + pid + '"]').attr('data-price')
-            var laundry_type = $('#prices option[value="' + pid + '"]').text()
-            var tr = $($('noscript#laundry-clone').html()).clone()
-            tr.find('.laundry_type').text(laundry_type)
-            tr.find('.laundry_price').text(parseFloat(price).toLocaleString('en-US'))
-            tr.find('.laundry_total').text(parseFloat(price).toLocaleString('en-US'))
-            tr.find('[name="price_id[]"]').val(pid)
-            tr.find('[name="laundry_price[]"]').val(price)
-            $('#laundry_list tbody').append(tr)
-            calc_total()
-            $('#prices').val('').trigger('change')
-            tr.find('[name="laundry_weight[]"]').on('input change', function() {
-                calc_total()
-            })
-            tr.find('.rem-laundry').click(function() {
-                if (confirm("Are you sure to remove this item?") == true) {
-                    tr.remove()
-                    calc_total()
-                }
-            })
         })
 
         $('#add_expense').click(function() {
@@ -473,17 +404,13 @@
             tr.find('[name="expense_id[]"]').val(pid)
             tr.find('[name="expense_note[]"]').val()
 
-            $('#product_list tbody').append(tr)
+            $('#expense_list tbody').append(tr)
             calc_total()
             $('#expenses').val('').trigger('change')
             tr.find('[name="expense_amount[]"]').on('input change', function() {
                 calc_total()
             })
-            calc_total()
-            $('#brands').val('').trigger('change')
-            tr.find('[name="brand_advance[]"]').on('input change', function() {
-                calc_total()
-            })
+
             tr.find('.rem-expense').click(function() {
                 if (confirm("Are you sure to remove this item?") == true) {
                     tr.remove()
@@ -491,7 +418,7 @@
                 }
             })
         })
-        $('#advance-form').submit(function(e) {
+        $('#profit-form').submit(function(e) {
             e.preventDefault();
             var _this = $(this)
             $('.err-msg').remove();
