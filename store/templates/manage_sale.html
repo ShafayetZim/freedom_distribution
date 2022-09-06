@@ -31,7 +31,7 @@
     {% if sale.code %}
     <div class="alert">
       <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
-      <strong>Warning!</strong> First select the group for edit/update purpose.
+      <strong>Warning!</strong> First select the Brand for edit/update purpose.
     </div>
     {% endif %}
     <div class="container">
@@ -67,14 +67,6 @@
                                     {% endfor %}
                                 </select>
                             </div>
-<!--                            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">-->
-<!--                                <label for="client" class="control-label">Fullname</label>-->
-<!--                                <input type="text" class="form-control form-control-sm rounded-0" name="client" id="client" value="{{sale.client}}" required>-->
-<!--                            </div>-->
-<!--                            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">-->
-<!--                                <label for="contact" class="control-label">Contact #</label>-->
-<!--                                <input type="text" class="form-control form-control-sm rounded-0" name="contact" id="contact" value="{{sale.contact}}">-->
-<!--                            </div>-->
                         </div>
                         <div class="row">
                             <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
@@ -115,6 +107,10 @@
                                 <label for="category" class="control-label">Brand</label>
                                   <select name="brand" id="category" class="form-select form-control-sm rounded-0">
                                       <option value="" disabled selected></option>
+                                      {% if sale.brand %}
+                                      <option selected value="{{sale.brand.pk}}">{{sale.brand}}</option>
+                                      <option>-----Please Select From Below-----</option>
+                                      {% endif %}
                                       {% for item in brand %}
                                       <option value="{{item.pk}}">{{item.name}}</option>
                                       {% endfor %}
@@ -140,13 +136,13 @@
                             <colgroup>
                                 <col width="5%">
                                 <col width="25%">
-                                <col width="8%">
-                                <col width="8%">
-                                <col width="8%">
                                 <col width="9%">
                                 <col width="9%">
-                                <col width="8%">
-                                <col width="8%">
+                                <col width="9%">
+                                <col width="10%">
+                                <col width="10%">
+                                <col width="9%">
+                                <col width="2%">
                                 <col width="2%">
                                 <col width="10%">
                             </colgroup>
@@ -160,7 +156,7 @@
                                     <th class="p-1 text-center">Quantity</th>
                                     <th class="p-1 text-center">Free</th>
                                     <th class="p-1 text-center">Good</th>
-                                    <th class="p-1 text-center">Damage</th>
+                                    <th class="p-1 text-center"></th>
                                     <th class="p-1 text-center"></th>
                                     <th class="p-1 text-center">Total</th>
                                 </tr>
@@ -190,7 +186,7 @@
                                         <input type="number" min="0" value="{{pitem.good_quantity|floatformat}}" class="form-control form-control-sm rounded-0 text-center" name="product_good_quantity[]" required>
                                     </td>
                                     <td class="px-2 py-1 align-middle">
-                                        <input type="number" min="0" value="{{pitem.damage_quantity|floatformat}}" class="form-control form-control-sm rounded-0 text-center" name="product_damage_quantity[]" required>
+                                        <input type="hidden" min="0" value="{{pitem.damage_quantity|floatformat}}" class="form-control form-control-sm rounded-0 text-center" name="product_damage_quantity[]" required>
                                     </td>
                                     <td class="px-2 py-1 align-middle">
                                         <input type="hidden" min="0" value="{{pitem.sign|floatformat}}" class="form-control form-control-sm rounded-0 text-center" name="product_sign[]" required>
@@ -212,7 +208,7 @@
 {% if sale.code %}
             <div class="card rounded-0 mb-3">
                 <div class="card-header">
-                    <div class="card-title py-1">Damaged Return Item List</div>
+                    <div class="card-title py-1">Return Damage Item List</div>
                 </div>
                 <div class="card-body">
                     <div class="container-fluid">
@@ -232,7 +228,7 @@
                                     <option value="" disabled selected></option>
                                     {% for product in products %}
                                     {% if product.available > 0 %}
-                                    <option value="{{product.pk}}" data-buy = "{{product.buy}}" data-price = "{{product.price}}" data-available = "{{product.available}}">{{product.name}}</option>
+                                    <option value="{{product.pk}}" data-buy = "{{product.buy}}" data-price = "{{product.price}}" data-available = "{{product.available}}" data-brand="{{product.brand}}">{{product.name}}</option>
                                     {% endif %}
                                     {% endfor %}
                                 </select>
@@ -261,7 +257,7 @@
                                     <th class="p-1 text-center"></th>
                                     <th class="p-1 text-center">Product Name</th>
 <!--                                    <th class="p-1 text-center">Buy Price</th>-->
-                                    <th class="p-1 text-center">Unit Price</th>
+                                    <th class="p-1 text-center">Price</th>
 <!--                                    <th class="p-1 text-center">Available</th>-->
                                     <th class="p-1 text-center">Quantity</th>
                                     <th class="p-1 text-center"></th>
@@ -277,13 +273,13 @@
                                     <td class="px-2 py-1 align-middle text-center">
                                         <input type="hidden" name="return_id[]" value="{{pitem.product.id}}">
                                         <input type="hidden" name="return_buy[]" value="{{pitem.buy}}">
-
+                                        <input type="hidden" name="return_brand[]" value="{{pitem.brand}}">
                                         <button class="btn btn-outline-danger btn-sm rounded-0 rem-return" type="button"><i class="fa fa-times"></i></button>
                                     </td>
                                     <td class="px-2 py-1 align-middle product_type">{{pitem.product.name}}</td>
 <!--                                    <td class="px-2 py-1 align-middle text-end product_buy">{{pitem.buy|floatformat}}</td>-->
                                     <td class="px-2 py-1 align-middle text-end">
-                                        <input type="number" name="return_price[]" value="{{pitem.price}}">
+                                        <input type="number" name="return_price[]" step="0.01" value="{{pitem.price}}">
                                     </td>
 <!--                                    <td class="px-2 py-1 align-middle text-end  product_available">{{pitem.available}}</td>-->
                                     <td class="px-2 py-1 align-middle">
@@ -368,7 +364,7 @@
                                     </td>
                                     <td class="px-2 py-1 align-middle laundry_type">{{item.client.name}}</td>
                                     <td class="px-2 py-1 align-middle text-start">
-                                       <select name="laundry_brand[]" class="form-select form-control-sm rounded-0" required>
+                                       <select name="laundry_brand[]" id="due-brand" class="form-select form-control-sm rounded-0" required>
                                             {% if item.brand %}
                                             <option selected value="{{item.brand}}">{{item.brand}}</option>
                                             {% endif %}
@@ -536,7 +532,7 @@
         </td>
         <td class="px-2 py-1 align-middle laundry_type"></td>
         <td class="px-2 py-1 align-middle text-start">
-            <select type="text" name="laundry_brand[]" class="form-select form-control-sm rounded-0" required>
+            <select type="text" name="laundry_brand[]" id="client-brand" class="form-select form-control-sm rounded-0" required>
                 <option value="" disabled selected>Please Select Brand Here</option>
                 {% for item in brands %}
                 <option value="{{item.name}}">{{item.name}}</option>
@@ -580,7 +576,7 @@
             <input type="number" min="0" value="0" class="form-control form-control-sm rounded-0 text-center" name="product_good_quantity[]" required>
         </td>
         <td class="px-2 py-1 align-middle">
-            <input type="number" min="0" value="0" class="form-control form-control-sm rounded-0 text-center" name="product_damage_quantity[]" required>
+            <input type="hidden" min="0" value="0" class="form-control form-control-sm rounded-0 text-center" name="product_damage_quantity[]" required>
         </td>
         <td class="px-2 py-1 align-middle">
             <input type="hidden" min="0" value="0" class="form-control form-control-sm rounded-0 text-center" name="product_sign[]" required>
@@ -608,13 +604,13 @@
         <td class="px-2 py-1 align-middle text-center">
             <input type="hidden" name="return_id[]" value="">
             <input type="hidden" name="return_buy[]" value="">
-
+            <input type="hidden" name="return_brand[]" value="">
             <button class="btn btn-outline-danger btn-sm rounded-0 rem-return" type="button"><i class="fa fa-times"></i></button>
         </td>
         <td class="px-2 py-1 align-middle product_type"></td>
 <!--        <td class="px-2 py-1 align-middle text-end product_buy">0.00</td>-->
         <td class="px-2 py-1 align-middle text-end">
-            <input type="number" name="return_price[]" value="">
+            <input type="number" step="0.01" name="return_price[]" value="">
         </td>
 <!--        <td class="px-2 py-1 align-middle text-end product_available"></td>-->
         <td class="px-2 py-1 align-middle">
@@ -649,7 +645,7 @@
             weight = weight > 0 ? weight : 0;
             price = price > 0 ? price : 0;
             sub_laundry += parseFloat(parseFloat(weight) - parseFloat(price))
-            gtotal += parseFloat(parseFloat(weight) - parseFloat(price))
+
             $(this).find('.laundry_total').text(parseFloat(parseFloat(weight) - parseFloat(price)).toLocaleString('en-US'))
         })
         $('.sub-total-laundry').text(parseFloat(sub_laundry).toLocaleString('en-US', {
@@ -688,9 +684,9 @@
             var sign = $(this).find('[name="return_sign[]"]').val()
             qty = qty > 0 ? qty : 0;
             price = price > 0 ? price : 0;
-            sub_return += parseFloat(parseFloat(qty) * parseFloat(-price))
-            gtotal += parseFloat(parseFloat(qty) * parseFloat(-price))
-            $(this).find('.product_total').text(parseFloat(parseFloat(qty) * parseFloat(-price)).toLocaleString('en-US'))
+            sub_return += parseFloat(parseFloat(-price))
+            gtotal += parseFloat(parseFloat(-price))
+            $(this).find('.product_total').text(parseFloat(parseFloat(-price)).toLocaleString('en-US'))
         })
         $('.sub-total-return').text(parseFloat(sub_return).toLocaleString('en-US', {
             style: 'decimal',
@@ -783,6 +779,23 @@
             width: "100%",
             selectionCssClass: "form-control form-control-sm rounded-0"
         })
+        $('#brand').select2({
+            placeholder: "Please Select Brand Here",
+            width: "100%",
+            selectionCssClass: "form-control form-control-sm rounded-0"
+        })
+        $('#due-brand').select2({
+            placeholder: "Please Select Brand Here",
+            width: "100%",
+            selectionCssClass: "form-control form-control-sm rounded-0"
+        })
+
+        $('#laundry_list tbody').find('.rem-laundry').click(function() {
+            if (confirm("Are you sure to remove this item?") == true) {
+                $(this).closest('tr').remove()
+                calc_total()
+            }
+        })
 
         $('#add_laundry').click(function() {
             var pid = $('#prices').val()
@@ -810,6 +823,11 @@
             tr.find('[name="laundry_price[]"]').on('input change', function() {
                 calc_total()
             })
+            $('#client-brand').select2({
+            placeholder: "Please Select Brand Here",
+            width: "100%",
+            selectionCssClass: "form-control form-control-sm rounded-0"
+        })
 
             tr.find('.rem-laundry').click(function() {
                 if (confirm("Are you sure to remove this item?") == true) {
@@ -817,6 +835,25 @@
                     calc_total()
                 }
             })
+        })
+
+        $('#product_list tbody').find('[name="product_price[]"]').on('input change', function() {
+            calc_total()
+        })
+        $('#product_list tbody').find('[name="product_quantity[]"]').on('input change', function() {
+            calc_total()
+        })
+        $('#product_list tbody').find('[name="product_good_quantity[]"]').on('input change', function() {
+            calc_total()
+        })
+        $('#product_list tbody').find('[name="product_damage_quantity[]"]').on('input change', function() {
+            calc_total()
+        })
+        $('#product_list tbody').find('.rem-product').click(function() {
+            if (confirm("Are you sure to remove this item?") == true) {
+                $(this).closest('tr').remove()
+                calc_total()
+            }
         })
 
 
@@ -841,8 +878,8 @@
             tr.find('[name="product_buy[]"]').val(buy)
             tr.find('[name="product_price[]"]').val(price)
             tr.find('[name="product_available[]"]').val(max)
-            tr.find('[name="product_quantity[]"]').attr('max', max)
-            tr.find('[name="product_free_quantity[]"]').attr('max', max)
+            tr.find('[name="product_quantity[]"]').val()
+            tr.find('[name="product_free_quantity[]"]').val()
             tr.find('[name="product_good_quantity[]"]').val()
             tr.find('[name="product_damage_quantity[]"]').val()
             tr.find('[name="product_sign[]"]').attr('max', max)
@@ -874,11 +911,34 @@
                 }
             })
         })
+
+        $('#return_list tbody').find('[name="return_price[]"]').on('input change', function() {
+            calc_total()
+        })
+        $('#return_list tbody').find('[name="return_quantity[]"]').on('input change', function() {
+            calc_total()
+        })
+
+        $('#laundry_list tbody').find('[name="laundry_price[]"]').on('input change', function() {
+            calc_total()
+        })
+
+        $('#laundry_list tbody').find('[name="laundry_weight[]"]').on('input change', function() {
+            calc_total()
+        })
+        $('#return_list tbody').find('.rem-return').click(function() {
+            if (confirm("Are you sure to remove this item?") == true) {
+                $(this).closest('tr').remove()
+                calc_total()
+            }
+        })
+
         $('#add_return').click(function() {
             var pid = $('#rproducts').val()
             if (pid < '1') {
                 return false
             }
+            var brand = $('#products option[value="' + pid + '"]').attr('data-brand')
             var buy = $('#rproducts option[value="' + pid + '"]').attr('data-buy')
             var price = $('#rproducts option[value="' + pid + '"]').attr('data-price')
             var max = $('#rproducts option[value="' + pid + '"]').attr('data-available')
@@ -890,8 +950,9 @@
             tr.find('.product_total').text(parseFloat(price).toLocaleString('en-US'))
             tr.find('.product_available').text(parseFloat(max).toLocaleString('en-US'))
             tr.find('[name="return_id[]"]').val(pid)
+            tr.find('[name="return_brand[]"]').val(brand)
             tr.find('[name="return_buy[]"]').val(buy)
-            tr.find('[name="return_price[]"]').val(price)
+            tr.find('[name="return_price[]"]').val()
             tr.find('[name="product_available[]"]').val(max)
             tr.find('[name="return_quantity[]"]').attr('max', max)
             tr.find('[name="return_free_quantity[]"]').attr('max', max)
@@ -916,6 +977,18 @@
                 }
             })
         })
+
+        $('#brand_list tbody').find('[name="brand_price[]"]').on('input change', function() {
+            calc_total()
+        })
+
+        $('#brand_list tbody').find('.rem-brand').click(function() {
+            if (confirm("Are you sure to remove this item?") == true) {
+                $(this).closest('tr').remove()
+                calc_total()
+            }
+        })
+
         $('#add_brand').click(function() {
             var pid = $('#brands').val()
             if (pid < '1') {
@@ -941,6 +1014,56 @@
                     calc_total()
                 }
             })
+        })
+
+        $('#tendered_amount').on('change input', function() {
+            var tender = $(this).val()
+            var total = $('[name="total_amount"]').val()
+            tender = tender > 0 ? tender : 0;
+            total = total > 0 ? total : 0;
+            change = parseFloat(total) - parseFloat(tender)
+            $('#change').text(parseFloat(change).toLocaleString('en-US', {
+                style: 'decimal',
+                maximumFractionDigits: 2,
+                minimumFractionDigits: 2
+            }))
+
+        })
+        $('#cost_amount').on('change input', function() {
+            var cost = $(this).val()
+            var total = $('[name="total_amount"]').val()
+            var extra = $('[name="extra"]').val()
+            cost = cost > 0 ? cost : 0;
+            total = total > 0 ? total : 0;
+            change = parseFloat(total) - parseFloat(cost) + parseFloat(extra)
+            $('.gtotal').text(parseFloat(change).toLocaleString('en-US', {
+                style: 'decimal',
+                maximumFractionDigits: 2,
+                minimumFractionDigits: 2
+            }))
+
+        })
+        $('#extra_amount').on('change input', function() {
+            var extra = $(this).val()
+            var total = $('[name="total_amount"]').val()
+            var cost = $('[name="cost"]').val()
+            extra = extra > 0 ? extra : 0;
+            total = total > 0 ? total : 0;
+            change = parseFloat(total) - parseFloat(cost) + parseFloat(extra)
+            $('.gtotal').text(parseFloat(change).toLocaleString('en-US', {
+                style: 'decimal',
+                maximumFractionDigits: 2,
+                minimumFractionDigits: 2
+            }))
+
+        })
+
+        $('#pay_later').click(function() {
+            $('#tendered_amount').val(0).attr('required', false)
+            $('#laundry-form').submit()
+        })
+        $('#laundry-submit-btn').click(function() {
+            $('#tendered_amount').attr('required', true)
         })
 
         $('#laundry-form').submit(function(e) {
@@ -1016,116 +1139,8 @@
 
 
 
-      $('#tendered_amount').on('change input', function() {
-            var tender = $(this).val()
-            var total = $('[name="total_amount"]').val()
-            tender = tender > 0 ? tender : 0;
-            total = total > 0 ? total : 0;
-            change = parseFloat(total) - parseFloat(tender)
-            $('#change').text(parseFloat(change).toLocaleString('en-US', {
-                style: 'decimal',
-                maximumFractionDigits: 2,
-                minimumFractionDigits: 2
-            }))
 
-        })
-        $('#cost_amount').on('change input', function() {
-            var cost = $(this).val()
-            var total = $('[name="total_amount"]').val()
-            var extra = $('[name="extra"]').val()
-            cost = cost > 0 ? cost : 0;
-            total = total > 0 ? total : 0;
-            change = parseFloat(total) - parseFloat(cost) + parseFloat(extra)
-            $('.gtotal').text(parseFloat(change).toLocaleString('en-US', {
-                style: 'decimal',
-                maximumFractionDigits: 2,
-                minimumFractionDigits: 2
-            }))
 
-        })
-        $('#extra_amount').on('change input', function() {
-            var extra = $(this).val()
-            var total = $('[name="total_amount"]').val()
-            var cost = $('[name="cost"]').val()
-            extra = extra > 0 ? extra : 0;
-            total = total > 0 ? total : 0;
-            change = parseFloat(total) - parseFloat(cost) + parseFloat(extra)
-            $('.gtotal').text(parseFloat(change).toLocaleString('en-US', {
-                style: 'decimal',
-                maximumFractionDigits: 2,
-                minimumFractionDigits: 2
-            }))
-
-        })
-        $('#pay_later').click(function() {
-            $('#tendered_amount').val(0).attr('required', false)
-            $('#laundry-form').submit()
-        })
-        $('#laundry-submit-btn').click(function() {
-            $('#tendered_amount').attr('required', true)
-        })
-        $('#product_list tbody').find('[name="product_price[]"]').on('input change', function() {
-            calc_total()
-        })
-        $('#laundry_list tbody').find('.rem-laundry').click(function() {
-            if (confirm("Are you sure to remove this item?") == true) {
-                $(this).closest('tr').remove()
-                calc_total()
-            }
-        })
-        $('#product_list tbody').find('[name="product_quantity[]"]').on('input change', function() {
-            calc_total()
-        })
-        $('#product_list tbody').find('[name="product_good_quantity[]"]').on('input change', function() {
-            calc_total()
-        })
-        $('#product_list tbody').find('[name="product_damage_quantity[]"]').on('input change', function() {
-            calc_total()
-        })
-        $('#product_list tbody').find('.rem-product').click(function() {
-            if (confirm("Are you sure to remove this item?") == true) {
-                $(this).closest('tr').remove()
-                calc_total()
-            }
-        })
-
-        $('#return_list tbody').find('[name="return_price[]"]').on('input change', function() {
-            calc_total()
-        })
-        $('#return_list tbody').find('.rem-return').click(function() {
-            if (confirm("Are you sure to remove this item?") == true) {
-                $(this).closest('tr').remove()
-                calc_total()
-            }
-        })
-        $('#return_list tbody').find('[name="return_quantity[]"]').on('input change', function() {
-            calc_total()
-        })
-
-        $('#laundry_list tbody').find('[name="laundry_price[]"]').on('input change', function() {
-            calc_total()
-        })
-
-        $('#laundry_list tbody').find('[name="laundry_weight[]"]').on('input change', function() {
-            calc_total()
-        })
-
-        $('#brand').select2({
-            placeholder: "Please Select Brand Here",
-            width: "100%",
-            selectionCssClass: "form-control form-control-sm rounded-0"
-            })
-
-        $('#brand_list tbody').find('[name="brand_price[]"]').on('input change', function() {
-            calc_total()
-        })
-
-        $('#brand_list tbody').find('.rem-brand').click(function() {
-            if (confirm("Are you sure to remove this item?") == true) {
-                $(this).closest('tr').remove()
-                calc_total()
-            }
-        })
 
 
 
