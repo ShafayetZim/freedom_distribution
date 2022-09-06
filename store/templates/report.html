@@ -31,7 +31,7 @@
         <div class="card rounded-0 shadow">
             <div class="card-body">
                 <div class="container-fluid">
-                    <table class="table table-bordered table-striped" id="laundry-tbl">
+                    <table class="table table-bordered table-striped" id="report-tbl">
                         <colgroup>
                             <col width="5%">
                             <col width="20%">
@@ -111,7 +111,7 @@
 </noscript> {% endblock pageContent %} {% block ScriptBlock %}
 <script>
     $(function() {
-        $('#laundry-tbl').find('td, th').addClass('px-2 py-1 align-middle')
+        $('#report-tbl').find('td, th').addClass('px-2 py-1 align-middle')
         $('#filter-form').submit(function(e) {
             e.preventDefault()
             location.href = '{% url "daily-report" %}/' + $('#date').val()
@@ -132,7 +132,7 @@
             })
             var ph = $($('noscript#print-header').html()).clone()
             var el = "";
-            el += $('#laundry-tbl').clone()[0].outerHTML
+            el += $('#report-tbl').clone()[0].outerHTML
 
 
             var nw = window.open("", "_blank", "width=" + ($(window).width() * .8) + ", left=" + ($(window).width() * .1) + "height=" + ($(window).height() * .8) + ", top=" + ($(window).height() * .1) + "")
