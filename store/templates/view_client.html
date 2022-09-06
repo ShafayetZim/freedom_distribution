@@ -43,7 +43,9 @@
               </dd>
               <dt class="h5 fw-bolder">Due Amount</dt>
               <dd class="ps-4 h4 fw-bolder">
+                {% if client.totalDue != 0 %}
                 {{client.totalDue|floatformat}}
+                {% else %} 0 {% endif %}
               </dd>
             </dl>
           </div>
