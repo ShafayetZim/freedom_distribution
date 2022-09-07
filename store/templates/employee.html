@@ -25,7 +25,7 @@
               <i class="fa fa-plus"></i> Add New
             </button>
           </div>
-          <table class="table table-bordered table-striped" id="product-tbl">
+          <table class="table table-bordered table-striped" id="employee-tbl">
             <colgroup>
               <col width="5%" />
               <col width="20%" />
@@ -59,16 +59,30 @@
                     class="badge badge-success bg-gradient bg-success px-3 rounded-pill bg-opacity-75 text-sm py-1"
                     >Salesman</span
                   >
+                  {% elif item.type == '2' %}
+                  <span
+                    class="badge badge-danger bg-gradient bg-danger px-3 rounded-pill bg-opacity-75 text-sm py-1"
+                    >Deliveryman</span
+                  >
+                  {% elif item.type == '3' %}
+                  <span
+                    class="badge badge-primary bg-gradient bg-primary px-3 rounded-pill bg-opacity-75 text-sm py-1"
+                    >Manager</span
+                  >
                   {% else %}
                   <span
-                    class="badge badge-secondary bg-gradient bg-danger px-3 rounded-pill bg-opacity-75 text-sm py-1"
-                    >Deliveryman</span
+                    class="badge badge-warning bg-gradient bg-secondary px-3 rounded-pill bg-opacity-75 text-sm py-1"
+                    >AIC</span
                   >
                   {% endif %}
                 </td>
                 <td class="text-center">{{ item.phone }}</td>
                 <td class="text-center">{{ item.nid}}</td>
+                {% if item.due != 0 %}
                 <td class="text-center">{{ item.due}}</td>
+                {% else %}
+                <td class="text-center">0</td>
+                {% endif %}
                 <td class="text-center">
                   {% if item.status == '1' %}
                   <span
@@ -157,8 +171,8 @@
         "'" + $(this).attr("data-url") + "'",
       ]);
     });
-    $("#product-tbl").find("td, th").addClass("px-2 py-1 align-middle");
-    $("#product-tbl").DataTable({
+    $("#employee-tbl").find("td, th").addClass("px-2 py-1 align-middle");
+    $("#employee-tbl").DataTable({
       columnDefs: [
         {
           orderable: false,
