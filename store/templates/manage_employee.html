@@ -30,6 +30,14 @@
         <option value="2" selected>Deliveryman</option>
         {% else %}
         <option value="2">Deliveryman</option>
+        {% endif %} {% if employee.type == '3' %}
+        <option value="3" selected>Manager</option>
+        {% else %}
+        <option value="3">Manager</option>
+        {% endif %} {% if employee.type == '4' %}
+        <option value="4" selected>AIC</option>
+        {% else %}
+        <option value="4">AIC</option>
         {% endif %}
       </select>
     </div>
