@@ -11,12 +11,13 @@
                     <div class="text-end mb-3">
                         <a class="btn btn-sm btn-primary rounded-0 bg-gradient-primary" href="{% url 'manage-purchase' %}" id="create_new"><i class="fa fa-plus"></i> Add New</a>
                     </div>
-                    <table class="table table-bordered table-striped" id="laundry-tbl">
+                    <table class="table table-bordered table-striped" id="purchase-tbl">
                         <colgroup>
-                            <col width="10%">
-                            <col width="25%">
-                            <col width="25%">
-                            <col width="25%">
+                            <col width="5%">
+                            <col width="20%">
+                            <col width="20%">
+                            <col width="20%">
+                            <col width="20%">
                             <col width="15%">
                         </colgroup>
                         <thead>
@@ -24,6 +25,7 @@
                                 <th class="text-center">#</th>
                                 <th class="text-center">Date Added</th>
                                 <th class="text-center">Code</th>
+                                <th class="text-center">Brand</th>
                                 <th class="text-center">Total</th>
                                 <th class="text-center">Action</th>
                             </tr>
@@ -32,10 +34,15 @@
                             {% for item in purchases %}
                             <tr>
                                 <td class="text-center">{{ forloop.counter }}</td>
-                                <td>{{ item.date_added|date:"Y-m-d h:i A"}}</td>
+                                <td class="text-center">{{ item.date_added|date:"Y-m-d h:i A"}}</td>
                                 <td class="text-center">
                                     <div class="lh-1">
                                         <div>{{ item.code}}</div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <div class="lh-1">
+                                        <div>{{ item.brand}}</div>
                                     </div>
                                 </td>
                                 <td class="text-center">
@@ -68,10 +75,10 @@
 <script>
     $(function() {
         $('.delete-data').click(function() {
-            _conf("Are you sure to delete this Transaction?", 'delete_laundry', ["'" + $(this).attr('data-url') + "'"])
+            _conf("Are you sure to delete this Transaction?", 'delete_purchase', ["'" + $(this).attr('data-url') + "'"])
         })
-        $('#laundry-tbl').find('td, th').addClass('px-2 py-1 align-middle')
-        $('#laundry-tbl').DataTable({
+        $('#purchase-tbl').find('td, th').addClass('px-2 py-1 align-middle')
+        $('#purchase-tbl').DataTable({
             columnDefs: [{
                 orderable: false,
                 targets: [4]
@@ -83,7 +90,7 @@
         })
     })
 
-    function delete_laundry(url) {
+    function delete_purchase(url) {
 
         var _this = $('#confirm_modal .modal-body')
         $('.err-msg').remove();
