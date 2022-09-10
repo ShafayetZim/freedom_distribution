@@ -9,58 +9,134 @@
 </style>
 <section class="py-4">
   <div class="container">
-    <h3 class="fw-bolder text-center">List of Low Stock Products</h3>
+    <h3 class="fw-bolder text-center">Filter Low Stock Products</h3>
     <center>
       <hr class="bg-primary opacity-100" style="height: 3px" width="5%" />
     </center>
-    <div class="card rounded-0 shadow">
-      <div class="card-body">
-        <div class="container-fluid">
-
-          <table class="table table-bordered table-striped" id="product-tbl">
-            <colgroup>
-              <col width="5%" />
-              <col width="30%" />
-              <col width="20%" />
-              <col width="15%" />
-              <col width="15%" />
-              <col width="25%" />
-            </colgroup>
-            <thead>
-              <tr>
-                <th class="text-center">#</th>
-                <th class="text-center">Name</th>
-                <th class="text-center">Category</th>
-                <th class="text-center">Buy Price</th>
-                <th class="text-center">Price</th>
-                <th class="text-center">Stock</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for product in products %}
-              {% if product.available < 50 %}
-              <tr>
-                <td class="text-center">{{ forloop.counter }}</td>
-                <td class="text-center">{{ product.name }}</td>
-                <td class="text-center">{{ product.category}}</td>
-                <td class="text-center">{{ product.buy }}</td>
-                <td class="text-center">{{ product.price}}</td>
-
-                <td class="text-center">{{ product.available|floatformat }}</td>
-              </tr>
-              {% endif %}
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      </div>
+    <div class="card rounded-0">
+    <div class="card-header py-1">
+        <div class="card-title mb-0">Filter Low Stock Product by Brand</div>
     </div>
+    <div class="card-body">
+
+        <form method="GET">
+        <section class="site_filter">
+        <div class="container-fluid">
+            <div class="row justify-content-center">
+
+                <div class="col-4">
+                    <div class="form-group">
+                        <label for="brand">Check Brand</label>
+                        <select class="form-control" id="check_brand" name="check_brand">
+                            <option value="All">All</option>
+                            {% for item in brand %}
+                            <option value="{{item.id}}" data-name="{{item.name}}">{{item.name}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <div class="text-center mt-3">
+        <button class="btn btn-success">View</button>
+    </div>
+</form>
+    </div>
+</div>
+
+    <div class="card rounded-0 shadow mb-3">
+            <div class="card-body">
+                <div class="container-fluid">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <tbody>
+                        <tr>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <br>
+                    <table class="table table-bordered table-striped" style="border-collapse: collapse; width: 100%;" border="1" cellpadding="8">
+                        <tbody>
+                        <tr>
+                            <td style="width: 5%;text-align:center;"><strong>SL</strong></td>
+                            <td style="width: 20%;text-align:center;"><strong>Product</strong></td>
+                            <td style="width: 20%;text-align:center;"><strong>Brand</strong></td>
+                            <td style="width: 20%;text-align:center;"><strong>Stock Quantity</strong></td>
+                            <td style="width: 15%;text-align:center;"><strong>Buy Price</strong></td>
+                            <td style="width: 15%;text-align:center;"><strong> Stock Value</strong></td>
+
+                        </tr>
+                        {% for item in products %}
+                            {% if item.available < 50 %}
+                                <tr>
+                                    <td style="width: 5%;">
+                                        {{forloop.counter}}
+                                    </td>
+                                    <td style="width: 20%;">
+                                        {{item.name}}
+                                    </td>
+                                    <td style="width: 20%;">
+                                        {{item.brand}}
+                                    </td>
+                                    <td style="width: 20%;">
+                                        <input type="text" class="input-fields-to-sum form-control form-control-sm rounded-0" name="qty" id="qty" value="{{item.available}}" readonly>
+                                    </td>
+                                    <td style="width: 15%;">
+                                         {{item.buy}}
+                                    </td>
+                                    <td style="width: 15%; text-align: right;">
+                                        <input type="text" class="input-box-to-sum form-control form-control-sm rounded-0" name="total_amount" id="total_amount" value="{% widthratio item.buy 1 item.available %}" readonly>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="3" class="text-end">Total Stock Quantity</th>
+                                <th class="text-start fw-bolder">
+                                    <input type="text" class="form-control form-control-sm rounded-0 total" name="total_qty" id="total_qty" value="" readonly>
+                                </th>
+                                <th colspan="1" class="text-end">Total Stock Value</th>
+                                <th class="text-start fw-bolder">
+                                    <input type="text" class="form-control form-control-sm rounded-0 total" name="total" id="total" value="" readonly>
+                                </th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+    </div>
+
   </div>
 </section>
 {% endblock pageContent %} {% block ScriptBlock %}
 <script>
   $(function () {
-
+    $("#create_new").click(function () {
+      uni_modal(
+        "<i class='fa fa-plus'></i> Add New Product",
+        "{% url 'manage-product' %}"
+      );
+    });
+    $(".edit-data").click(function () {
+      uni_modal(
+        "<i class='fa fa-edit'></i> Edit Product Details",
+        $(this).attr("data-url")
+      );
+    });
+    $(".view_image").click(function () {
+      var img = $(this).attr("data-img-url");
+      $("#viewer_modal #img-viewer-field").attr("src", img);
+      $("#viewer_modal").modal("show");
+    });
+    $(".delete-data").click(function () {
+      _conf("Are you sure to delete this Product?", "delete_product", [
+        "'" + $(this).attr("data-url") + "'",
+      ]);
+    });
     $("#product-tbl").find("td, th").addClass("px-2 py-1 align-middle");
     $("#product-tbl").DataTable({
       columnDefs: [
@@ -75,6 +151,89 @@
       ],
     });
   });
+
+  function delete_product(url) {
+    var _this = $("#confirm_modal .modal-body");
+    $(".err-msg").remove();
+    var el = $("<div>");
+    el.addClass("alert alert-danger err-msg");
+    el.hide();
+    start_loader();
+    $.ajax({
+      headers: {
+        "X-CSRFToken": "{{csrf_token}}",
+      },
+      url: url,
+      dataType: "JSON",
+      error: (err) => {
+        console.log(err);
+        alert("an error occurred.");
+        end_loader();
+      },
+      success: function (resp) {
+        if (resp.status == "success") {
+          location.reload();
+        } else if (!!resp.msg) {
+          el.html(resp.msg);
+          _this.prepend(el);
+          el.show();
+        } else {
+          el.html("An error occurred");
+          _this.prepend(el);
+          el.show();
+        }
+        end_loader();
+      },
+    });
+  }
+
+  $('#check_brand').select2({
+    placeholder: "Please Select Brand Here",
+    width: "100%",
+    selectionCssClass: "form-control form-control-sm rounded-2"
+  })
+
+  $(document).ready(function() {
+   calculateTotals();
+
+    $(".input-fields-to-sum").on('input', function() {
+        calculateTotals();
+    });
+    $(".input-box-to-sum").on('input', function() {
+        calculateTotals();
+    });
+});
+
+function calculateTotals() {
+   // walk on input fields with class, calculate sum and put it in total field
+   // input can contain invalid numbers, handle errors when parsing
+    var arr = document.getElementsByClassName('input-fields-to-sum');
+    var arr2 = document.getElementsByClassName('input-box-to-sum');
+    var tot1=0;
+    var tot2=0;
+        for(var i=0;i<arr.length;i++){
+            if(parseFloat(arr[i].value))
+                tot1 += parseFloat(arr[i].value);
+        }
+        for(var i=0;i<arr2.length;i++){
+            if(parseFloat(arr2[i].value))
+                tot2 += parseFloat(arr2[i].value);
+        }
+
+    var result = (tot1);
+    $("#total_qty").val(result);
+    $("#total").val(tot2);
+}
+
+function parseNumber(str, defaultValue) {
+    if (str !== undefined && str.length) {
+        var parsed = parseFloat(str.replace(',','.').replace(/\s/g,'').replace(/\&nbsp\;/g,''));
+        if (isNaN(parsed)) return defaultValue;
+        return parsed;
+    }
+    return defaultValue;
+}
+
 
 </script>
 {% endblock ScriptBlock %}
