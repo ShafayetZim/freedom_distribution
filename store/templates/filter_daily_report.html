@@ -49,7 +49,7 @@
 
                         <div class="col">
                             <div class="form-group">
-                                <label for="salesman">Check Brand</label>
+                                <label for="salesman">Check Deliveryman</label>
                                 <select class="form-control" id="check_deliveryman" name="check_deliveryman">
 <!--                                    <option disabled selected value="">Select deliveryman</option>-->
                                     <option value="All">All</option>
@@ -119,7 +119,7 @@
                                 {{item.brand}}
                             </td>
                             <td style="width: 40%;">
-                                <input type="text" class="input-fields-to-sum form-control form-control-sm rounded-0" name="qty" id="qty" value="{{item.sum}}" readonly>
+                                <input type="text" class="input-fields-to-sum form-control form-control-sm rounded-0" name="qty" id="qty" value="{{item.sum|floatformat:2}}" readonly>
                             </td>
 
                         </tr>
@@ -137,6 +137,48 @@
                 </div>
             </div>
     </div>
+    {% if damage %}
+    <div class="card rounded-0 shadow">
+            <div class="card-body">
+                <div class="container-fluid">
+
+                    <h6>Damage Return Summary</h6>
+                    <table class="table table-bordered table-striped" style="border-collapse: collapse; width: 100%;" border="1" cellpadding="8">
+                        <tbody>
+                        <tr>
+                            <td style="width: 5%;text-align:center;"><strong>SL</strong></td>
+                            <td style="width: 20%;text-align:center;"><strong>Brand</strong></td>
+                            <td style="width: 15%;text-align:center;"><strong>Amount</strong></td>
+
+                        </tr>
+                         {% for item in damage %}
+                        <tr>
+                            <td style="width: 10%;">
+                                {{forloop.counter}}
+                            </td>
+                            <td style="width: 50%;">
+                                {{item.brand}}
+                            </td>
+                            <td style="width: 40%;">
+                                <input type="text" class="damage-fields-to-sum form-control form-control-sm rounded-0" name="damage" id="damage" value="{{item.sum|floatformat:2}}" readonly>
+                            </td>
+
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="2" class="text-end">Total amount</th>
+                                <th class="text-start fw-bolder">
+                                    <input type="text" class="form-control form-control-sm rounded-0 total" name="damage_total" id="damage_total" value="" readonly>
+                                </th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+    </div>
+    {% endif %}
     {% if due %}
     <div class="card rounded-0 shadow">
             <div class="card-body">
@@ -159,7 +201,7 @@
                                 {{item.client__name}}
                             </td>
                             <td style="width: 40%;">
-                                <input type="text" class="due-fields-to-sum form-control form-control-sm rounded-0" name="due" id="due" value="{{item.sum}}" readonly>
+                                <input type="text" class="due-fields-to-sum form-control form-control-sm rounded-0" name="due" id="due" value="{{item.sum|floatformat:2}}" readonly>
                             </td>
 
                         </tr>
@@ -200,7 +242,7 @@
                                 {{item.brand__name}}
                             </td>
                             <td style="width: 40%;">
-                                <input type="text" class="commission-fields-to-sum form-control form-control-sm rounded-0" name="commission" id="commission" value="{{item.sum}}" readonly>
+                                <input type="text" class="commission-fields-to-sum form-control form-control-sm rounded-0" name="commission" id="commission" value="{{item.sum|floatformat:2}}" readonly>
                             </td>
 
                         </tr>
@@ -228,23 +270,19 @@
 
                         <tbody>
                             <tr>
-                                <th colspan="2" class="text-end">Total Damage Return</th>
+                                <th colspan="2" class="text-end">Total Paid</th>
                                 <th class="text-start fw-bolder">
-                                    <input type="text" class="damage-fields-to-sum form-control form-control-sm rounded-0 damage_total" name="damage_total" id="damage_total" value="{{amount}}" readonly>
+                                    <input type="text" class="cost-fields-to-sum form-control form-control-sm rounded-0 paid_total" name="paid_total" id="paid_total" value="{{paid|floatformat:2}}" readonly>
                                 </th>
                                 <th colspan="2" class="text-end">Total Cost</th>
                                 <th class="text-start fw-bolder">
-                                    <input type="text" class="cost-fields-to-sum form-control form-control-sm rounded-0 cost_total" name="cost_total" id="cost_total" value="{{cost}}" readonly>
+                                    <input type="text" class="cost-fields-to-sum form-control form-control-sm rounded-0 cost_total" name="cost_total" id="cost_total" value="{{cost|floatformat:2}}" readonly>
                                 </th>
                             </tr>
                             <tr>
                                 <th colspan="2" class="text-end">Total Extra</th>
                                 <th class="text-start fw-bolder">
-                                    <input type="text" class="cost-fields-to-sum form-control form-control-sm rounded-0 extra_total" name="extra_total" id="extra_total" value="{{extra}}" readonly>
-                                </th>
-                                <th colspan="2" class="text-end">Total Paid</th>
-                                <th class="text-start fw-bolder">
-                                    <input type="text" class="cost-fields-to-sum form-control form-control-sm rounded-0 paid_total" name="paid_total" id="paid_total" value="{{paid}}" readonly>
+                                    <input type="text" class="cost-fields-to-sum form-control form-control-sm rounded-0 extra_total" name="extra_total" id="extra_total" value="{{extra|floatformat:2}}" readonly>
                                 </th>
                             </tr>
                         </tbody>
@@ -360,6 +398,9 @@ $(document).ready(function() {
     $(".commission-fields-to-sum").on('input', function() {
         calculateTotals();
     });
+    $(".damage-fields-to-sum").on('input', function() {
+        calculateTotals();
+    });
 });
 
 function calculateTotals() {
@@ -369,10 +410,12 @@ function calculateTotals() {
     var arr2 = document.getElementsByClassName('input-box-to-sum');
     var arr3 = document.getElementsByClassName('due-fields-to-sum');
     var arr4 = document.getElementsByClassName('commission-fields-to-sum');
+    var arr5 = document.getElementsByClassName('damage-fields-to-sum');
     var tot1=0;
     var tot2=0;
     var tot3=0;
     var tot4=0;
+    var tot5=0;
         for(var i=0;i<arr.length;i++){
             if(parseFloat(arr[i].value))
                 tot1 += parseFloat(arr[i].value);
@@ -389,12 +432,17 @@ function calculateTotals() {
             if(parseFloat(arr4[i].value))
                 tot4 += parseFloat(arr4[i].value);
         }
+        for(var i=0;i<arr5.length;i++){
+            if(parseFloat(arr5[i].value))
+                tot5 += parseFloat(arr5[i].value);
+        }
 
     var result = (tot1);
     $("#total_qty").val(result);
     $("#total").val(tot2);
     $("#due_total").val(tot3);
     $("#commission_total").val(tot4);
+    $("#damage_total").val(tot5);
 }
 
 function parseNumber(str, defaultValue) {
