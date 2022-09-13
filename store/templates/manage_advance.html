@@ -28,16 +28,25 @@
                             </div>
                         </div>
                         {% endif %}
-<!--                        <div class="row">-->
-<!--                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">-->
-<!--                                <label for="client" class="control-label">Fullname</label>-->
-<!--                                <input type="text" class="form-control form-control-sm rounded-0" name="client" id="client" value="{{purchase.client}}" required>-->
-<!--                            </div>-->
-<!--                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">-->
-<!--                                <label for="contact" class="control-label">Contact #</label>-->
-<!--                                <input type="text" class="form-control form-control-sm rounded-0" name="contact" id="contact" value="{{purchase.contact}}">-->
-<!--                            </div>-->
-<!--                        </div>-->
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                <label for="brand" class="control-label">Brand</label>
+                                <select name="brand" id="header-brand" class="form-select form-control-sm rounded-0" required>
+                                    {% if online.brand %}
+                                    <option selected value="{{online.brand.pk}}">{{online.brand}}</option>
+                                    {% else %}
+                                    <option disabled selected value="">Please Select Brand First</option>
+                                    {% endif %}
+                                    {% for item in brand %}
+                                    <option value="{{item.pk}}">{{item.name}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                <label for="note" class="control-label">Note</label>
+                                <input type="text" class="form-control form-control-sm rounded-0" name="note" id="note" value="{{online.note}}">
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -89,7 +98,7 @@
                                     </td>
                                     <td class="px-2 py-1 align-middle brand_type">{{pitem.brand.name}}</td>
                                     <td class="px-2 py-1 align-middle">
-                                        <input type="date" value="{{pitem.day}}" class="form-control form-control-sm rounded-0 text-center" name="brand_day[]" required>
+                                        <input type="date" value="{{pitem.day}}" class="form-control form-control-sm rounded-0 text-center" name="brand_date[]" required>
                                     </td>
                                     <td class="px-2 py-1 align-middle">
                                         <input type="number" min="1" value="{{pitem.advance|floatformat}}" class="form-control form-control-sm rounded-0 text-center" name="brand_advance[]" required>
@@ -155,7 +164,7 @@
                                     </td>
                                     <td class="px-2 py-1 align-middle credit_type">{{pitem.brand.name}}</td>
                                     <td class="px-2 py-1 align-middle">
-                                        <input type="date" value="{{pitem.day}}" class="form-control form-control-sm rounded-0 text-center" name="credit_day[]" required>
+                                        <input type="date" value="{{pitem.day}}" class="form-control form-control-sm rounded-0 text-center" name="credit_date[]" required>
                                     </td>
                                     <td class="px-2 py-1 align-middle">
                                         <input type="number" min="1" value="{{pitem.amount|floatformat}}" class="form-control form-control-sm rounded-0 text-center" name="credit_amount[]" required>
@@ -293,6 +302,11 @@
             selectionCssClass: "form-control form-control-sm rounded-0"
         })
         $('#brand').select2({
+            placeholder: "Please Select Brands Here",
+            width: "100%",
+            selectionCssClass: "form-control form-control-sm rounded-0"
+        })
+        $('#header-brand').select2({
             placeholder: "Please Select Brands Here",
             width: "100%",
             selectionCssClass: "form-control form-control-sm rounded-0"
