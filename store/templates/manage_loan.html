@@ -1,0 +1,429 @@
+{% extends 'base.html' %}{% load static %}{% load humanize %}{% block pageContent %}
+<style>
+    #laundry-img {
+        max-width: 100%;
+        max-height: 10em;
+        object-fit: scale-down;
+        object-position: center center;
+    }
+</style>
+<section class="py-4">
+    <div class="container">
+        <form action="" id="loan-form">
+            <input type="hidden" name="id" value="{{loan.id}}">
+            <input type="hidden" name="code" value="{% if loan.code  %}{{loan.code}}{% else %}generate{% endif %}">
+            <input type="hidden" name="due_amount" value="{% if loan.due_amount  %}{{loan.due_amount}}{% else %}0{% endif %}">
+            <div class="card rounded-0 mb-3">
+                <div class="card-header">
+                    <div class="card-title py-1">Employee Details</div>
+                </div>
+                <div class="card-body">
+                    <div class="container-fluid">
+                        {% if loan.code %}
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                <label for="" class="control-label">Loan Code</label>
+                                <div class="h5"><b>{{loan.code}}</b></div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                <label for="employee" class="control-label">Employee</label>
+                                <select name="employee" id="employee" class="form-select form-control-sm rounded-0" required>
+                                    {% if loan.employee %}
+                                    <option selected value="{{loan.employee.pk}}">{{loan.employee}}</option>
+                                    {% else %}
+                                    <option disabled selected value="">Please Select Employee First</option>
+                                    {% endif %}
+                                    {% for item in employee %}
+                                    <option value="{{item.pk}}">{{item.name}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                <label for="note" class="control-label">Note</label>
+                                <input type="text" class="form-control form-control-sm rounded-0" name="note" id="note" value="{{loan.note}}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card rounded-0 mb-3">
+                <div class="card-header">
+                    <div class="card-title py-1">Debit List</div>
+                </div>
+                <div class="card-body">
+                    <div class="container-fluid">
+                        <div class="row align-items-end">
+                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                <label for="debit" class="control-label">Debit</label>
+                                <select id="debit" class="form-control form-control-sm rounded-0">
+                                    <option value="" disabled selected></option>
+                                    {% for item in debit %}
+                                    <option value="{{item.pk}}">{{item.name}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                <button class="btn btn-primary btn-sm rounded-0 bg-gradient bg-primary" type="button" id="add_debit"><i class="fa fa-plus"></i> Add debit</button>
+                            </div>
+                        </div>
+                        <div class="clear-fix mt-2"></div>
+                        <table class="table table-bordered" id="debit_list">
+                            <colgroup>
+                                <col width="5%">
+                                <col width="35%">
+                                <col width="20%">
+                                <col width="20%">
+                                <col width="20%">
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th class="p-1 text-center"></th>
+                                    <th class="p-1 text-center">Type</th>
+                                    <th class="p-1 text-center">Date</th>
+                                    <th class="p-1 text-center">Amount</th>
+                                    <th class="p-1 text-center">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for pitem in items %}
+                                <tr>
+                                    <td class="px-2 py-1 align-middle text-center">
+                                        <input type="hidden" name="debit_id[]" value="{{pitem.debit.id}}">
+                                        <button class="btn btn-outline-danger btn-sm rounded-0 rem-debit" type="button"><i class="fa fa-times"></i></button>
+                                    </td>
+                                    <td class="px-2 py-1 align-middle debit_type">{{pitem.debit.name}}</td>
+                                    <td class="px-2 py-1 align-middle">
+                                        <input type="date" value="{{pitem.day}}" class="form-control form-control-sm rounded-0 text-center" name="debit_date[]" required>
+                                    </td>
+                                    <td class="px-2 py-1 align-middle">
+                                        <input type="number" min="1" value="{{pitem.amount|floatformat}}" class="form-control form-control-sm rounded-0 text-center" name="debit_amount[]" required>
+                                    </td>
+                                    <td class="px-2 py-1 align-middle debit_total text-end">{{pitem.total_amount|floatformat}}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th class="text-center" colspan="4">Total</th>
+                                    <th class="text-end sub-total-debit">0.00</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="card rounded-0 mb-3">
+                <div class="card-header">
+                    <div class="card-title py-1">Credit List</div>
+                </div>
+                <div class="card-body">
+                    <div class="container-fluid">
+                        <div class="row align-items-end">
+                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                <label for="credit" class="control-label">Credit</label>
+                                <select id="credit" class="form-control form-control-sm rounded-0">
+                                    <option value="" disabled selected></option>
+                                    {% for item in credit %}
+                                    <option value="{{item.pk}}">{{item.name}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                <button class="btn btn-primary btn-sm rounded-0 bg-gradient bg-primary" type="button" id="add_credit"><i class="fa fa-plus"></i> Add Credit</button>
+                            </div>
+                        </div>
+                        <div class="clear-fix mt-2"></div>
+                        <table class="table table-bordered" id="credit_list">
+                            <colgroup>
+                                <col width="5%">
+                                <col width="35%">
+                                <col width="20%">
+                                <col width="20%">
+                                <col width="20%">
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th class="p-1 text-center"></th>
+                                    <th class="p-1 text-center">Type</th>
+                                    <th class="p-1 text-center">Date</th>
+                                    <th class="p-1 text-center">Amount</th>
+                                    <th class="p-1 text-center">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for pitem in pitems %}
+                                <tr>
+                                    <td class="px-2 py-1 align-middle text-center">
+                                        <input type="hidden" name="credit_id[]" value="{{pitem.credit.id}}">
+                                        <button class="btn btn-outline-danger btn-sm rounded-0 rem-credit" type="button"><i class="fa fa-times"></i></button>
+                                    </td>
+                                    <td class="px-2 py-1 align-middle credit_type">{{pitem.credit.name}}</td>
+                                    <td class="px-2 py-1 align-middle">
+                                        <input type="date" value="{{pitem.day}}" class="form-control form-control-sm rounded-0 text-center" name="credit_date[]" required>
+                                    </td>
+                                    <td class="px-2 py-1 align-middle">
+                                        <input type="number" min="1" value="{{pitem.amount|floatformat}}" class="form-control form-control-sm rounded-0 text-center" name="credit_amount[]" required>
+                                    </td>
+                                    <td class="px-2 py-1 align-middle credit_total text-end">{{pitem.total_amount|floatformat}}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th class="text-center" colspan="4">Total</th>
+                                    <th class="text-end sub-total-credit">0.00</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="card rounded-0 mb-3">
+                <div class="card-body">
+                    <div class="d-flex w-100 justify-content-end align-items-center">
+                        <div class="col-auto">
+                            <h4 class="fw-bolder text-muted pe-2">Grand Total:</h4>
+                        </div>
+                        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 text-end">
+                            <h4 class="fw-bolder pe-2 gtotal">{% if loan.due_amount %}{{loan.due_amount|floatformat:2|intcomma}}{% else %}0.00{% endif %}</h4>
+                        </div>
+                    </div>
+<!--                    <div class="d-flex w-100 justify-content-end align-items-center">-->
+<!--                        <div class="col-auto">-->
+<!--                            <h4 class="fw-bolder text-muted pe-2">Paid Amount:</h4>-->
+<!--                        </div>-->
+<!--                        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 text-end">-->
+<!--                            <input type="number" step="any" class="form-control form-control-lg rounded-0 text-end" id="tendered_amount" name="tendered" value="{% if purchase.tendered %}{{purchase.tendered|floatformat:2}}{% else %}0{% endif %}" required>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                    <div class="d-flex w-100 justify-content-end align-items-center">-->
+<!--                        <div class="col-auto">-->
+<!--                            <h4 class="fw-bolder text-muted pe-2">Change:</h4>-->
+<!--                        </div>-->
+<!--                        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 text-end">-->
+<!--                            <h4 class="fw-bolder pe-2 " id="change">{% if purchase.change %}{{purchase.change|floatformat:2|intcomma}}{% else %}0.00{% endif %}</h4>-->
+<!--                        </div>-->
+<!--                    </div>-->
+                </div>
+                <div class="card-footer py-1 text-center">
+                    <button class="btn btn-primary btn-sm rounded-0" type="button" id="pay_later">Save</button>
+<!--                    <button class="btn btn-success btn-sm rounded-0" id="loan-submit-btn" form="loan-form"><i class="fa fa-save"></i> Pay</button>-->
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+
+<noscript id="credit-clone">
+    <tr>
+        <td class="px-2 py-1 align-middle text-center">
+            <input type="hidden" name="credit_id[]" value="">
+            <button class="btn btn-outline-danger btn-sm rounded-0 rem-credit" type="button"><i class="fa fa-times"></i></button>
+        </td>
+        <td class="px-2 py-1 align-middle credit_type"></td>
+        <td class="px-2 py-1 align-middle">
+            <input type="date" class="form-control form-control-sm rounded-0 text-center" name="credit_date[]" required>
+        </td>
+        <td class="px-2 py-1 align-middle">
+            <input type="number" min="1" value="0" class="form-control form-control-sm rounded-0 text-center" name="credit_amount[]" required>
+        </td>
+        <td class="px-2 py-1 align-middle credit_total text-end">0.00</td>
+    </tr>
+</noscript>
+<noscript id="debit-clone">
+    <tr>
+        <td class="px-2 py-1 align-middle text-center">
+            <input type="hidden" name="debit_id[]" value="">
+            <button class="btn btn-outline-danger btn-sm rounded-0 rem-debit" type="button"><i class="fa fa-times"></i></button>
+        </td>
+        <td class="px-2 py-1 align-middle debit_type"></td>
+        <td class="px-2 py-1 align-middle">
+            <input type="date" class="form-control form-control-sm rounded-0 text-center" name="debit_date[]" required>
+        </td>
+        <td class="px-2 py-1 align-middle">
+            <input type="number" min="1" value="0" class="form-control form-control-sm rounded-0 text-center" name="debit_amount[]" required>
+        </td>
+        <td class="px-2 py-1 align-middle debit_total text-end">0.00</td>
+    </tr>
+</noscript> {% endblock pageContent %} {% block ScriptBlock %}
+<script>
+    function calc_total() {
+        var sub_credit = 0
+        var sub_debit = 0
+        var gtotal = 0
+        $('#credit_list tbody tr').each(function() {
+            var credit = $(this).find('[name="credit_amount[]"]').val()
+            credit = credit > 0 ? credit : 0;
+            sub_credit += parseFloat(parseFloat(credit))
+            gtotal += parseFloat(parseFloat(-credit))
+            $(this).find('.credit_total').text(parseFloat(parseFloat(credit)).toLocaleString('en-US'))
+        })
+        $('.sub-total-credit').text(parseFloat(sub_credit).toLocaleString('en-US', {
+            style: 'decimal',
+            maximumFractionDigits: 2,
+            minimumFractionDigits: 2
+        }))
+        $('#debit_list tbody tr').each(function() {
+            var debit = $(this).find('[name="debit_amount[]"]').val()
+            debit = debit > 0 ? debit : 0;
+            sub_debit += parseFloat(parseFloat(debit))
+            gtotal += parseFloat(parseFloat(debit))
+            $(this).find('.debit_total').text(parseFloat(parseFloat(debit)).toLocaleString('en-US'))
+        })
+        $('.sub-total-debit').text(parseFloat(sub_debit).toLocaleString('en-US', {
+            style: 'decimal',
+            maximumFractionDigits: 2,
+            minimumFractionDigits: 2
+        }))
+        $('[name="due_amount"]').val(gtotal)
+        $('.gtotal').text(parseFloat(gtotal).toLocaleString('en-US', {
+            style: 'decimal',
+            maximumFractionDigits: 2,
+            minimumFractionDigits: 2
+        }))
+        $
+    }
+    $(function() {
+        calc_total()
+        $('#employee').select2({
+            placeholder: "Please Select Employee Name Here",
+            width: "100%",
+            selectionCssClass: "form-control form-control-sm rounded-0"
+        })
+        $('#credit').select2({
+            placeholder: "Please Select Loan Type Here",
+            width: "100%",
+            selectionCssClass: "form-control form-control-sm rounded-0"
+        })
+        $('#debit').select2({
+            placeholder: "Please Select Loan Type Here",
+            width: "100%",
+            selectionCssClass: "form-control form-control-sm rounded-0"
+        })
+
+        $('#pay_later').click(function() {
+
+            $('#loan-form').submit()
+        })
+        $('#loan-submit-btn').click(function() {
+            $('#tendered_amount').attr('required', true)
+        })
+        $('#credit_list tbody').find('[name="credit_amount[]"]').on('input change', function() {
+            calc_total()
+        })
+        $('#credit_list tbody').find('.rem-credit').click(function() {
+            if (confirm("Are you sure to remove this item?") == true) {
+                $(this).closest('tr').remove()
+                calc_total()
+            }
+        })
+        $('#debit_list tbody').find('[name="debit_amount[]"]').on('input change', function() {
+            calc_total()
+        })
+        $('#debit_list tbody').find('.rem-debit').click(function() {
+            if (confirm("Are you sure to remove this item?") == true) {
+                $(this).closest('tr').remove()
+                calc_total()
+            }
+        })
+        $('#add_credit').click(function() {
+            var cid = $('#credit').val()
+            if (cid < '1') {
+                return false
+            }
+            var credit_type = $('#credit option[value="' + cid + '"]').text()
+            var tr = $($('noscript#credit-clone').html()).clone()
+            tr.find('.credit_type').text(credit_type)
+            tr.find('[name="credit_id[]"]').val(cid)
+            tr.find('[name="credit_date[]"]').val()
+            $('#credit_list tbody').append(tr)
+            calc_total()
+            $('#credit').val('').trigger('change')
+            tr.find('[name="credit_amount[]"]').on('input change', function() {
+                calc_total()
+            })
+            tr.find('.rem-credit').click(function() {
+                if (confirm("Are you sure to remove this item?") == true) {
+                    tr.remove()
+                    calc_total()
+                }
+            })
+        })
+
+        $('#add_debit').click(function() {
+            var pid = $('#debit').val()
+            if (pid < '1') {
+                return false
+            }
+            var debit_name = $('#debit option[value="' + pid + '"]').text()
+            var tr = $($('noscript#debit-clone').html()).clone()
+            tr.find('.debit_type').text(debit_name)
+            tr.find('[name="debit_id[]"]').val(pid)
+            tr.find('[name="debit_date[]"]').val()
+            $('#debit_list tbody').append(tr)
+            calc_total()
+            $('#debit').val('').trigger('change')
+            tr.find('[name="debit_amount[]"]').on('input change', function() {
+                calc_total()
+            })
+            tr.find('.rem-debit').click(function() {
+                if (confirm("Are you sure to remove this item?") == true) {
+                    tr.remove()
+                    calc_total()
+                }
+            })
+        })
+        $('#loan-form').submit(function(e) {
+            e.preventDefault();
+            var _this = $(this)
+            $('.err-msg').remove();
+            var el = $('<div>')
+            el.addClass("alert alert-danger err-msg")
+            el.hide()
+            if (_this[0].checkValidity() == false) {
+                _this[0].reportValidity();
+                return false;
+            }
+
+            start_loader();
+            $.ajax({
+                headers: {
+                    "X-CSRFToken": '{{csrf_token}}'
+                },
+                url: "{% url 'save-loan' %}",
+                data: new FormData($(this)[0]),
+                cache: false,
+                contentType: false,
+                processData: false,
+                method: 'POST',
+                type: 'POST',
+                dataType: 'json',
+                error: err => {
+                    console.log(err)
+                    alert("An error occured", 'error');
+                    end_loader();
+                },
+                success: function(resp) {
+                    if (typeof resp == 'object' && resp.status == 'success') {
+                        location.replace('{% url "loan-page" %}')
+                    } else if (resp.status == 'failed' && !!resp.msg) {
+                        el.text(resp.msg)
+                    } else {
+                        el.text("An error occured", 'error');
+                        end_loader();
+                        console.err(resp)
+                    }
+                    _this.prepend(el)
+                    el.show('slow')
+                    $("html, body, .modal").scrollTop(0);
+                    end_loader()
+                }
+            })
+        })
+    })
+</script>
+{% endblock ScriptBlock %}
