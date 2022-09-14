@@ -11,16 +11,18 @@
                     <div class="text-end mb-3">
                         <a class="btn btn-sm btn-primary rounded-0 bg-gradient-primary" href="{% url 'manage-sale' %}" id="create_new"><i class="fa fa-plus"></i> Add New</a>
                     </div>
-                    <table class="table table-bordered table-striped" id="laundry-tbl">
+                    <table class="table table-bordered table-striped" id="sales-tbl">
                         <colgroup>
                             <col width="5%">
-                            <col width="15%">
-                            <col width="12%">
-                            <col width="20%">
-                            <col width="20%">
                             <col width="10%">
+                            <col width="10%">
+                            <col width="14%">
+                            <col width="14%">
+                            <col width="11%">
+                            <col width="11%">
                             <col width="8%">
-                            <col width="10%">
+                            <col width="8%">
+                            <col width="9%">
                         </colgroup>
                         <thead>
                             <tr>
@@ -29,40 +31,51 @@
                                 <th class="text-center">Code</th>
                                 <th class="text-center">Brand</th>
                                 <th class="text-center">Road</th>
+                                <th class="text-center">Sales Man</th>
+                                <th class="text-center">Delivery Man</th>
                                 <th class="text-center">Status</th>
                                 <th class="text-center">Print</th>
                                 <th class="text-center">Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for laundry in sales %}
+                            {% for item in sales %}
                             <tr>
                                 <td class="text-center">{{ forloop.counter }}</td>
-                                <td>{{ laundry.date_added|date:"Y-m-d h:i A"}}</td>
+                                <td>{{ item.date_added|date:"Y-m-d h:i A"}}</td>
                                 <td class="text-center">
                                     <div class="lh-1">
-                                        <div>{{ laundry.code}}</div>
+                                        <div>{{ item.code}}</div>
                                     </div>
                                 </td>
                                 <td class="text-center">
                                     <div class="lh-1">
-                                        <div>{{ laundry.brand}}</div>
+                                        <div>{{ item.brand}}</div>
                                     </div>
                                 </td>
                                 <td class="text-center">
                                     <div class="lh-1">
-                                        <div>{{ laundry.road}}</div>
-<!--                                        <div>{{ laundry.contact}}</div>-->
+                                        <div>{{ item.road}}</div>
                                     </div>
                                 </td>
                                 <td class="text-center">
-                                    {% if laundry.status == '0' %}
+                                    <div class="lh-1">
+                                        <div>{{ item.salesman}}</div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <div class="lh-1">
+                                        <div>{{ item.deliveryman}}</div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    {% if item.status == '0' %}
                                     <span class="badge badge-secondary bg-gradient bg-secondary px-3 rounded-pill bg-opacity-75 text-sm py-1">Pending</span>
-                                    {% elif laundry.status == '1' %}
+                                    {% elif item.status == '1' %}
                                     <span class="badge badge-primary bg-gradient bg-primary px-3 rounded-pill bg-opacity-75 text-sm py-1">In-Progress</span>
-                                    {% elif laundry.status == '2' %}
+                                    {% elif item.status == '2' %}
                                     <span class="badge badge-success bg-gradient bg-success px-3 rounded-pill bg-opacity-75 text-sm py-1">Done</span>
-                                    {% elif laundry.status == '3' %}
+                                    {% elif item.status == '3' %}
                                     <span class="badge badge-warning bg-gradient bg-warning px-3 rounded-pill bg-opacity-75 text-sm py-1">Picked Up</span>
                                     {% else %}
                                     <span class="badge badge-light bg-gradient bg-light px-3 border rounded-pill bg-opacity-75 text-sm py-1">N/A</span>
@@ -71,7 +84,7 @@
                                 <td class="text-center">
                                     <div class="lh-1">
                                         <div>
-                                            <a href="{% url 'print-sales' id=laundry.id %}" target="_blank">
+                                            <a href="{% url 'print-sales' id=item.id %}" target="_blank">
                                                 <button class="btn btn-outline-danger btn-sm" type="button" data-id="{{ invoice.pk }}" title="Print">
                                                     <i class="fas fa-file-pdf"></i>
                                                 </button>
@@ -81,13 +94,13 @@
                                 </td>
                                 <td class="text-center">
                                     <div class="dropdown">
-                                        <button class="btn btn-light btn-sm rounded-0 border dropdown-toggle" type="button" id="abtn{{laundry.pk}}" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <button class="btn btn-light btn-sm rounded-0 border dropdown-toggle" type="button" id="abtn{{item.pk}}" data-bs-toggle="dropdown" aria-expanded="false">
                                           Action
                                         </button>
-                                        <ul class="dropdown-menu" aria-labelledby="abtn{{laundry.pk}}">
-                                            <li><a class="dropdown-item" href="{% url 'view-sale-pk' laundry.pk %}"><i class="fa fa-eye text-dark"></i> View</a></li>
-                                            <li><a class="dropdown-item" href="{% url 'manage-sale-pk' laundry.pk %}"><i class="fa fa-edit text-primary"></i> Edit</a></li>
-                                            <li><a class="dropdown-item delete-data" href="javascript:void(0)" data-url="{% url 'delete-sale' laundry.pk %}"><i class="fa fa-trash text-danger"></i> Delete</a></li>
+                                        <ul class="dropdown-menu" aria-labelledby="abtn{{item.pk}}">
+                                            <li><a class="dropdown-item" href="{% url 'view-sale-pk' item.pk %}"><i class="fa fa-eye text-dark"></i> View</a></li>
+                                            <li><a class="dropdown-item" href="{% url 'manage-sale-pk' item.pk %}"><i class="fa fa-edit text-primary"></i> Edit</a></li>
+                                            <li><a class="dropdown-item delete-data" href="javascript:void(0)" data-url="{% url 'delete-sale' item.pk %}"><i class="fa fa-trash text-danger"></i> Delete</a></li>
                                         </ul>
                                     </div>
                                 </td>
@@ -104,10 +117,10 @@
 <script>
     $(function() {
         $('.delete-data').click(function() {
-            _conf("Are you sure to delete this Transaction?", 'delete_laundry', ["'" + $(this).attr('data-url') + "'"])
+            _conf("Are you sure to delete this Transaction?", 'delete_sales', ["'" + $(this).attr('data-url') + "'"])
         })
-        $('#laundry-tbl').find('td, th').addClass('px-2 py-1 align-middle')
-        $('#laundry-tbl').DataTable({
+        $('#sales-tbl').find('td, th').addClass('px-2 py-1 align-middle')
+        $('#sales-tbl').DataTable({
             columnDefs: [{
                 orderable: false,
                 targets: [4]
@@ -119,7 +132,7 @@
         })
     })
 
-    function delete_laundry(url) {
+    function delete_sales(url) {
 
         var _this = $('#confirm_modal .modal-body')
         $('.err-msg').remove();
