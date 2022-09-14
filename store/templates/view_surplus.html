@@ -73,81 +73,23 @@
             </div>
         </div>
 
-        <div class="card rounded-0 mb-3">
-            <div class="card-header py-1">
-                <div class="card-title mb-0 py-1">Item List</div>
-            </div>
-            <div class="card-body">
-                <div class="container-fluid">
-                    <table class="table table-bordered" id="product_list">
-                        <colgroup>
-                            <col width="30%">
-                            <col width="30%">
-                            <col width="20%">
-                            <col width="20%">
-                        </colgroup>
-                        <thead>
-                            <tr>
-                                <th class="p-1 text-center">Expense Name</th>
-                                <th class="p-1 text-center">Note</th>
-                                <th class="p-1 text-center">Amount</th>
-                                <th class="p-1 text-center">Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for pitem in pitems %}
-                            <tr>
-                                <td class="px-2 py-1 align-middle product_type">{{pitem.expense.name}}</td>
-                                <td class="px-2 py-1 align-middle text-center product_price">{{pitem.note}}</td>
-                                <td class="px-2 py-1 align-middle text-center">{{pitem.amount|floatformat}}</td>
-                                <td class="px-2 py-1 align-middle product_total text-end">{{pitem.total_amount|floatformat}}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                        <tfoot>
-                            <tr>
-                                <th class="text-center" colspan="3">Total</th>
-                                <th class="text-end sub-total-product">{{surplus.total_expense|floatformat:2|intcomma}}</th>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>
-            </div>
-        </div>
+
         <div class="card rounded-0 mb-3">
             <div class="card-body">
                 <div id="payment-details">
                     <div class="d-flex w-100 justify-content-end align-items-center">
                         <div class="col-auto">
-                            <h4 class="fw-bolder text-muted pe-2">Grand Total:</h4>
+                            <h4 class="fw-bolder text-muted pe-2">Profit Margin:</h4>
                         </div>
                         <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 text-end">
-                            <h4 class="fw-bolder pe-2 gtotal">{% if surplus.total_expense %}{{surplus.total_expense|floatformat:2|intcomma}}{% else %}0.00{% endif %}</h4>
+                            <h4 class="fw-bolder pe-2 gtotal">{% if surplus.margin %}{{surplus.margin|floatformat:2|intcomma}}{% else %}0.00{% endif %}</h4>
                         </div>
                     </div>
-<!--                    <div class="d-flex w-100 justify-content-end align-items-center">-->
-<!--                        <div class="col-auto">-->
-<!--                            <h4 class="fw-bolder text-muted pe-2">Paid Amount:</h4>-->
-<!--                        </div>-->
-<!--                        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 text-end">-->
-<!--                            <h4 class="fw-bolder pe-2">{% if purchase.tendered %}{{purchase.tendered|floatformat:2|intcomma}}{% else %}0.00{% endif %}</h4>-->
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                    <div class="d-flex w-100 justify-content-end align-items-center">-->
-<!--                        <div class="col-auto">-->
-<!--                            <h4 class="fw-bolder text-muted pe-2">Change:</h4>-->
-<!--                        </div>-->
-<!--                        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 text-end">-->
-<!--                            <h4 class="fw-bolder pe-2 " id="change">{% if purchase.change %}{{purchase.change|floatformat:2|intcomma}}{% else %}0.00{% endif %}</h4>-->
-<!--                        </div>-->
-<!--                    </div>-->
                 </div>
             </div>
             <div class="card-footer py-1 text-center">
-                <button class="btn btn-primary bg-primary btn-sm rounded-0" id="update-month" type="button">Update Month</button>
                 <a class="btn btn-primary bg-gradient bg-primary btn-sm rounded-0" href="{% url 'manage-surplus-pk' surplus.pk %}"><i class="fa fa-edit"></i> Edit</a>
                 <button class="btn btn-danger bg-gradient bg-danger btn-sm rounded-0" type="button" id="delete-data"><i class="fa fa-trash"></i> Delete</button>
-<!--                <button class="btn btn-success bg-gradient bg-success  btn-sm rounded-0" type="button" id="print"><i class="fa fa-print"></i> Print</button>-->
                 <a class="btn btn-light bg-gradient bg-light border btn-sm rounded-0" href="{% url 'surplus-page' %}"><i class="fa fa-angle-left"></i> Back to List</a>
             </div>
         </div>
