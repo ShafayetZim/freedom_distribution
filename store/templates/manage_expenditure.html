@@ -1,0 +1,274 @@
+{% extends 'base.html' %}{% load static %}{% load humanize %}{% block pageContent %}
+<style>
+    #laundry-img {
+        max-width: 100%;
+        max-height: 10em;
+        object-fit: scale-down;
+        object-position: center center;
+    }
+</style>
+<section class="py-4">
+    <div class="container">
+
+        <form action="" id="expenditure-form">
+            <input type="hidden" name="id" value="{{expenditure.id}}">
+            <input type="hidden" name="code" value="{% if expenditure.code  %}{{expenditure.code}}{% else %}generate{% endif %}">
+            <input type="hidden" name="total_amount" value="{% if expenditure.total_amount  %}{{expenditure.total_amount}}{% else %}0{% endif %}">
+
+
+            <div class="card rounded-0 mb-3">
+                <div class="card-header">
+                    <div class="card-title py-1">Expense List</div>
+                </div>
+                <div class="card-body">
+                    <div class="container-fluid">
+                        <div class="row align-items-end">
+                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                <label for="expenses" class="control-label">Expense</label>
+                                <select id="expenses" class="form-control form-control-sm rounded-0">
+                                    <option value="" disabled selected></option>
+                                    {% for item in expense %}
+                                    <option value="{{item.pk}}">{{item.name}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                <button class="btn btn-primary btn-sm rounded-0 bg-gradient bg-primary" type="button" id="add_expense"><i class="fa fa-plus"></i> Add brand</button>
+                            </div>
+                        </div>
+                        <div class="clear-fix mt-2"></div>
+                        <table class="table table-bordered" id="expense_list">
+                            <colgroup>
+                                <col width="5%">
+                                <col width="30%">
+                                <col width="30%">
+                                <col width="17%">
+                                <col width="18%">
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th class="p-1 text-center"></th>
+                                    <th class="p-1 text-center">Expense Name</th>
+                                    <th class="p-1 text-center">Note</th>
+                                    <th class="p-1 text-center">Amount</th>
+                                    <th class="p-1 text-center">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for pitem in pitems %}
+                                <tr>
+                                    <td class="px-2 py-1 align-middle text-center">
+                                        <input type="hidden" name="expense_id[]" value="{{pitem.expense.id}}">
+                                        <button class="btn btn-outline-danger btn-sm rounded-0 rem-expense" type="button"><i class="fa fa-times"></i></button>
+                                    </td>
+                                    <td class="px-2 py-1 align-middle expense_type">{{pitem.expense.name}}</td>
+                                    <td class="px-2 py-1 align-middle">
+                                        <input type="text" value="{{pitem.note}}" class="form-control form-control-sm rounded-0 text-center" name="expense_note[]">
+                                    </td>
+                                    <td class="px-2 py-1 align-middle">
+                                        <input type="number" min="1" value="{{pitem.amount|floatformat}}" class="form-control form-control-sm rounded-0 text-center" name="expense_amount[]" required>
+                                    </td>
+                                    <td class="px-2 py-1 align-middle expense_total text-end">{{pitem.total_amount|floatformat}}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th class="text-end" colspan="4">Total</th>
+                                    <th class="text-end sub-total-expense">0.00</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="card rounded-0 mb-3">
+                <div class="card-body">
+                    <div class="d-flex w-100 justify-content-end align-items-center">
+                        <div class="col-auto">
+                            <h4 class="fw-bolder text-muted pe-2">Charge total:</h4>
+                        </div>
+                        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 text-end">
+                            <h4 class="fw-bolder pe-2 gtotal">{% if surplus.total_expense %}{{surplus.total_expense|floatformat:2|intcomma}}{% else %}0.00{% endif %}</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer py-1 text-center">
+                    <button class="btn btn-primary btn-sm rounded-0" type="button" id="pay_later">Save</button>
+<!--                    <button class="btn btn-success btn-sm rounded-0" id="laundry-submit-btn" form="laundry-form"><i class="fa fa-save"></i> Pay</button>-->
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+
+<noscript id="product-clone">
+    <tr>
+        <td class="px-2 py-1 align-middle text-center">
+            <input type="hidden" name="expense_id[]" value="">
+            <button class="btn btn-outline-danger btn-sm rounded-0 rem-expense" type="button"><i class="fa fa-times"></i></button>
+        </td>
+        <td class="px-2 py-1 align-middle expense_type"></td>
+        <td class="px-2 py-1 align-middle">
+            <input type="text" class="form-control form-control-sm rounded-0 text-center" name="expense_note[]">
+        </td>
+        <td class="px-2 py-1 align-middle">
+            <input type="number" min="0" value="0" class="form-control form-control-sm rounded-0 text-center" name="expense_amount[]" required>
+        </td>
+        <td class="px-2 py-1 align-middle expense_total text-end">0.00</td>
+    </tr>
+</noscript> {% endblock pageContent %} {% block ScriptBlock %}
+<script>
+    function calc_total() {
+        var sub_expense = 0
+        var gtotal = 0
+
+        $('#expense_list tbody tr').each(function() {
+            var buy = $(this).find('[name="expense_amount[]"]').val()
+
+            buy = buy > 0 ? buy : 0;
+            sub_expense += parseFloat(parseFloat(buy))
+            gtotal += parseFloat(parseFloat(buy))
+            $(this).find('.expense_total').text(parseFloat(parseFloat(buy)).toLocaleString('en-US'))
+        })
+        $('.sub-total-expense').text(parseFloat(sub_expense).toLocaleString('en-US', {
+            style: 'decimal',
+            maximumFractionDigits: 2,
+            minimumFractionDigits: 2
+        }))
+        $('[name="total_amount"]').val(gtotal)
+        $('[name="total_expense"]').val(gtotal)
+
+        $('.gtotal').text(parseFloat(gtotal).toLocaleString('en-US', {
+            style: 'decimal',
+            maximumFractionDigits: 2,
+            minimumFractionDigits: 2
+        }))
+        $
+    }
+    $(function() {
+        calc_total()
+        $('#expenses').select2({
+            placeholder: "Please Select Expenses Here",
+            width: "100%",
+            selectionCssClass: "form-control form-control-sm rounded-0"
+        })
+        $('#check_brand').select2({
+            placeholder: "Please Select Brand Here",
+            width: "100%",
+            selectionCssClass: "form-control form-control-sm rounded-2"
+        })
+
+        $('#pay_later').click(function() {
+
+            $('#expenditure-form').submit()
+        })
+
+        $('#expense_list tbody').find('[name="expense_amount[]"]').on('input change', function() {
+            calc_total()
+        })
+
+        $('#expense_list tbody').find('.rem-expense').click(function() {
+            if (confirm("Are you sure to remove this item?") == true) {
+                $(this).closest('tr').remove()
+                calc_total()
+            }
+        })
+
+        $('#add_expense').click(function() {
+            var pid = $('#expenses').val()
+            if (pid < '1') {
+                return false
+            }
+
+            var expense_name = $('#expenses option[value="' + pid + '"]').text()
+            var tr = $($('noscript#product-clone').html()).clone()
+            tr.find('.expense_type').text(expense_name)
+            tr.find('[name="expense_id[]"]').val(pid)
+            tr.find('[name="expense_note[]"]').val()
+
+            $('#expense_list tbody').append(tr)
+            calc_total()
+            $('#expenses').val('').trigger('change')
+            tr.find('[name="expense_amount[]"]').on('input change', function() {
+                calc_total()
+            })
+
+            tr.find('.rem-expense').click(function() {
+                if (confirm("Are you sure to remove this item?") == true) {
+                    tr.remove()
+                    calc_total()
+                }
+            })
+        })
+        $('#expenditure-form').submit(function(e) {
+            e.preventDefault();
+            var _this = $(this)
+            $('.err-msg').remove();
+            var el = $('<div>')
+            el.addClass("alert alert-danger err-msg")
+            el.hide()
+            if (_this[0].checkValidity() == false) {
+                _this[0].reportValidity();
+                return false;
+            }
+
+            start_loader();
+            $.ajax({
+                headers: {
+                    "X-CSRFToken": '{{csrf_token}}'
+                },
+                url: "{% url 'save-expenditure' %}",
+                data: new FormData($(this)[0]),
+                cache: false,
+                contentType: false,
+                processData: false,
+                method: 'POST',
+                type: 'POST',
+                dataType: 'json',
+                error: err => {
+                    console.log(err)
+                    alert("An error occured", 'error');
+                    end_loader();
+                },
+                success: function(resp) {
+                    if (typeof resp == 'object' && resp.status == 'success') {
+                        location.replace('{% url "view-expenditure" %}/' + resp.id)
+                    } else if (resp.status == 'failed' && !!resp.msg) {
+                        el.text(resp.msg)
+                    } else {
+                        el.text("An error occured", 'error');
+                        end_loader();
+                        console.err(resp)
+                    }
+                    _this.prepend(el)
+                    el.show('slow')
+                    $("html, body, .modal").scrollTop(0);
+                    end_loader()
+                }
+            })
+        })
+    })
+
+
+
+    function findTotal(){
+        var arr = document.getElementsByClassName('out');
+        var tot1=0;
+        var tot2 =0;
+        for(var i=0;i<arr.length;i++){
+            if(parseFloat(arr[i].value))
+                tot1 += parseFloat(arr[i].value);
+        }
+        var arr2 = document.getElementsByClassName('in');
+        for(var i=0;i<arr2.length;i++){
+            if(parseFloat(arr2[i].value))
+                tot2 += parseFloat(arr2[i].value);
+        }
+
+        var tot = parseFloat(parseFloat(tot2) - parseFloat(tot1))
+        document.getElementById('margin').value = tot;
+    }
+
+</script>
+{% endblock ScriptBlock %}
