@@ -9,7 +9,7 @@ class Employee(models.Model):
     name = models.CharField(max_length=100)
     phone = models.CharField(max_length=100)
     nid = models.CharField(max_length=100, null=True, blank=True)
-    type = models.CharField(max_length=2, choices=(('1','Salesman'), ('2','Deliveryman')), default = 1)
+    type = models.CharField(max_length=2, choices=(('1','Salesman'), ('2','Deliveryman'), ('3','Manager'), ('4','AIC')), default = 1)
     status = models.CharField(max_length=2, choices=(('1','Active'), ('2','Inactive')), default = 1)
     delete_flag = models.IntegerField(default = 0)
     date_added = models.DateTimeField(default = timezone.now)
@@ -20,6 +20,17 @@ class Employee(models.Model):
 
     def __str__(self):
         return str(f"{self.name}")
+
+    def due(self):
+        try:
+            balance = Loan.objects.filter(employee__id=self.id).aggregate(Sum('due_amount'))
+            balance = balance['due_amount__sum']
+        except:
+            balance = 0
+
+        balance = balance if not balance is None else 0
+
+        return float(balance)
 
 
 class Road(models.Model):
@@ -50,6 +61,14 @@ class Client(models.Model):
 
     def __str__(self):
         return str(f"{self.name}")
+
+    def totalDue(self):
+        try:
+            due = SaleDue.objects.filter(client__id=self.id).aggregate(Sum('balance'))
+            due = due['balance__sum']
+        except:
+            due = 0
+        return float(due)
 
 
 class Brand(models.Model):
@@ -136,6 +155,27 @@ class Products(models.Model):
 
         return float(damage + restore - out)
 
+    def value(self):
+        try:
+            restore = SaleReturn.objects.filter(product__id = self.id).aggregate(Sum('total_amount'))
+            restore = restore['total_amount__sum']
+        except:
+            restore = 0
+        try:
+            out = DamageProduct.objects.filter(product__id = self.id).aggregate(Sum('total_amount'))
+            out = out['total_amount__sum']
+        except:
+            out = 0
+
+        restore = restore if not restore is None else 0
+        out = out if not out is None else 0
+
+        return float(restore - out)
+
+    def fresh_value(self):
+        stock = self.available() * self.buy
+        return stock
+
 
 class StockIn(models.Model):
     product = models.ForeignKey(Products, on_delete=models.CASCADE)
@@ -217,7 +257,7 @@ class Sales(models.Model):
 
 class SaleProducts(models.Model):
     sale = models.ForeignKey(Sales, on_delete=models.CASCADE,related_name="sale_fk2")
-    product = models.ForeignKey(Products, on_delete=models.CASCADE,related_name="product_fk")
+    product = models.ForeignKey(Products, on_delete=models.DO_NOTHING,related_name="product_fk")
     brand = models.CharField(max_length=100, null=True)
     buy = models.FloatField(max_length=15, default=0)
     price = models.FloatField(max_length=15, default=0)
@@ -239,6 +279,7 @@ class SaleProducts(models.Model):
 class SaleReturn(models.Model):
     sale = models.ForeignKey(Sales, on_delete=models.CASCADE,related_name="sale_fk3")
     product = models.ForeignKey(Products, on_delete=models.CASCADE,related_name="product_fk2")
+    brand = models.CharField(max_length=100, null=True)
     buy = models.FloatField(max_length=15, default=0)
     price = models.FloatField(max_length=15, default=0)
     quantity = models.FloatField(max_length=15, default=0)
@@ -261,8 +302,13 @@ class SaleDue(models.Model):
     brand = models.CharField(max_length=250, blank=True, null=True)
     note = models.CharField(max_length=250, blank=True, null=True)
     due = models.FloatField(max_length=15, default=0)
+    new = models.FloatField(max_length=15, default=0)
+    previous = models.FloatField(max_length=15, default=0)
     paid = models.FloatField(max_length=15, default=0)
     balance = models.FloatField(max_length=15, default=0)
+    date_added = models.DateTimeField(default=timezone.now)
+    date_updated = models.DateTimeField(auto_now=True)
+    date = models.DateField(default=date.today)
 
     class Meta:
         verbose_name_plural = "List of Sale Due"
@@ -287,8 +333,7 @@ class SaleCommission(models.Model):
 
 class Purchase(models.Model):
     code = models.CharField(max_length=100)
-    client = models.CharField(max_length=250, blank=True, null=True)
-    contact = models.CharField(max_length=250, blank=True, null=True)
+    brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, null=True, related_name="brand_fk5")
     total_amount = models.FloatField(max_length=15)
     status = models.CharField(max_length=2,
                               choices=(('0', 'Pending'), ('1', 'In-progress'), ('2', 'Done'), ('3', 'Picked Up')),
@@ -354,11 +399,15 @@ class CommissionBill(models.Model):
 
 class Online(models.Model):
     code = models.CharField(max_length=100)
+    brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, null=True, related_name="brand_fk6")
+    note = models.CharField(max_length=250, blank=True, null=True)
+    due_amount = models.FloatField(max_length=15, null=True)
     status = models.CharField(max_length=2,
                               choices=(('0', 'Pending'), ('1', 'In-progress'), ('2', 'Done')),
                               default=0)
     date_added = models.DateTimeField(default=timezone.now)
     date_updated = models.DateTimeField(auto_now=True)
+    date = models.DateField(default=date.today)
 
     class Meta:
         verbose_name_plural = "List of Advance"
@@ -368,8 +417,16 @@ class Online(models.Model):
 
     def totalDue(self):
         try:
-            brands = OnlineAdvance.objects.filter(online=self).aggregate(Sum('due'))
-            brands = brands['due__sum']
+            brands = OnlineAdvance.objects.filter(online=self).aggregate(Sum('total_amount'))
+            brands = brands['total_amount__sum']
+        except:
+            brands = 0
+        return float(brands)
+
+    def totalCredit(self):
+        try:
+            brands = OnlineCredit.objects.filter(online=self).aggregate(Sum('total_amount'))
+            brands = brands['total_amount__sum']
         except:
             brands = 0
         return float(brands)
@@ -379,12 +436,27 @@ class OnlineAdvance(models.Model):
     online = models.ForeignKey(Online, on_delete=models.CASCADE, related_name="online_fk")
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE, related_name="brand_fk3")
     advance = models.FloatField(max_length=15, default=0)
-    receive = models.FloatField(max_length=15, default=0)
-    due = models.FloatField(max_length=15)
+    total_amount = models.FloatField(max_length=15)
     date = models.DateField(default=date.today)
+    day = models.CharField(max_length=100, null=True)
 
     class Meta:
         verbose_name_plural = "List of Advance Brand"
+
+    def __str__(self):
+        return str(f"{self.online.code} - {self.brand.name}")
+
+
+class OnlineCredit(models.Model):
+    online = models.ForeignKey(Online, on_delete=models.CASCADE, related_name="online_fk2")
+    brand = models.ForeignKey(Brand, on_delete=models.CASCADE, related_name="brand_fk4")
+    amount = models.CharField(max_length=100)
+    total_amount = models.FloatField(max_length=15)
+    date = models.DateField(default=date.today)
+    day = models.CharField(max_length=100, null=True)
+
+    class Meta:
+        verbose_name_plural = "List of Advance Credited"
 
     def __str__(self):
         return str(f"{self.online.code} - {self.brand.name}")
@@ -486,3 +558,30 @@ class Charge(models.Model):
 
     def __str__(self):
         return str(f"{self.surplus.code} - {self.expense.name}")
+
+
+class Debit(models.Model):
+    name = models.CharField(max_length=100)
+    delete_flag = models.IntegerField(default=0)
+    date_added = models.DateTimeField(default=timezone.now)
+    date_updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name_plural = "List of Debit"
+
+    def __str__(self):
+        return str(f"{self.name}")
+
+
+class Credit(models.Model):
+    name = models.CharField(max_length=100)
+    delete_flag = models.IntegerField(default=0)
+    date_added = models.DateTimeField(default=timezone.now)
+    date_updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name_plural = "List of Credit"
+
+    def __str__(self):
+        return str(f"{self.name}")
+
