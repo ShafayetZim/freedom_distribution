@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+table, th, td {
+  border: 1px ;
+  border-collapse: collapse;
+}
+th, td {
+  font-size: 14px;
+  padding-top: 5px;
+}
+th {
+    background-color: grey;
+    text-align: center;
+    color: white;
+    padding-right: 1px;
+    width: 18%;
+    border-right: 2px solid white;
+}
+td {
+    text-align: center;
+    width: 32%;
+    padding-left: 3px;
+    border-style: hidden;
+}
+#div1 {
+    height:20px;
+}
+#div2 {
+    height:20px;
+}
+#div3 {
+    height:20px;
+}
+.footer {
+   position: fixed;
+   left: 0;
+   border-top: 2px solid grey;
+   bottom: 0;
+   width: 100%;
+   color: black;
+   text-align: center;
+   font-size: 14px;
+}
+
+</style>
+</head>
+<body>
+
+<div id="div1">
+<div class="center" style="text-align: left;">
+
+    <table style="width: 100%; border-collapse: collapse; border-style: hidden;" border="0">
+        <tbody>
+        <tr style="border-style: hidden;">
+            <td style="width: 25%;  height:120px; border-right: none;"><img class="" src="../static/assets/default/img/FreedomDistribution.psd" alt="Header Avatar" width="800" height="400"></td>
+            <td style="width: 50%;  height:120px; font-size:12px; text-align: center; padding-left:2px;"><span style="font-size: 20px;">Freedom Distribution</span><br />
+                Your Trusted Business Partner... <br />
+                16 Moharaja Rd, Mymensingh 2200 <br />
+                <span style=""><b>Pro: A. K. M. Nuruzzaman (Rakib)</b></span>
+            </td>
+            <td style="width: 25%;  height:120px; padding-top:0px;"><img src="{{shipment.barcode.path}}" alt="" height="160px" width="540px" /></td>
+
+        </tr>
+
+        </tbody>
+    </table>
+</div>
+
+</div>
+
+<div id="div2">
+
+
+</div>
+
+<table>
+    <tr>
+        <th colspan="4" style="border-right: none;">All Fresh Product</th>
+    </tr>
+</table>
+
+<br />
+
+{% if product %}
+<table>
+    <tr>
+        <th>Sl. No.</th>
+        <th style="width: 75%;">Products</th>
+        <th>Code</th>
+        <th>Brand</th>
+        <th>Buy</th>
+        <th>Price</th>
+        <th>MRP</th>
+        <th>Stock</th>
+        <th>Stock Value</th>
+    </tr>
+  {% for item in product %}
+    <tr>
+        <td  style="width: 10%;">{{forloop.counter}}</td>
+        <td  style="width: 75%;">{{item.name}}</td>
+        <td>{{item.code}}</td>
+        <td>{{item.brand}}</td>
+        <td>{{item.buy}}</td>
+        <td>{{item.price}}</td>
+        <td>{{item.mrp}}</td>
+        <td>{{item.available}}</td>
+        <td>{{item.fresh_value }}</td>
+    </tr>
+  {% endfor %}
+
+</table>
+
+<br />
+{% endif %}
+
+
+<div class="footer">
+  <p><br/>
+      Tel: 01917713794 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Email: freedomdistribution@gmail.com &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Web: www.freedomdistribution.com.bd</p>
+</div>
+
+</body>
+</html>
