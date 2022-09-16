@@ -665,3 +665,62 @@ class SaveLoan(forms.ModelForm):
             print(err)
             return False
 
+
+class SaveExpenditure(forms.ModelForm):
+    code = forms.CharField(max_length=250)
+    total_amount = forms.CharField(max_length=250)
+
+    class Meta:
+        model = models.Expenditure
+        fields = ('code', 'total_amount', )
+
+    def clean_code(self):
+        code = self.cleaned_data['code']
+
+        if code == 'generate':
+            pref = datetime.datetime.now().strftime('%y%m%d')
+            code = 1
+            while True:
+                try:
+                    check = models.Expenditure.objects.get(code=f"{pref}{code:04d}")
+                    code = code + 1
+                except:
+                    return f"{pref}{code:04d}"
+                    break
+        else:
+            return code
+
+    def save(self):
+        instance = self.instance
+        Expenses = []
+
+        if 'expense_id[]' in self.data:
+            for k, val in enumerate(self.data.getlist('expense_id[]')):
+                expense = models.Expense.objects.get(id=val)
+                note = self.data.getlist('expense_note[]')[k]
+                amount = self.data.getlist('expense_amount[]')[k]
+                total = float(amount)
+
+                try:
+                    Expenses.append(models.ExpenditureCharge(expenditure=instance, expense=expense, note=note, amount=amount, total_amount=total))
+                    print("ExpenditureCharges..")
+                except Exception as err:
+                    print(err)
+                    return False
+        try:
+            instance.save()
+            models.ExpenditureCharge.objects.filter(expenditure=instance).delete()
+            models.ExpenditureCharge.objects.bulk_create(Expenses)
+
+        except Exception as err:
+            print(err)
+            return False
+
+
+class SaveInvestment(forms.ModelForm):
+    invest = forms.CharField(max_length=250)
+
+    class Meta:
+        model = models.Investment
+        fields = ('invest',)
+
