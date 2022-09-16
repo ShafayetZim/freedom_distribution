@@ -61,7 +61,7 @@ class UpdateUser(UserChangeForm):
 
     class Meta:
         model = User
-        fields = ('email', 'username','first_name', 'last_name')
+        fields = ('email', 'username','first_name', 'last_name',)
 
     def clean_email(self):
         email = self.cleaned_data['email']
@@ -191,10 +191,10 @@ class SaveSale(forms.ModelForm):
             code = 1
             while True:
                 try:
-                    check = models.Sales.objects.get(code=f"{pref}{code:05d}")
+                    check = models.Sales.objects.get(code=f"{pref}{code:03d}")
                     code = code + 1
                 except:
-                    return f"{pref}{code:05d}"
+                    return f"{pref}{code:03d}"
                     break
         else:
             return code
@@ -236,6 +236,7 @@ class SaveSale(forms.ModelForm):
         if 'return_id[]' in self.data:
             for k, val in enumerate(self.data.getlist('return_id[]')):
                 product = models.Products.objects.get(id=val)
+                brand = self.data.getlist('return_brand[]')[k]
                 buy = self.data.getlist('return_buy[]')[k]
                 price = self.data.getlist('return_price[]')[k]
                 qty = self.data.getlist('return_quantity[]')[k]
@@ -243,25 +244,28 @@ class SaveSale(forms.ModelForm):
                 goodqty = self.data.getlist('return_good_quantity[]')[k]
                 damageqty = self.data.getlist('return_damage_quantity[]')[k]
                 sign = self.data.getlist('return_sign[]')[k]
-                total = float(price) * float(qty)
+                total = float(price)
                 # free = self.cleaned_data['free_quantity']
                 try:
-                    Returns.append(models.SaleReturn(sale=instance, product=product, buy=buy, price=price, quantity=qty, total_amount=total, free_quantity=freeqty, good_quantity=goodqty, damage_quantity=damageqty, sign=sign))
+                    Returns.append(models.SaleReturn(sale=instance, product=product, brand=brand, buy=buy, price=price, quantity=qty, total_amount=total, free_quantity=freeqty, good_quantity=goodqty, damage_quantity=damageqty, sign=sign))
                     print("SaleReturns..")
                 except Exception as err:
                     print(err)
                     return False
 
-        if 'price_id[]' in self.data:
-            for k, val in enumerate(self.data.getlist('price_id[]')):
+        if 'client_id[]' in self.data:
+            for k, val in enumerate(self.data.getlist('client_id[]')):
                 prices = models.Client.objects.get(id= val)
-                brand = self.data.getlist('laundry_brand[]')[k]
-                note = self.data.getlist('laundry_note[]')[k]
-                price = self.data.getlist('laundry_price[]')[k]
-                weight = self.data.getlist('laundry_weight[]')[k]
-                total = float(price) - float(weight)
+                brand = self.data.getlist('due_brand[]')[k]
+                note = self.data.getlist('due_note[]')[k]
+                due = self.data.getlist('due_price[]')[k]
+                new = self.data.getlist('due_new[]')[k]
+                previous = self.data.getlist('due_previous[]')[k]
+                date = self.data.getlist('due_date[]')[k]
+                paid = float(new) + float(previous)
+                total = float(due) - float(paid)
                 try:
-                    Clients.append(models.SaleDue(sale=instance, client=prices, brand=brand, note=note, due=price, paid=weight, balance=total))
+                    Clients.append(models.SaleDue(sale=instance, client=prices, brand=brand, note=note, due=due, new=new, previous=previous, date=date, paid=paid, balance=total))
                     print("ClientDues..")
                 except Exception as err:
                     print(err)
@@ -295,16 +299,16 @@ class SaveSale(forms.ModelForm):
 
 class SavePurchase(forms.ModelForm):
     code = forms.CharField(max_length=250)
-    client = forms.CharField(max_length=250, required=False)
-    contact = forms.CharField(max_length=250, required=False)
+    brand = forms.Select(
+        attrs={'class': 'form-control form-control-sm rounded-0', 'value': '', 'id': 'id_brand'}
+    )
     status = forms.CharField(max_length=2)
     payment = forms.CharField(max_length=2)
     total_amount = forms.CharField(max_length=250)
-    # tendered = forms.CharField(max_length=250)
 
     class Meta:
         model = models.Purchase
-        fields = ('code', 'client', 'contact', 'status', 'payment', 'total_amount', )
+        fields = ('code', 'brand', 'status', 'payment', 'total_amount', )
 
     def clean_code(self):
         code = self.cleaned_data['code']
@@ -400,11 +404,16 @@ class SaveCommissionBill(forms.ModelForm):
 
 class SaveAdvance(forms.ModelForm):
     code = forms.CharField(max_length=250)
+    brand = forms.Select(
+        attrs={'class': 'form-control form-control-sm rounded-0', 'value': '', 'id': 'id_brand'}
+    )
+    note = forms.CharField(max_length=250, required=False)
+    due_amount = forms.CharField(max_length=250)
     status = forms.CharField(max_length=2)
 
     class Meta:
         model = models.Online
-        fields = ('code', 'status', )
+        fields = ('code', 'brand', 'note', 'due_amount', 'status', )
 
     def clean_code(self):
         code = self.cleaned_data['code']
@@ -425,17 +434,32 @@ class SaveAdvance(forms.ModelForm):
     def save(self):
         instance = self.instance
         Brands = []
+        Credits = []
 
         if 'brand_id[]' in self.data:
             for k, val in enumerate(self.data.getlist('brand_id[]')):
                 brand = models.Brand.objects.get(id=val)
                 advance = self.data.getlist('brand_advance[]')[k]
-                receive = self.data.getlist('brand_receive[]')[k]
-                total = float(advance) - float(receive)
+                day = self.data.getlist('brand_date[]')[k]
+                total = float(advance)
 
                 try:
-                    Brands.append(models.OnlineAdvance(online=instance, brand=brand, advance=advance, receive=receive, due=total))
+                    Brands.append(models.OnlineAdvance(online=instance, brand=brand, advance=advance, day=day, total_amount=total))
                     print("Advance Brand..")
+                except Exception as err:
+                    print(err)
+                    return False
+
+        if 'credit_id[]' in self.data:
+            for k, val in enumerate(self.data.getlist('credit_id[]')):
+                brand = models.Brand.objects.get(id=val)
+                amount = self.data.getlist('credit_amount[]')[k]
+                day = self.data.getlist('credit_date[]')[k]
+                total = float(amount)
+
+                try:
+                    Credits.append(models.OnlineCredit(online=instance, brand=brand, amount=amount, day=day, total_amount=total))
+                    print("Advance Credit..")
                 except Exception as err:
                     print(err)
                     return False
@@ -443,6 +467,8 @@ class SaveAdvance(forms.ModelForm):
             instance.save()
             models.OnlineAdvance.objects.filter(online=instance).delete()
             models.OnlineAdvance.objects.bulk_create(Brands)
+            models.OnlineCredit.objects.filter(online=instance).delete()
+            models.OnlineCredit.objects.bulk_create(Credits)
 
         except Exception as err:
             print(err)
@@ -484,7 +510,7 @@ class SaveDamage(forms.ModelForm):
                 brand = self.data.getlist('product_brand[]')[k]
                 price = self.data.getlist('product_price[]')[k]
                 qty = self.data.getlist('product_quantity[]')[k]
-                total = float(price) * float(qty)
+                total = float(price)
 
                 try:
                     Products.append(models.DamageProduct(damage=instance, product=product, brand=brand, price=price, quantity=qty, total_amount=total))
@@ -603,11 +629,12 @@ class SaveLoan(forms.ModelForm):
         if 'debit_id[]' in self.data:
             for k, val in enumerate(self.data.getlist('debit_id[]')):
                 debit = models.Debit.objects.get(id=val)
+                day = self.data.getlist('debit_date[]')[k]
                 amount = self.data.getlist('debit_amount[]')[k]
                 total = float(amount)
 
                 try:
-                    Debits.append(models.LoanDebit(loan=instance, debit=debit, amount=amount, total_amount=total))
+                    Debits.append(models.LoanDebit(loan=instance, debit=debit, day=day, amount=amount, total_amount=total))
                     print("LoanDebits..")
                 except Exception as err:
                     print(err)
@@ -616,11 +643,12 @@ class SaveLoan(forms.ModelForm):
         if 'credit_id[]' in self.data:
             for k, val in enumerate(self.data.getlist('credit_id[]')):
                 credit = models.Credit.objects.get(id=val)
+                day = self.data.getlist('credit_date[]')[k]
                 amount = self.data.getlist('credit_amount[]')[k]
                 total = float(amount)
 
                 try:
-                    Credits.append(models.LoanCredit(loan=instance, credit=credit, amount=amount, total_amount=total))
+                    Credits.append(models.LoanCredit(loan=instance, credit=credit, day=day, amount=amount, total_amount=total))
                     print("LoanCredits..")
                 except Exception as err:
                     print(err)
