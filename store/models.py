@@ -585,3 +585,102 @@ class Credit(models.Model):
     def __str__(self):
         return str(f"{self.name}")
 
+
+class Loan(models.Model):
+    code = models.CharField(max_length=100)
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='employee_fk')
+    note = models.CharField(max_length=250, blank=True, null=True)
+    due_amount = models.FloatField(max_length=15)
+    date_added = models.DateTimeField(default=timezone.now)
+    date_updated = models.DateTimeField(auto_now=True)
+    date = models.DateField(default=date.today)
+
+    class Meta:
+        verbose_name_plural = "List of Loans"
+
+    def __str__(self):
+        return str(f"{self.code} - {self.employee.name}")
+
+    def totalCredit(self):
+        try:
+            credit = LoanCredit.objects.filter(loan=self).aggregate(Sum('total_amount'))
+            credit = credit['total_amount__sum']
+        except:
+            credit = 0
+        return float(credit)
+
+    def totalDebit(self):
+        try:
+            debit = LoanDebit.objects.filter(loan=self).aggregate(Sum('total_amount'))
+            debit = debit['total_amount__sum']
+        except:
+            debit = 0
+        return float(debit)
+
+
+class LoanCredit(models.Model):
+    loan = models.ForeignKey(Loan, on_delete=models.CASCADE, related_name="loan_fk")
+    credit = models.ForeignKey(Credit, on_delete=models.CASCADE, related_name="credit_fk")
+    amount = models.CharField(max_length=100)
+    total_amount = models.FloatField(max_length=15)
+    date = models.DateField(default=date.today)
+    day = models.CharField(max_length=100, null=True)
+
+    class Meta:
+        verbose_name_plural = "List of Loans Credited"
+
+    def __str__(self):
+        return str(f"{self.loan.code} - {self.credit.name}")
+
+
+class LoanDebit(models.Model):
+    loan = models.ForeignKey(Loan, on_delete=models.CASCADE, related_name="loan_fk2")
+    debit = models.ForeignKey(Debit, on_delete=models.CASCADE, related_name="debit_fk")
+    amount = models.CharField(max_length=100)
+    total_amount = models.FloatField(max_length=15)
+    date = models.DateField(default=date.today)
+    day = models.CharField(max_length=100, null=True)
+
+    class Meta:
+        verbose_name_plural = "List of Loans Debited"
+
+    def __str__(self):
+        return str(f"{self.loan.code} - {self.debit.name}")
+
+
+class Expenditure(models.Model):
+    code = models.CharField(max_length=100)
+    total_amount = models.FloatField(max_length=15)
+    date_added = models.DateTimeField(default=timezone.now)
+    date_updated = models.DateTimeField(auto_now=True)
+    date = models.DateField(default=date.today)
+
+    class Meta:
+        verbose_name_plural = "List of Expenditure"
+
+    def __str__(self):
+        return str(f"{self.code}")
+
+    def totalExpense(self):
+        try:
+            expense = ExpenditureCharge.objects.filter(online=self).aggregate(Sum('total_amount'))
+            expense = expense['total_amount__sum']
+        except:
+            expense = 0
+        return float(expense)
+
+
+class ExpenditureCharge(models.Model):
+    expenditure = models.ForeignKey(Expenditure, on_delete=models.CASCADE, related_name="expenditure_fk")
+    expense = models.ForeignKey(Expense, on_delete=models.CASCADE, related_name="expense_fk2")
+    note = models.CharField(max_length=250, blank=True, null=True)
+    amount = models.CharField(max_length=100)
+    total_amount = models.FloatField(max_length=15)
+    date = models.DateField(default=date.today)
+
+    class Meta:
+        verbose_name_plural = "List of Expenditure Charges"
+
+    def __str__(self):
+        return str(f"{self.expenditure.code} - {self.expense.name}")
+
