@@ -684,3 +684,151 @@ class ExpenditureCharge(models.Model):
     def __str__(self):
         return str(f"{self.expenditure.code} - {self.expense.name}")
 
+
+class Investment(models.Model):
+    invest = models.FloatField(max_length=250)
+    delete_flag = models.IntegerField(default=0)
+    date_added = models.DateTimeField(default=timezone.now)
+    date_updated = models.DateTimeField(auto_now=True)
+    date = models.DateField(default=date.today)
+
+    class Meta:
+        verbose_name_plural = "List of Investment"
+
+    def __str__(self):
+        return str(f"{self.invest}")
+
+
+class OnlineTransaction(models.Model):
+    amount = models.FloatField(max_length=250)
+    note = models.CharField(max_length=250)
+    delete_flag = models.IntegerField(default=0)
+    date_added = models.DateTimeField(default=timezone.now)
+    date_updated = models.DateTimeField(auto_now=True)
+    date = models.DateField(default=date.today)
+
+    class Meta:
+        verbose_name_plural = "List of Expose"
+
+    def __str__(self):
+        return str(f"{self.amount}")
+
+
+class Bank(models.Model):
+    amount = models.FloatField(max_length=100)
+    note = models.CharField(max_length=250, blank=True, null=True)
+    delete_flag = models.IntegerField(default=0)
+    date_added = models.DateTimeField(default=timezone.now)
+    date_updated = models.DateTimeField(auto_now=True)
+    date = models.DateField(default=date.today)
+
+    class Meta:
+        verbose_name_plural = "List of Banks"
+
+    def __str__(self):
+        return str(f"{self.amount}")
+
+    def totalBalance(self):
+        try:
+            existing = Bank.objects.filter(delete_flag=0).aggregate(Sum('amount'))
+            existing = existing['amount__sum']
+        except:
+            existing = 0
+        try:
+            deposit = BankTransaction.objects.filter(type=1, delete_flag=0).aggregate(Sum('amount'))
+            deposit = deposit['amount__sum']
+        except:
+            deposit = 0
+        try:
+            withdraw = BankTransaction.objects.filter(type=2, delete_flag=0).aggregate(Sum('amount'))
+            withdraw = withdraw['amount__sum']
+        except:
+            withdraw = 0
+
+        existing = existing if not existing is None else 0
+        deposit = deposit if not deposit is None else 0
+        withdraw = withdraw if not withdraw is None else 0
+        return float(existing + deposit - withdraw)
+
+    def todayCash(self):
+        try:
+            existing = Bank.objects.filter(delete_flag=0).aggregate(Sum('amount'))
+            existing = existing['amount__sum']
+        except:
+            existing = 0
+        try:
+            deposit = BankTransaction.objects.filter(type=1, delete_flag=0).aggregate(Sum('amount'))
+            deposit = deposit['amount__sum']
+        except:
+            deposit = 0
+        try:
+            withdraw = BankTransaction.objects.filter(type=2, delete_flag=0).aggregate(Sum('amount'))
+            withdraw = withdraw['amount__sum']
+        except:
+            withdraw = 0
+        try:
+            sale = SaleProducts.objects.aggregate(Sum('total_amount'))
+            sale = sale['total_amount__sum']
+        except:
+            sale = 0
+        try:
+            damage = SaleReturn.objects.aggregate(Sum('total_amount'))
+            damage = damage['total_amount__sum']
+        except:
+            damage = 0
+        try:
+            due = SaleDue.objects.aggregate(Sum('balance'))
+            due = due['balance__sum']
+        except:
+            due = 0
+        try:
+            commission = SaleCommission.objects.aggregate(Sum('total_amount'))
+            commission = commission['total_amount__sum']
+        except:
+            commission = 0
+        try:
+            debit = LoanDebit.objects.aggregate(Sum('total_amount'))
+            debit = debit['total_amount__sum']
+        except:
+            debit = 0
+        try:
+            credit = LoanCredit.objects.aggregate(Sum('total_amount'))
+            credit = credit['total_amount__sum']
+        except:
+            credit = 0
+        try:
+            online = OnlineTransaction.objects.aggregate(Sum('amount'))
+            online = online['amount__sum']
+        except:
+            online = 0
+        try:
+            expense = ExpenditureCharge.objects.aggregate(Sum('total_amount'))
+            expense = expense['total_amount__sum']
+        except:
+            expense = 0
+
+        existing = existing if not existing is None else 0
+        deposit = deposit if not deposit is None else 0
+        withdraw = withdraw if not withdraw is None else 0
+        sale = sale if not sale is None else 0
+        damage = damage if not damage is None else 0
+        due = due if not due is None else 0
+        commission = commission if not commission is None else 0
+        debit = debit if not debit is None else 0
+        credit = credit if not credit is None else 0
+        online = online if not online is None else 0
+        expense = expense if not expense is None else 0
+        return float(existing - deposit + withdraw + sale - damage - due - commission - debit + credit - online - expense)
+
+
+class BankTransaction(models.Model):
+    amount = models.FloatField(max_length=100)
+    type = models.CharField(max_length=2, choices=(('1', 'Deposit'), ('2', 'Withdraw')), default=1)
+    delete_flag = models.IntegerField(default=0)
+    date = models.DateField(default=date.today)
+
+    class Meta:
+        verbose_name_plural = "List of Bank Transaction"
+
+    def __str__(self):
+        return str(f"{self.amount} - {self.type}")
