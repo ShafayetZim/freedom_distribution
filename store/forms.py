@@ -724,3 +724,29 @@ class SaveInvestment(forms.ModelForm):
         model = models.Investment
         fields = ('invest',)
 
+
+class SaveOnlineTransaction(forms.ModelForm):
+    amount = forms.CharField(max_length=250)
+    note = forms.CharField(max_length=250)
+
+    class Meta:
+        model = models.OnlineTransaction
+        fields = ('amount', 'note',)
+
+
+class SaveBank(forms.ModelForm):
+    amount = forms.CharField(max_length=250)
+    note = forms.CharField(max_length=250, required=False)
+
+    class Meta:
+        model = models.Bank
+        fields = ('amount', 'note',)
+
+
+class SaveBankTransaction(forms.ModelForm):
+    amount = forms.CharField(max_length=250)
+    type = forms.CharField(max_length=2)
+
+    class Meta:
+        model = models.BankTransaction
+        fields = ('amount', 'type',)
