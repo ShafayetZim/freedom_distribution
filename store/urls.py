@@ -175,5 +175,13 @@ urlpatterns = [
     path('view_bank_transaction/<int:pk>',views.view_bank_transaction,name='view-bank-transaction-pk'),
     path('save_bank_transaction',views.save_bank_transaction,name='save-bank-transaction'),
     path('delete_bank_transaction/<int:pk>',views.delete_bank_transaction,name='delete-bank-transaction'),
-
+    path('today_cash',views.today_cash,name='today-cash-page'),
+    path('filter_daily_report',views.filter_daily_report,name='filter-daily-report'),
+    path('print-product', views.print_product, name='print-product'),
+    path('print-damage', views.print_damage, name='print-damage'),
+    path('daily-collection', views.daily_collection, name='daily-collection'),
+    path('daily-collection/<str:date>',views.daily_collection,name='daily-collection-date'),
+    path('edit_sale',views.edit_sale,name='edit-sale'),
+    path('edit_sale/<int:pk>',views.edit_sale,name='edit-sale-pk'),
+    path('sale_qty_report',views.sale_qty_report,name='sale-qty-report'),
 ]+ static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
