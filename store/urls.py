@@ -131,5 +131,12 @@ urlpatterns = [
     path('delete_surplus/<int:pk>',views.delete_surplus,name='delete-surplus'),
     path('update_surplus_form/<int:pk>',views.update_surplus_form,name='surplus-update-month'),
     path('update_surplus_month',views.update_surplus_month,name='update-surplus-month'),
+    path('loan',views.loan,name='loan-page'),
+    path('manage_loan',views.manage_loan,name='manage-loan'),
+    path('manage_loan/<int:pk>',views.manage_loan,name='manage-loan-pk'),
+    path('view_loan',views.view_loan,name='view-loan'),
+    path('view_loan/<int:pk>',views.view_loan,name='view-loan-pk'),
+    path('save_loan',views.save_loan,name='save-loan'),
+    path('delete_loan/<int:pk>',views.delete_loan,name='delete-loan'),
 
 ]+ static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
