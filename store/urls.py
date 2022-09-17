@@ -138,5 +138,11 @@ urlpatterns = [
     path('view_loan/<int:pk>',views.view_loan,name='view-loan-pk'),
     path('save_loan',views.save_loan,name='save-loan'),
     path('delete_loan/<int:pk>',views.delete_loan,name='delete-loan'),
+    path('deliveryman_report', views.deliveryman_report, name="deliveryman-report"),
+    path('salesman_report', views.salesman_report, name="salesman-report"),
+    path('damage_products',views.damage_products,name='damage-product-page'),
+    path('damage_report',views.damage_report,name='damage-report'),
+    path('fresh_product_report',views.fresh_product_report,name='fresh-product-report'),
+    path('dues_report',views.dues_report,name='dues-report'),
 
 ]+ static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
