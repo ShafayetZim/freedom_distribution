@@ -2445,3 +2445,435 @@ def delete_online_transaction(request, pk=None):
 
     return HttpResponse(json.dumps(resp), content_type="application/json")
 
+
+@login_required
+def bank(request):
+    context = context_data(request)
+    context['page'] = 'bank'
+    context['page_title'] = "Bank Amount List"
+    context['bank'] = models.Bank.objects.filter(delete_flag=0).all()
+    return render(request, 'bank.html', context)
+
+
+@login_required
+def save_bank(request):
+    resp = { 'status': 'failed', 'msg' : '' }
+    if request.method == 'POST':
+        post = request.POST
+        if not post['id'] == '':
+            bank = models.Bank.objects.get(id = post['id'])
+            form = forms.SaveBank(request.POST, instance=bank)
+        else:
+            form = forms.SaveBank(request.POST)
+
+        if form.is_valid():
+            form.save()
+            if post['id'] == '':
+                messages.success(request, "Bank amount has been saved successfully.")
+            else:
+                messages.success(request, "Bank amount has been updated successfully.")
+            resp['status'] = 'success'
+        else:
+            for field in form:
+                for error in field.errors:
+                    if not resp['msg'] == '':
+                        resp['msg'] += str('<br/>')
+                    resp['msg'] += str(f'[{field.name}] {error}')
+    else:
+         resp['msg'] = "There's no data sent on the request"
+
+    return HttpResponse(json.dumps(resp), content_type="application/json")
+
+
+@login_required
+def view_bank(request, pk=None):
+    context = context_data(request)
+    context['page'] = 'view_bank'
+    context['page_title'] = 'View Bank'
+    if pk is None:
+        context['bank'] = {}
+    else:
+        context['bank'] = models.Bank.objects.get(id=pk)
+
+    return render(request, 'view_bank.html', context)
+
+
+@login_required
+def manage_bank(request, pk=None):
+    context = context_data(request)
+    context['page'] = 'manage_bank'
+    context['page_title'] = 'Manage Bank'
+    if pk is None:
+        context['bank'] = {}
+    else:
+        context['bank'] = models.Bank.objects.get(id=pk)
+
+    return render(request, 'manage_bank.html', context)
+
+
+@login_required
+def delete_bank(request, pk=None):
+    resp = {'status': 'failed', 'msg': ''}
+    if pk is None:
+        resp['msg'] = 'Bank ID is invalid'
+    else:
+        try:
+            models.Bank.objects.filter(pk=pk).update(delete_flag=1)
+            messages.success(request, "Bank amount has been deleted successfully.")
+            resp['status'] = 'success'
+        except:
+            resp['msg'] = "Deleting Bank amount Failed"
+
+    return HttpResponse(json.dumps(resp), content_type="application/json")
+
+
+@login_required
+def bank_transaction(request):
+    context = context_data(request)
+    context['page'] = 'bank transaction'
+    context['page_title'] = "Bank Transaction List"
+    context['bank'] = models.BankTransaction.objects.filter(delete_flag=0).all()
+    return render(request, 'bank_transaction.html', context)
+
+
+@login_required
+def save_bank_transaction(request):
+    resp = { 'status': 'failed', 'msg' : '' }
+    if request.method == 'POST':
+        post = request.POST
+        if not post['id'] == '':
+            bank = models.Bank.objects.get(id = post['id'])
+            form = forms.SaveBankTransaction(request.POST, instance=bank)
+        else:
+            form = forms.SaveBankTransaction(request.POST)
+
+        if form.is_valid():
+            form.save()
+            if post['id'] == '':
+                messages.success(request, "Bank amount has been saved successfully.")
+            else:
+                messages.success(request, "Bank amount has been updated successfully.")
+            resp['status'] = 'success'
+        else:
+            for field in form:
+                for error in field.errors:
+                    if not resp['msg'] == '':
+                        resp['msg'] += str('<br/>')
+                    resp['msg'] += str(f'[{field.name}] {error}')
+    else:
+         resp['msg'] = "There's no data sent on the request"
+
+    return HttpResponse(json.dumps(resp), content_type="application/json")
+
+
+@login_required
+def view_bank_transaction(request, pk=None):
+    context = context_data(request)
+    context['page'] = 'view_bank_transaction'
+    context['page_title'] = 'View Bank Transaction'
+    if pk is None:
+        context['bank'] = {}
+    else:
+        context['bank'] = models.BankTransaction.objects.get(id=pk)
+
+    return render(request, 'view_bank_transaction.html', context)
+
+
+@login_required
+def manage_bank_transaction(request, pk=None):
+    context = context_data(request)
+    context['page'] = 'manage_bank_transaction'
+    context['page_title'] = 'Manage Transaction Bank'
+    if pk is None:
+        context['bank'] = {}
+    else:
+        context['bank'] = models.BankTransaction.objects.get(id=pk)
+
+    return render(request, 'manage_bank_transaction.html', context)
+
+
+@login_required
+def delete_bank_transaction(request, pk=None):
+    resp = {'status': 'failed', 'msg': ''}
+    if pk is None:
+        resp['msg'] = 'Bank ID is invalid'
+    else:
+        try:
+            models.BankTransaction.objects.filter(pk=pk).update(delete_flag=1)
+            messages.success(request, "Bank amount has been deleted successfully.")
+            resp['status'] = 'success'
+        except:
+            resp['msg'] = "Deleting Bank amount Failed"
+
+    return HttpResponse(json.dumps(resp), content_type="application/json")
+
+
+@login_required
+def today_cash(request):
+    context = context_data(request)
+    context['page'] = 'today cash'
+    context['page_title'] = "Today Cash"
+    context['cash'] = models.Bank.objects.filter(delete_flag=0).all()
+    return render(request, 'today_cash.html', context)
+
+
+@login_required
+def filter_daily_report(request, pk=None):
+    context = context_data(request)
+    context['page'] = 'filter_report'
+    context['page_title'] = 'Filter Report'
+
+    request_data = request.GET
+    check_salesman = request_data.get("check_salesman")
+    check_deliveryman = request_data.get("check_deliveryman")
+    check_brand = request_data.get("check_brand")
+    start_date = request_data.get("start_date")
+    end_date = request_data.get("end_date")
+    salesman = models.Employee.objects.filter(delete_flag=0, type=1).all()
+    deliveryman = models.Employee.objects.filter(delete_flag=0, type=2).all()
+    brand = models.Brand.objects.filter(delete_flag=0).all()
+
+    if check_brand == "All" and check_salesman == "All" and check_deliveryman == "All":
+        man = models.Sales.objects.filter(date__range=[start_date, end_date])
+        trade = models.SaleProducts.objects.filter(sale__in=man).values('brand').annotate(
+            sum=Sum('total_amount'))
+        damage = models.SaleReturn.objects.filter(sale__in=man, ).values('brand').annotate(sum=Sum('total_amount'))
+        due = models.SaleDue.objects.filter(sale__in=man, ).values('client', 'client__name').annotate(
+            sum=Sum('balance'))
+        commission = models.SaleCommission.objects.filter(sale__in=man, ).values('brand', 'brand__name').annotate(
+            sum=Sum('total_amount'))
+    elif check_brand == "All" and check_salesman != "All" and check_deliveryman == "All":
+        man = models.Sales.objects.filter(salesman=check_salesman,
+                                          date__range=[start_date, end_date])
+        trade = models.SaleProducts.objects.filter(sale__in=man, ).values('brand', ).annotate(sum=Sum('total_amount'))
+        damage = models.SaleReturn.objects.filter(sale__in=man, ).values('brand').annotate(sum=Sum('total_amount'))
+        due = models.SaleDue.objects.filter(sale__in=man, ).values('client', 'client__name').annotate(
+            sum=Sum('balance'))
+        commission = models.SaleCommission.objects.filter(sale__in=man, ).values('brand', 'brand__name').annotate(
+            sum=Sum('total_amount'))
+    elif check_brand == "All" and check_salesman == "All" and check_deliveryman != "All":
+        man = models.Sales.objects.filter(deliveryman=check_deliveryman,
+                                          date__range=[start_date, end_date])
+        trade = models.SaleProducts.objects.filter(sale__in=man, ).values('brand', ).annotate(sum=Sum('total_amount'))
+        damage = models.SaleReturn.objects.filter(sale__in=man, ).values('brand').annotate(sum=Sum('total_amount'))
+        due = models.SaleDue.objects.filter(sale__in=man, ).values('client', 'client__name').annotate(
+            sum=Sum('balance'))
+        commission = models.SaleCommission.objects.filter(sale__in=man, ).values('brand', 'brand__name').annotate(
+            sum=Sum('total_amount'))
+    elif check_brand != "All" and check_salesman == "All" and check_deliveryman == "All":
+        man = models.Sales.objects.filter(brand=check_brand,
+                                          date__range=[start_date, end_date])
+        trade = models.SaleProducts.objects.filter(sale__in=man, ).values('brand', ).annotate(sum=Sum('total_amount'))
+        damage = models.SaleReturn.objects.filter(sale__in=man, ).values('brand').annotate(sum=Sum('total_amount'))
+        due = models.SaleDue.objects.filter(sale__in=man, ).values('client', 'client__name').annotate(
+            sum=Sum('balance'))
+        commission = models.SaleCommission.objects.filter(sale__in=man, ).values('brand', 'brand__name').annotate(
+            sum=Sum('total_amount'))
+    elif check_brand != "All" and check_salesman == "All" and check_deliveryman != "All":
+        man = models.Sales.objects.filter(brand=check_brand, deliveryman=check_deliveryman,
+                                          date__range=[start_date, end_date])
+        trade = models.SaleProducts.objects.filter(sale__in=man, ).values('brand', ).annotate(sum=Sum('total_amount'))
+        damage = models.SaleReturn.objects.filter(sale__in=man, ).values('brand').annotate(sum=Sum('total_amount'))
+        due = models.SaleDue.objects.filter(sale__in=man, ).values('client', 'client__name').annotate(
+            sum=Sum('balance'))
+        commission = models.SaleCommission.objects.filter(sale__in=man, ).values('brand', 'brand__name').annotate(
+            sum=Sum('total_amount'))
+    elif check_brand != "All" and check_salesman != "All" and check_deliveryman == "All":
+        man = models.Sales.objects.filter(brand=check_brand, salesman=check_salesman,
+                                          date__range=[start_date, end_date])
+        trade = models.SaleProducts.objects.filter(sale__in=man, ).values('brand', ).annotate(sum=Sum('total_amount'))
+        damage = models.SaleReturn.objects.filter(sale__in=man, ).values('brand').annotate(sum=Sum('total_amount'))
+        due = models.SaleDue.objects.filter(sale__in=man, ).values('client', 'client__name').annotate(
+            sum=Sum('balance'))
+        commission = models.SaleCommission.objects.filter(sale__in=man, ).values('brand', 'brand__name').annotate(
+            sum=Sum('total_amount'))
+    elif check_brand == "All" and check_salesman != "All" and check_deliveryman != "All":
+        man = models.Sales.objects.filter(deliveryman=check_deliveryman, salesman=check_salesman,
+                                          date__range=[start_date, end_date])
+        trade = models.SaleProducts.objects.filter(sale__in=man, ).values('brand', ).annotate(sum=Sum('total_amount'))
+        damage = models.SaleReturn.objects.filter(sale__in=man, ).values('brand').annotate(sum=Sum('total_amount'))
+        due = models.SaleDue.objects.filter(sale__in=man, ).values('client', 'client__name').annotate(
+            sum=Sum('balance'))
+        commission = models.SaleCommission.objects.filter(sale__in=man, ).values('brand', 'brand__name').annotate(
+            sum=Sum('total_amount'))
+    else:
+        man = models.Sales.objects.filter(brand=check_brand, salesman=check_salesman, deliveryman=check_deliveryman,
+                                          date__range=[start_date, end_date])
+        trade = models.SaleProducts.objects.filter(sale__in=man, ).values('brand', ).annotate(sum=Sum('total_amount'))
+        damage = models.SaleReturn.objects.filter(sale__in=man, ).values('brand').annotate(sum=Sum('total_amount'))
+        due = models.SaleDue.objects.filter(sale__in=man, ).values('client', 'client__name').annotate(
+            sum=Sum('balance'))
+        commission = models.SaleCommission.objects.filter(sale__in=man, ).values('brand', 'brand__name').annotate(
+            sum=Sum('total_amount'))
+
+    context['man'] = man
+    context['damage'] = damage
+
+    cost = 0
+    extra = 0
+    paid = 0
+    for item in context['man']:
+        cost += float(item.cost)
+        extra += float(item.extra)
+        paid += float(item.tendered)
+    cost = cost
+    extra = extra
+    paid = paid
+
+    context['check_salesman'] = check_salesman
+    context['check_brand'] = check_brand
+    context['start_date'] = start_date
+    context['end_date'] = end_date
+    context['salesman'] = salesman
+    context['deliveryman'] = deliveryman
+    context['brand'] = brand
+    context['trade'] = trade
+    context['due'] = due
+    context['commission'] = commission
+    context['cost'] = cost
+    context['extra'] = extra
+    context['paid'] = paid
+
+    return render(request, 'filter_daily_report.html', context)
+
+
+@login_required
+def print_product(request,):
+    product = models.Products.objects.filter(delete_flag=0, status=1)
+
+    context = {
+        'page-title': "product print",
+        'product': product,
+    }
+    pdf = render_to_pdf('product_print.html', context)
+    return HttpResponse(pdf, content_type='application/pdf')
+
+
+@login_required
+def print_damage(request,):
+    product = models.Products.objects.filter(delete_flag=0, status=1)
+
+    context = {
+        'page-title': "product print",
+        'product': product,
+    }
+    pdf = render_to_pdf('damage_print.html', context)
+    return HttpResponse(pdf, content_type='application/pdf')
+
+
+@login_required
+def daily_collection(request, date=None):
+    context = context_data(request)
+    context['page'] = 'view_dues_collection'
+    context['page_title'] = 'Daily Dues Collection Report'
+
+    if date is None:
+        date = datetime.datetime.now()
+        year = date.strftime('%Y')
+        month = date.strftime('%m')
+        day = date.strftime('%d')
+    else:
+        date = datetime.datetime.strptime(date, '%Y-%m-%d')
+        year = date.strftime('%Y')
+        month = date.strftime('%m')
+        day = date.strftime('%d')
+
+    context['date'] = date
+    context['sales'] = models.SaleDue.objects.filter(
+        date__year=year,
+        date__month=month,
+        date__day=day,
+    ).order_by('-sale')
+    grand_total = 0
+    for sale in context['sales']:
+        grand_total += float(sale.new)
+    sum = grand_total
+    context['sum'] = sum
+
+    return render(request, 'daily_collection.html', context)
+
+
+def sale_qty_report(request):
+    context = context_data(request)
+    context['page'] = 'sale_qty_report'
+    context['page_title'] = 'Sale Qty Report'
+
+    request_data = request.GET
+    check_brand = request_data.get("check_brand")
+    start_date = request_data.get("start_date")
+    end_date = request_data.get("end_date")
+
+    brand = models.Brand.objects.filter(delete_flag=0).all()
+
+    if check_brand != "All":
+        sales = models.Sales.objects.filter(brand=check_brand, date__range=[start_date, end_date])
+        trade = models.SaleProducts.objects.filter(sale__in=sales).values('brand', 'product', 'product__name',).annotate(
+            sum=Sum('quantity') - Sum('good_quantity'))
+    else:
+        sales = models.Sales.objects.filter(date__range=[start_date, end_date])
+        trade = models.SaleProducts.objects.filter(sale__in=sales).values('brand', 'product', 'product__name',).annotate(
+            sum=Sum('quantity') - Sum('good_quantity'))
+
+    context['check_brand'] = check_brand
+    context['start_date'] = start_date
+    context['end_date'] = end_date
+    context['brand'] = brand
+    context['trade'] = trade
+
+    return render(request, 'sale_qty_report.html', context)
+
+
+def check_report(request):
+    context = context_data(request)
+    context['page'] = 'free_report'
+    context['page_title'] = 'Free Report'
+
+    request_data = request.GET
+    check_salesman = request_data.get("check_salesman")
+    start_date = request_data.get("start_date")
+    end_date = request_data.get("end_date")
+    salesman = models.Employee.objects.filter(delete_flag=0, type=1).all()
+
+    if check_salesman != "All":
+        man = models.Sales.objects.filter(salesman=check_salesman, date__range=[start_date, end_date])
+        trade = models.SaleProducts.objects.filter(sale__in=man,).values('brand',).annotate(sum=Sum('total_amount'))
+        damage = models.SaleReturn.objects.filter(sale__in=man,).values('brand').annotate(sum=Sum('total_amount'))
+        due = models.SaleDue.objects.filter(sale__in=man,).values('client', 'client__name').annotate(sum=Sum('balance'))
+        commission = models.SaleCommission.objects.filter(sale__in=man,).values('brand', 'brand__name').annotate(sum=Sum('total_amount'))
+
+    else:
+        man = models.Sales.objects.filter(date__range=[start_date, end_date])
+        trade = models.SaleProducts.objects.filter(sale__in=man).values('brand').annotate(
+            sum=Sum('total_amount'))
+        damage = models.SaleReturn.objects.filter(sale__in=man, ).values('brand').annotate(sum=Sum('total_amount'))
+        due = models.SaleDue.objects.filter(sale__in=man, ).values('client', 'client__name').annotate(
+            sum=Sum('balance'))
+        commission = models.SaleCommission.objects.filter(sale__in=man, ).values('brand', 'brand__name').annotate(
+            sum=Sum('total_amount'))
+
+    context['man'] = man
+    context['damage'] = damage
+
+    cost = 0
+    extra = 0
+    paid = 0
+    for item in context['man']:
+        cost += float(item.cost)
+        extra += float(item.extra)
+        paid += float(item.tendered)
+    cost = cost
+    extra = extra
+    paid = paid
+
+    context['check_salesman'] = check_salesman
+    context['start_date'] = start_date
+    context['end_date'] = end_date
+    context['salesman'] = salesman
+    context['trade'] = trade
+    context['due'] = due
+    context['commission'] = commission
+    context['cost'] = cost
+    context['extra'] = extra
+    context['paid'] = paid
+
+    return render(request, 'salesman_report.html', context)
