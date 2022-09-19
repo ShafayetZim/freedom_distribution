@@ -2195,3 +2195,253 @@ def dues_report(request):
 
     return render(request, 'dues_report.html', context)
 
+
+@login_required
+def expenditure(request):
+    context = context_data(request)
+    context['page'] = 'expenditure'
+    context['page_title'] = "Expenditure List"
+    context['expenditure'] = models.Expenditure.objects.order_by('-date_added').all()
+    return render(request, 'expenditure.html', context)
+
+
+@login_required
+def save_expenditure(request):
+    resp = { 'status': 'failed', 'msg' : '', 'id': '' }
+    if request.method == 'POST':
+        post = request.POST
+        if not post['id'] == '':
+            expenditure = models.Expenditure.objects.get(id=post['id'])
+            form = forms.SaveExpenditure(request.POST, instance=expenditure)
+        else:
+            form = forms.SaveExpenditure(request.POST)
+        if form.is_valid():
+            form.save()
+            if post['id'] == '':
+                messages.success(request, "Expenditure operation has been saved successfully.")
+                pid = models.Expenditure.objects.last().id
+                resp['id'] = pid
+            else:
+                messages.success(request, "Expenditure operation has been updated successfully.")
+                resp['id'] = post['id']
+            resp['status'] = 'success'
+        else:
+            for field in form:
+                for error in field.errors:
+                    if not resp['msg'] == '':
+                        resp['msg'] += str('<br/>')
+                    resp['msg'] += str(f'[{field.name}] {error}')
+    else:
+         resp['msg'] = "There's no data sent on the request"
+
+    return HttpResponse(json.dumps(resp), content_type="application/json")
+
+
+@login_required
+def view_expenditure(request, pk=None):
+    context = context_data(request)
+    context['page'] = 'view_expenditure'
+    context['page_title'] = 'View Expenditure'
+    if pk is None:
+        context['expenditure'] = {}
+        context['pitems'] = {}
+    else:
+        context['expenditure'] = models.Expenditure.objects.get(id=pk)
+        context['pitems'] = models.ExpenditureCharge.objects.filter(expenditure__id=pk).all()
+
+    return render(request, 'view_expenditure.html', context)
+
+
+@login_required
+def manage_expenditure(request, pk=None):
+    context = context_data(request)
+    context['page'] = 'manage_expenditure'
+    context['page_title'] = 'Manage Expenditure'
+
+    context['expense'] = models.Expense.objects.filter(delete_flag=0).all()
+    if pk is None:
+        context['expenditure'] = {}
+        context['pitems'] = {}
+    else:
+        context['expenditure'] = models.Expenditure.objects.get(id=pk)
+        context['pitems'] = models.ExpenditureCharge.objects.filter(expenditure__id=pk).all()
+
+    return render(request, 'manage_expenditure.html', context)
+
+
+def delete_expenditure(request, pk = None):
+    resp = { 'status' : 'failed', 'msg':''}
+    if pk is None:
+        resp['msg'] = 'Expenditure ID is invalid'
+    else:
+        try:
+            models.Expenditure.objects.filter(pk = pk).delete()
+            messages.success(request, "Expenditure has been deleted successfully.")
+            resp['status'] = 'success'
+        except:
+            resp['msg'] = "Deleting Expenditure Sale Failed"
+
+    return HttpResponse(json.dumps(resp), content_type="application/json")
+
+
+@login_required
+def investment(request):
+    context = context_data(request)
+    context['page'] = 'Investment'
+    context['page_title'] = "Investment List"
+    context['investment'] = models.Investment.objects.filter(delete_flag=0).all()
+    return render(request, 'investment.html', context)
+
+
+@login_required
+def save_investment(request):
+    resp = { 'status': 'failed', 'msg' : '' }
+    if request.method == 'POST':
+        post = request.POST
+        if not post['id'] == '':
+            investment = models.Investment.objects.get(id = post['id'])
+            form = forms.SaveInvestment(request.POST, instance=investment)
+        else:
+            form = forms.SaveInvestment(request.POST)
+
+        if form.is_valid():
+            form.save()
+            if post['id'] == '':
+                messages.success(request, "Investment has been saved successfully.")
+            else:
+                messages.success(request, "Investment has been updated successfully.")
+            resp['status'] = 'success'
+        else:
+            for field in form:
+                for error in field.errors:
+                    if not resp['msg'] == '':
+                        resp['msg'] += str('<br/>')
+                    resp['msg'] += str(f'[{field.name}] {error}')
+    else:
+         resp['msg'] = "There's no data sent on the request"
+
+    return HttpResponse(json.dumps(resp), content_type="application/json")
+
+
+@login_required
+def view_investment(request, pk=None):
+    context = context_data(request)
+    context['page'] = 'view_investment'
+    context['page_title'] = 'View Investment'
+    if pk is None:
+        context['investment'] = {}
+    else:
+        context['investment'] = models.Investment.objects.get(id=pk)
+
+    return render(request, 'view_investment.html', context)
+
+
+@login_required
+def manage_investment(request, pk=None):
+    context = context_data(request)
+    context['page'] = 'manage_investment'
+    context['page_title'] = 'Manage Investment'
+    if pk is None:
+        context['investment'] = {}
+    else:
+        context['investment'] = models.Investment.objects.get(id=pk)
+
+    return render(request, 'manage_investment.html', context)
+
+
+@login_required
+def delete_investment(request, pk=None):
+    resp = {'status': 'failed', 'msg': ''}
+    if pk is None:
+        resp['msg'] = 'Investment ID is invalid'
+    else:
+        try:
+            models.Investment.objects.filter(pk=pk).update(delete_flag=1)
+            messages.success(request, "Investment has been deleted successfully.")
+            resp['status'] = 'success'
+        except:
+            resp['msg'] = "Deleting Investment Failed"
+
+    return HttpResponse(json.dumps(resp), content_type="application/json")
+
+
+@login_required
+def online_transaction(request):
+    context = context_data(request)
+    context['page'] = 'online_transaction'
+    context['page_title'] = "Online Transaction List"
+    context['online'] = models.OnlineTransaction.objects.filter(delete_flag=0).all()
+    return render(request, 'online_transaction.html', context)
+
+
+@login_required
+def save_online_transaction(request):
+    resp = { 'status': 'failed', 'msg' : '' }
+    if request.method == 'POST':
+        post = request.POST
+        if not post['id'] == '':
+            online = models.OnlineTransaction.objects.get(id = post['id'])
+            form = forms.SaveOnlineTransaction(request.POST, instance=online)
+        else:
+            form = forms.SaveOnlineTransaction(request.POST)
+
+        if form.is_valid():
+            form.save()
+            if post['id'] == '':
+                messages.success(request, "Online transaction has been saved successfully.")
+            else:
+                messages.success(request, "Online transaction has been updated successfully.")
+            resp['status'] = 'success'
+        else:
+            for field in form:
+                for error in field.errors:
+                    if not resp['msg'] == '':
+                        resp['msg'] += str('<br/>')
+                    resp['msg'] += str(f'[{field.name}] {error}')
+    else:
+         resp['msg'] = "There's no data sent on the request"
+
+    return HttpResponse(json.dumps(resp), content_type="application/json")
+
+
+@login_required
+def view_online_transaction(request, pk=None):
+    context = context_data(request)
+    context['page'] = 'view_online_transaction'
+    context['page_title'] = 'View Online_Transaction'
+    if pk is None:
+        context['online'] = {}
+    else:
+        context['online'] = models.OnlineTransaction.objects.get(id=pk)
+
+    return render(request, 'view_online_transaction.html', context)
+
+
+@login_required
+def manage_online_transaction(request, pk=None):
+    context = context_data(request)
+    context['page'] = 'manage_online_transaction'
+    context['page_title'] = 'Manage Online Transaction'
+    if pk is None:
+        context['online'] = {}
+    else:
+        context['online'] = models.OnlineTransaction.objects.get(id=pk)
+
+    return render(request, 'manage_online_transaction.html', context)
+
+
+@login_required
+def delete_online_transaction(request, pk=None):
+    resp = {'status': 'failed', 'msg': ''}
+    if pk is None:
+        resp['msg'] = 'Online Transaction ID is invalid'
+    else:
+        try:
+            models.OnlineTransaction.objects.filter(pk=pk).update(delete_flag=1)
+            messages.success(request, "Online Transaction has been deleted successfully.")
+            resp['status'] = 'success'
+        except:
+            resp['msg'] = "Deleting Online Transaction Failed"
+
+    return HttpResponse(json.dumps(resp), content_type="application/json")
+
