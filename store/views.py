@@ -2037,3 +2037,161 @@ def deliveryman_report(request):
 
     return render(request, 'deliveryman_report.html', context)
 
+
+def salesman_report(request):
+    context = context_data(request)
+    context['page'] = 'free_report'
+    context['page_title'] = 'Free Report'
+
+    request_data = request.GET
+    check_salesman = request_data.get("check_salesman")
+    start_date = request_data.get("start_date")
+    end_date = request_data.get("end_date")
+    salesman = models.Employee.objects.filter(delete_flag=0, type=1).all()
+
+    if check_salesman != "All":
+        man = models.Sales.objects.filter(salesman=check_salesman, date__range=[start_date, end_date])
+        trade = models.SaleProducts.objects.filter(sale__in=man,).values('brand',).annotate(sum=Sum('total_amount'))
+        damage = models.SaleReturn.objects.filter(sale__in=man,).values('brand').annotate(sum=Sum('total_amount'))
+        due = models.SaleDue.objects.filter(sale__in=man,).values('client', 'client__name').annotate(sum=Sum('balance'))
+        commission = models.SaleCommission.objects.filter(sale__in=man,).values('brand', 'brand__name').annotate(sum=Sum('total_amount'))
+
+    else:
+        man = models.Sales.objects.filter(date__range=[start_date, end_date])
+        trade = models.SaleProducts.objects.filter(sale__in=man).values('brand').annotate(
+            sum=Sum('total_amount'))
+        damage = models.SaleReturn.objects.filter(sale__in=man, ).values('brand').annotate(sum=Sum('total_amount'))
+        due = models.SaleDue.objects.filter(sale__in=man, ).values('client', 'client__name').annotate(
+            sum=Sum('balance'))
+        commission = models.SaleCommission.objects.filter(sale__in=man, ).values('brand', 'brand__name').annotate(
+            sum=Sum('total_amount'))
+
+    context['man'] = man
+    context['damage'] = damage
+
+    cost = 0
+    extra = 0
+    paid = 0
+    for item in context['man']:
+        cost += float(item.cost)
+        extra += float(item.extra)
+        paid += float(item.tendered)
+    cost = cost
+    extra = extra
+    paid = paid
+
+    context['check_salesman'] = check_salesman
+    context['start_date'] = start_date
+    context['end_date'] = end_date
+    context['salesman'] = salesman
+    context['trade'] = trade
+    context['due'] = due
+    context['commission'] = commission
+    context['cost'] = cost
+    context['extra'] = extra
+    context['paid'] = paid
+
+    return render(request, 'salesman_report.html', context)
+
+
+@login_required
+def damage_products(request):
+    context = context_data(request)
+    context['page'] = 'Damage Product'
+    context['page_title'] = "Damage Product List"
+    context['products'] = models.Products.objects.filter(delete_flag=0).all()
+
+    request_data = request.GET
+    check_brand = request_data.get("check_brand")
+    start_date = request_data.get("start_date")
+    end_date = request_data.get("end_date")
+
+    brand = models.Brand.objects.filter(delete_flag=0).all()
+
+    if check_brand != "All":
+        free = models.DamageProduct.objects.filter(brand=check_brand,).values('brand', 'product', 'product__name').annotate(sum=Sum('quantity'), add=Sum('price'))
+        stockin = models.SaleReturn.objects.filter(brand=check_brand,).values('brand', 'product', 'product__name').annotate(sum=Sum('quantity'), add=Sum('price'))
+    else:
+        free = models.DamageProduct.objects.values('brand', 'product', 'product__name',).annotate(
+            sum=Sum('quantity'), add=Sum('price'))
+        stockin = models.SaleReturn.objects.values('brand', 'product', 'product__name', ).annotate(
+            sum=Sum('quantity'), add=Sum('price'))
+
+    context['check_brand'] = 'check_brand'
+    context['start_date'] = start_date
+    context['end_date'] = end_date
+    context['brand'] = brand
+    context['free'] = free
+    context['stockin'] = stockin
+
+    return render(request, 'damage_products.html', context)
+
+
+@login_required
+def damage_report(request):
+    context = context_data(request)
+    context['page'] = 'Damage Product'
+    context['page_title'] = "Damage Product Report"
+
+    request_data = request.GET
+    check_brand = request_data.get("check_brand")
+
+    brand = models.Brand.objects.filter(delete_flag=0).all()
+
+    if check_brand != "All":
+        product = models.Products.objects.filter(brand=check_brand).all()
+    else:
+        product = models.Products.objects.all()
+
+    context['check_brand'] = check_brand
+    context['brand'] = brand
+    context['product'] = product
+
+    return render(request, 'damage_report.html', context)
+
+
+@login_required
+def fresh_product_report(request):
+    context = context_data(request)
+    context['page'] = 'Fresh Product'
+    context['page_title'] = "Fresh Product Report"
+
+    request_data = request.GET
+    check_brand = request_data.get("check_brand")
+
+    brand = models.Brand.objects.filter(delete_flag=0).all()
+
+    if check_brand != "All":
+        product = models.Products.objects.filter(brand=check_brand).all()
+    else:
+        product = models.Products.objects.all()
+
+    context['check_brand'] = check_brand
+    context['brand'] = brand
+    context['product'] = product
+
+    return render(request, 'fresh_product_report.html', context)
+
+
+def dues_report(request):
+    context = context_data(request)
+    context['page'] = 'dues_report'
+    context['page_title'] = 'Dues Report'
+
+    request_data = request.GET
+    check_brand = request_data.get("check_brand")
+
+    brand = models.Brand.objects.filter(delete_flag=0).all()
+
+    if check_brand != "All":
+        dues = models.SaleDue.objects.filter(brand=check_brand,).values('brand', 'client', 'client__name',).annotate(sum=Sum('balance'))
+    else:
+        dues = models.SaleDue.objects.all().values('brand', 'client', 'client__name',).annotate(
+            sum=Sum('balance'))
+
+    context['check_brand'] = 'check_brand'
+    context['brand'] = brand
+    context['dues'] = dues
+
+    return render(request, 'dues_report.html', context)
+
