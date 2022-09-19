@@ -22,7 +22,7 @@ def context_data(request):
         'page_name' : '',
         'page_title' : '',
         'system_name' : 'Freedom Distribution',
-        'system_short_name' : 'FDSMS',
+        'system_short_name' : 'Freedom',
         'topbar' : True,
         'footer' : True,
     }
@@ -553,7 +553,7 @@ def sales(request):
     context = context_data(request)
     context['page'] = 'sale'
     context['page_title'] = "Sale List"
-    context['sales'] = models.Sales.objects.order_by('-date_added').all()
+    context['sales'] = models.Sales.objects.order_by('status', '-date_added').all()
     return render(request, 'sales.html', context)
 
 
@@ -564,7 +564,7 @@ def save_sale(request):
     if request.method == 'POST':
         post = request.POST
         if not post['id'] == '':
-            sale = models.Sales.objects.get(id = post['id'])
+            sale = models.Sales.objects.get(id=post['id'])
             form = forms.SaveSale(request.POST, instance=sale)
         else:
             form = forms.SaveSale(request.POST)
@@ -618,7 +618,7 @@ def manage_sale(request, pk=None):
     context['page_title'] = 'Manage sale'
     context['brand'] = models.Brand.objects.filter(delete_flag=0).all()
     context['products'] = models.Products.objects.filter(delete_flag=0, status=1).all()
-    context['prices'] = models.Client.objects.filter(delete_flag=0).all()
+    context['client'] = models.Client.objects.filter(delete_flag=0).all()
     context['brands'] = models.Brand.objects.filter(delete_flag=0).all()
     context['road'] = models.Road.objects.all()
     context['salesman'] = models.Employee.objects.filter(type=1).all()
@@ -637,6 +637,34 @@ def manage_sale(request, pk=None):
         context['bitems'] = models.SaleCommission.objects.filter(sale__id=pk).all()
 
     return render(request, 'manage_sale.html', context)
+
+
+@login_required
+def edit_sale(request, pk=None):
+    context = context_data(request)
+    context['page'] = 'manage_sale'
+    context['page_title'] = 'Manage sale'
+    context['brand'] = models.Brand.objects.filter(delete_flag=0).all()
+    context['products'] = models.Products.objects.filter(delete_flag=0, status=1).all()
+    context['prices'] = models.Client.objects.filter(delete_flag=0).all()
+    context['brands'] = models.Brand.objects.filter(delete_flag=0).all()
+    context['road'] = models.Road.objects.all()
+    context['salesman'] = models.Employee.objects.filter(type=1).all()
+    context['deliveryman'] = models.Employee.objects.filter(type=2).all()
+    if pk is None:
+        context['sale'] = {}
+        context['items'] = {}
+        context['pitems'] = {}
+        context['ritems'] = {}
+        context['bitems'] = {}
+    else:
+        context['sale'] = models.Sales.objects.get(id=pk)
+        context['items'] = models.SaleDue.objects.filter(sale__id=pk).all()
+        context['pitems'] = models.SaleProducts.objects.filter(sale__id=pk).all()
+        context['ritems'] = models.SaleReturn.objects.filter(sale__id=pk).all()
+        context['bitems'] = models.SaleCommission.objects.filter(sale__id=pk).all()
+
+    return render(request, 'edit_sale.html', context)
 
 
 @login_required
@@ -659,7 +687,7 @@ def update_transaction_status(request):
         resp['msg'] = 'Transaction ID is invalid'
     else:
         try:
-            models.Sales.objects.filter(pk = request.POST['id']).update(status = request.POST['status'])
+            models.Sales.objects.filter(pk=request.POST['id']).update(status=request.POST['status'])
             messages.success(request, "Transaction Status has been updated successfully.")
             resp['status'] = 'success'
         except:
@@ -675,7 +703,7 @@ def delete_sale(request, pk = None):
         resp['msg'] = 'Sale ID is invalid'
     else:
         try:
-            models.Sales.objects.filter(pk = pk).delete()
+            models.Sales.objects.filter(pk=pk).delete()
             messages.success(request, "Sale has been deleted successfully.")
             resp['status'] = 'success'
         except:
@@ -772,11 +800,9 @@ def view_purchase(request, pk=None):
     context['page_title'] = 'View Purchase'
     if pk is None:
         context['purchase'] = {}
-        # context['items'] = {}
         context['pitems'] = {}
     else:
         context['purchase'] = models.Purchase.objects.get(id=pk)
-        # context['items'] = models.LaundryItems.objects.filter(laundry__id=pk).all()
         context['pitems'] = models.PurchaseProducts.objects.filter(purchase__id=pk).all()
 
     return render(request, 'view_purchase.html', context)
@@ -787,15 +813,14 @@ def manage_purchase(request, pk=None):
     context = context_data(request)
     context['page'] = 'manage_purchase'
     context['page_title'] = 'Manage purchase'
+    context['brand'] = models.Brand.objects.filter(delete_flag=0).all()
     context['products'] = models.Products.objects.filter(delete_flag=0, status=1).all()
-    # context['prices'] = models.Prices.objects.filter(delete_flag=0, status=1).all()
+
     if pk is None:
         context['purchase'] = {}
-        # context['items'] = {}
         context['pitems'] = {}
     else:
         context['purchase'] = models.Purchase.objects.get(id=pk)
-        # context['items'] = models.LaundryItems.objects.filter(laundry__id=pk).all()
         context['pitems'] = models.PurchaseProducts.objects.filter(purchase__id=pk).all()
 
     return render(request, 'manage_purchase.html', context)
@@ -843,6 +868,13 @@ def delete_purchase(request, pk = None):
             resp['msg'] = "Deleting Purchase Failed"
 
     return HttpResponse(json.dumps(resp), content_type="application/json")
+
+
+def load_purchase_product(request):
+    brand_id = request.GET.get('brand')
+    products = models.Products.objects.filter(brand_id=brand_id, delete_flag=0, status=1).order_by('name')
+    context = {'products': products}
+    return render(request, 'dropdown_purchase.html', context)
 
 
 @login_required
@@ -904,11 +936,10 @@ def view_employee(request, pk=None):
     context['page_title'] = 'View Employee'
     if pk is None:
         context['employee'] = {}
-        #context['loan'] = {}
+        context['loan'] = {}
     else:
         context['employee'] = models.Employee.objects.get(id=pk)
-        #context['loan'] = models.Loan.objects.filter(loan__id=pk)
-        #context['stockouts'] = models.SaleProducts.objects.filter(product__id=pk).order_by('sale__code')
+        context['loan'] = models.Loan.objects.filter(employee__id=pk).order_by('code')
 
     return render(request, 'view_employee.html', context)
 
@@ -1045,10 +1076,10 @@ def view_client(request, pk=None):
     context['page_title'] = 'View Client'
     if pk is None:
         context['client'] = {}
-        context['stockouts'] = {}
+        context['dues'] = {}
     else:
         context['client'] = models.Client.objects.get(id=pk)
-        context['stockouts'] = models.SaleDue.objects.filter(client__id=pk).order_by('-sale__code')
+        context['dues'] = models.SaleDue.objects.filter(client__id=pk).order_by('-sale__code')
 
     return render(request, 'view_client.html', context)
 
@@ -1089,6 +1120,7 @@ def print_sales(request, id=None):
     invoice = get_object_or_404(models.Sales, id=id)
     invoice_item = models.SaleProducts.objects.filter(sale=id)
     return_item = models.SaleReturn.objects.filter(sale=id)
+    commission_item = models.SaleCommission.objects.filter(sale=id)
     due_item = models.SaleDue.objects.filter(sale=id)
     print(invoice_item)
     total_qty = invoice_item.aggregate(Sum('quantity'))
@@ -1099,6 +1131,7 @@ def print_sales(request, id=None):
         'page-title': "invoice print",
         'sales_item': invoice_item,
         'sales_return': return_item,
+        'sales_commission': commission_item,
         'sales_due': due_item,
         'total_qty': total_qty,
         'invoice_info': invoice,
@@ -1109,7 +1142,7 @@ def print_sales(request, id=None):
 
 def load_product(request):
     brand_id = request.GET.get('brand')
-    products = models.Products.objects.filter(brand_id=brand_id).order_by('name')
+    products = models.Products.objects.filter(brand_id=brand_id, delete_flag=0, status=1).order_by('name')
     context = {'products': products}
     return render(request, 'dropdown_sales.html', context)
 
@@ -1120,7 +1153,18 @@ def low_stock(request):
     context = context_data(request)
     context['page'] = 'low_stock'
     context['page_title'] = 'Low Stocks'
-    context['products'] = models.Products.objects.all()
+
+    request_data = request.GET
+    check_brand = request_data.get("check_brand")
+    brand = models.Brand.objects.filter(delete_flag=0).all()
+
+    if check_brand == "All":
+        context['products'] = models.Products.objects.all()
+    else:
+        context['products'] = models.Products.objects.filter(brand=check_brand)
+
+    context['brand'] = brand
+    context['check_brand'] = 'check_brand'
 
     return render(request, 'low_stock.html', context)
 
@@ -1137,9 +1181,11 @@ def commission_preview(request):
 
     brand = models.Brand.objects.filter(delete_flag=0).all()
     if check_brand == "All":
-        commission = models.SaleCommission.objects.filter(date__range=[start_date, end_date])
+        date = models.Sales.objects.filter(date__range=[start_date, end_date])
+        commission = models.SaleCommission.objects.filter(sale__in=date)
     else:
-        commission = models.SaleCommission.objects.filter(brand=check_brand, date__range=[start_date, end_date])
+        date = models.Sales.objects.filter(date__range=[start_date, end_date])
+        commission = models.SaleCommission.objects.filter(sale__in=date, brand=check_brand)
 
     context['check_brand'] = 'check_brand'
     context['start_date'] = start_date
@@ -1158,7 +1204,7 @@ def commission_preview(request):
 def all_commission(request):
     context = context_data(request)
     context['page'] = 'commission'
-    context['page_title'] = 'All Commisssion'
+    context['page_title'] = 'All Commission'
     context['items'] = models.SaleCommission.objects.all()
 
     return render(request, 'all_commission.html', context)
@@ -1213,11 +1259,8 @@ def view_commission_bill(request, pk=None):
     context['page_title'] = 'View Bill'
     if pk is None:
         context['bills'] = {}
-        # context['stockins'] = {}
     else:
         context['bills'] = models.CommissionBill.objects.get(id=pk)
-        # context['stockins'] = models.StockIn.objects.filter(product__id=pk)
-        # context['stockouts'] = models.SaleProducts.objects.filter(product__id=pk).order_by('sale__code')
 
     return render(request, 'view_commission_bill.html', context)
 
@@ -1227,7 +1270,6 @@ def manage_commission_bill(request, pk=None):
     context = context_data(request)
     context['page'] = 'manage_bill'
     context['page_title'] = 'Manage Bill'
-    # context['category'] = models.Category.objects.all()
     context['brand'] = models.Brand.objects.filter(delete_flag=0).all()
     if pk is None:
         context['bills'] = {}
@@ -1264,8 +1306,8 @@ def free_product_report(request):
     end_date = request_data.get("end_date")
 
     product = models.Products.objects.filter(delete_flag=0).all()
-
-    free = models.SaleProducts.objects.filter(product=check_product, date__range=[start_date, end_date])
+    date = models.Sales.objects.filter(date__range=[start_date, end_date])
+    free = models.SaleProducts.objects.filter(sale__in=date, product=check_product)
 
     context['check_product'] = 'check_product'
     context['start_date'] = start_date
@@ -1292,7 +1334,7 @@ def advance(request):
     context = context_data(request)
     context['page'] = 'advance'
     context['page_title'] = "Advance List"
-    context['online'] = models.Online.objects.order_by('-date_added').all()
+    context['online'] = models.Online.objects.order_by('status', '-date_added').all()
     return render(request, 'advance.html', context)
 
 
@@ -1335,9 +1377,11 @@ def view_advance(request, pk=None):
     context['page_title'] = 'View Advance'
     if pk is None:
         context['online'] = {}
+        context['items'] = {}
         context['pitems'] = {}
     else:
         context['online'] = models.Online.objects.get(id=pk)
+        context['items'] = models.OnlineCredit.objects.filter(online__id=pk).all()
         context['pitems'] = models.OnlineAdvance.objects.filter(online__id=pk).all()
 
     return render(request, 'view_advance.html', context)
@@ -1351,9 +1395,11 @@ def manage_advance(request, pk=None):
     context['brand'] = models.Brand.objects.filter(delete_flag=0).all()
     if pk is None:
         context['online'] = {}
+        context['items'] = {}
         context['pitems'] = {}
     else:
         context['online'] = models.Online.objects.get(id=pk)
+        context['items'] = models.OnlineCredit.objects.filter(online__id=pk).all()
         context['pitems'] = models.OnlineAdvance.objects.filter(online__id=pk).all()
 
     return render(request, 'manage_advance.html', context)
@@ -1374,6 +1420,35 @@ def delete_advance(request, pk = None):
     return HttpResponse(json.dumps(resp), content_type="application/json")
 
 
+@login_required
+def update_advance_form(request, pk=None):
+    context = context_data(request)
+    context['page'] = 'update_advance'
+    context['page_title'] = 'Update Advance Transaction'
+    if pk is None:
+        context['advance'] = {}
+    else:
+        context['advance'] = models.Online.objects.get(id=pk)
+
+    return render(request, 'update_advance.html', context)
+
+
+@login_required
+def update_advance_status(request):
+    resp = { 'status' : 'failed', 'msg':''}
+    if request.POST['id'] is None:
+        resp['msg'] = 'Transaction ID is invalid'
+    else:
+        try:
+            models.Online.objects.filter(pk=request.POST['id']).update(status=request.POST['status'])
+            messages.success(request, "Advance Transaction Status has been updated successfully.")
+            resp['status'] = 'success'
+        except:
+            resp['msg'] = "Updating Advance Transaction Failed"
+
+    return HttpResponse(json.dumps(resp), content_type="application/json")
+
+
 def advance_report(request):
     context = context_data(request)
     context['page'] = 'advance_report'
@@ -1386,26 +1461,33 @@ def advance_report(request):
 
     brand = models.Brand.objects.filter(delete_flag=0).all()
     if check_brand == "All":
-        online = models.OnlineAdvance.objects.filter(date__range=[start_date, end_date])
+        date = models.Online.objects.filter(date__range=[start_date, end_date])
+        online = models.OnlineAdvance.objects.filter(online__in=date)
+        credit = models.OnlineCredit.objects.filter(online__in=date)
     else:
-        online = models.OnlineAdvance.objects.filter(brand=check_brand, due=0, date__range=[start_date, end_date])
+        date = models.Online.objects.filter(date__range=[start_date, end_date])
+        online = models.OnlineAdvance.objects.filter(online__in=date, brand=check_brand)
+        credit = models.OnlineCredit.objects.filter(online__in=date, brand=check_brand)
 
     context['check_brand'] = check_brand
     context['start_date'] = start_date
     context['end_date'] = end_date
     context['brand'] = brand
     context['online'] = online
+    context['credit'] = credit
 
     advance = 0
-    receive = 0
+    amount = 0
     due = 0
     for item in context['online']:
         advance += float(item.advance)
-        receive += float(item.receive)
-        due += float(item.due)
 
+    for item in context['credit']:
+        amount += float(item.amount)
+
+    due = advance-amount
     context['advance'] = advance
-    context['receive'] = receive
+    context['receive'] = amount
     context['due'] = due
 
     return render(request, 'advance_report.html', context)
@@ -1416,7 +1498,7 @@ def damage(request):
     context = context_data(request)
     context['page'] = 'damage'
     context['page_title'] = "Damage List"
-    context['damage'] = models.DamageSale.objects.order_by('-date_added').all()
+    context['damage'] = models.DamageSale.objects.order_by('status', '-date_added').all()
     return render(request, 'damage.html', context)
 
 
@@ -1472,6 +1554,7 @@ def manage_damage(request, pk=None):
     context = context_data(request)
     context['page'] = 'manage_damage'
     context['page_title'] = 'Manage Damage'
+    context['brand'] = models.Brand.objects.filter(delete_flag=0).all()
     context['products'] = models.Products.objects.filter(delete_flag=0, status=1).all()
     if pk is None:
         context['damage'] = {}
@@ -1525,6 +1608,13 @@ def update_damage_status(request):
             resp['msg'] = "Updating Transaction Failed"
 
     return HttpResponse(json.dumps(resp), content_type="application/json")
+
+
+def load_damage_product(request):
+    brand_id = request.GET.get('brand')
+    products = models.Products.objects.filter(brand_id=brand_id, delete_flag=0, status=1).order_by('name')
+    context = {'products': products}
+    return render(request, 'dropdown_damage.html', context)
 
 
 @login_required
@@ -1654,7 +1744,7 @@ def view_surplus(request, pk=None):
 @login_required
 def manage_surplus(request, pk=None):
     context = context_data(request)
-    context['page'] = 'manage_damage'
+    context['page'] = 'manage_surplus'
     context['page_title'] = 'Manage Surplus'
 
     request_data = request.GET
@@ -1664,11 +1754,14 @@ def manage_surplus(request, pk=None):
 
     brand = models.Brand.objects.filter(delete_flag=0).all()
     if check_brand == "All":
-        online = models.SaleProducts.objects.filter(date__range=[start_date, end_date])
         other = models.Sales.objects.filter(date__range=[start_date, end_date])
+        online = models.SaleProducts.objects.filter(sale__in=other)
+        expenditure = models.Expenditure.objects.filter(date__range=[start_date, end_date])
+
     else:
         other = models.Sales.objects.filter(brand=check_brand, date__range=[start_date, end_date])
-        online = models.SaleProducts.objects.filter(sale__in=other, date__range=[start_date, end_date])
+        online = models.SaleProducts.objects.filter(sale__in=other)
+        expenditure = models.Expenditure.objects.filter(date__range=[start_date, end_date])
 
     context['check_brand'] = check_brand
     context['start_date'] = start_date
@@ -1676,6 +1769,12 @@ def manage_surplus(request, pk=None):
     context['brand'] = brand
     context['online'] = online
     context['other'] = other
+    context['expenditure'] = expenditure
+
+    outlay = 0
+
+    for item in context['expenditure']:
+        outlay += float(item.total_amount)
 
     gross = 0
     knockout = 0
@@ -1698,6 +1797,7 @@ def manage_surplus(request, pk=None):
     context['knockout'] = knockout
     context['cost'] = cost
     context['extra'] = extra
+    context['outlay'] = outlay
 
     context['expense'] = models.Expense.objects.filter(delete_flag=0).all()
     if pk is None:
@@ -1873,4 +1973,67 @@ def delete_loan(request, pk=None):
     return HttpResponse(json.dumps(resp), content_type="application/json")
 
 
+def deliveryman_report(request):
+    context = context_data(request)
+    context['page'] = 'free_report'
+    context['page_title'] = 'Free Report'
+
+    request_data = request.GET
+    check_deliveryman = request_data.get("check_deliveryman")
+    start_date = request_data.get("start_date")
+    end_date = request_data.get("end_date")
+
+    deliveryman = models.Employee.objects.filter(delete_flag=0, type=2).all()
+
+    if check_deliveryman != "All":
+        man = models.Sales.objects.filter(deliveryman=check_deliveryman, date__range=[start_date, end_date])
+        trade = models.SaleProducts.objects.filter(sale__in=man,).values('brand',).annotate(sum=Sum('total_amount'))
+        # damage = models.SaleReturn.objects.filter(sale__in=man, ).values('brand').annotate(sum=Sum('total_amount'))
+        damage = models.SaleReturn.objects.filter(sale__in=man,).values('brand').annotate(sum=Sum('total_amount'))
+        due = models.SaleDue.objects.filter(sale__in=man,).values('client', 'client__name').annotate(sum=Sum('balance'))
+        commission = models.SaleCommission.objects.filter(sale__in=man,).values('brand', 'brand__name').annotate(sum=Sum('total_amount'))
+
+    else:
+        man = models.Sales.objects.filter(date__range=[start_date, end_date])
+        trade = models.SaleProducts.objects.filter(sale__in=man).values('brand').annotate(
+            sum=Sum('total_amount'))
+        # damage = models.SaleReturn.objects.filter(sale__in=man, ).values('brand').annotate(sum=Sum('total_amount'))
+        damage = models.SaleReturn.objects.filter(sale__in=man, ).values('brand').annotate(sum=Sum('total_amount'))
+        due = models.SaleDue.objects.filter(sale__in=man, ).values('client', 'client__name').annotate(
+            sum=Sum('balance'))
+        commission = models.SaleCommission.objects.filter(sale__in=man, ).values('brand', 'brand__name').annotate(
+            sum=Sum('total_amount'))
+
+    context['man'] = man
+    context['damage'] = damage
+
+    cost = 0
+    extra = 0
+    paid = 0
+    for item in context['man']:
+        cost += float(item.cost)
+        extra += float(item.extra)
+        paid += float(item.tendered)
+    cost = cost
+    extra = extra
+    paid = paid
+
+    # amount = 0
+    # for item in context['damage']:
+        # amount += float(item.total_amount)
+    # amount = amount
+
+    context['check_deliveryman'] = 'check_deliveryman'
+    context['start_date'] = start_date
+    context['end_date'] = end_date
+    context['deliveryman'] = deliveryman
+    context['trade'] = trade
+    context['due'] = due
+    context['commission'] = commission
+    context['cost'] = cost
+    context['extra'] = extra
+    context['paid'] = paid
+    # context['amount'] = amount
+
+    return render(request, 'deliveryman_report.html', context)
 
