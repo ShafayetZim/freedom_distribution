@@ -31,8 +31,10 @@
                         <tfoot>
                             <tr>
                                 {% for item in cash %}
+                                {% if forloop.first %}
                                 <th colspan="3" class="text-end">Today's Cash</th>
                                 <th class="text-end fw-bolder">{{item.todayCash|floatformat:2|intcomma}}</th>
+                                {% endif %}
                                 {% endfor %}
                             </tr>
                         </tfoot>
