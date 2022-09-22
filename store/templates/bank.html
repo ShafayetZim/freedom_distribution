@@ -17,8 +17,10 @@
             <div class="card-body">
                 <div class="container-fluid">
                     {% for item in bank %}
+                    {% if forloop.first %}
                     <button class="btn btn-sm btn-secondary">Remaining Balance</button>
                     {{item.totalBalance}}
+                    {% endif %}
                     {% endfor %}
                     <div class="text-end mb-3">
                         <button class="btn btn-sm btn-primary rounded-0 bg-gradient-primary" type="button" id="create_new"><i class="fa fa-plus"></i> Add New</button>
