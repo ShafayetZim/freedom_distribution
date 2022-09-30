@@ -146,12 +146,21 @@
           <div class="card-body">
             <div class="container-fluid">
               <table class="table table-stripped table-bordered" id="client-tbl">
+                <colgroup>
+                    <col width="8%">
+                    <col width="20%">
+                    <col width="17%">
+                    <col width="20%">
+                    <col width="20%">
+                    <col width="15%">
+                </colgroup>
                 <thead>
                   <tr>
                     <th class="px-1 py-1 text-center">#</th>
                     <th class="px-1 py-1 text-center">Date Added</th>
                     <th class="px-1 py-1 text-center">Transaction Code</th>
                     <th class="px-1 py-1 text-center">Brand</th>
+                    <th class="px-1 py-1 text-center">Note</th>
                     <th class="px-1 py-1 text-center">Dues Amount</th>
                   </tr>
                 </thead>
@@ -174,6 +183,9 @@
                       </td>
                       <td class="px-1 py-1 align-middle text-center">
                         {{ item.brand }}
+                      </td>
+                      <td class="px-1 py-1 align-middle text-center">
+                        {{ item.note }}
                       </td>
                       <td class="px-1 py-1 align-middle text-end">
                         {{ item.balance|floatformat|intcomma }}
