@@ -2877,3 +2877,18 @@ def check_report(request):
     context['paid'] = paid
 
     return render(request, 'salesman_report.html', context)
+
+
+def loan_dues_report(request):
+    context = context_data(request)
+    context['page'] = 'loan_dues_report'
+    context['page_title'] = 'Loan Dues Report'
+
+    request_data = request.GET
+
+    loan = models.Loan.objects.values(
+            'employee', 'employee__name', 'employee__type').annotate(sum=Sum('due_amount'))
+
+    context['loan'] = loan
+
+    return render(request, 'loan_dues_report.html', context)

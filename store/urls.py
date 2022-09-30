@@ -184,4 +184,5 @@ urlpatterns = [
     path('edit_sale',views.edit_sale,name='edit-sale'),
     path('edit_sale/<int:pk>',views.edit_sale,name='edit-sale-pk'),
     path('sale_qty_report',views.sale_qty_report,name='sale-qty-report'),
+    path('loan_dues_report',views.loan_dues_report,name='loan-dues-report'),
 ]+ static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
