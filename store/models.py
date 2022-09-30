@@ -9,7 +9,7 @@ class Employee(models.Model):
     name = models.CharField(max_length=100)
     phone = models.CharField(max_length=100)
     nid = models.CharField(max_length=100, null=True, blank=True)
-    type = models.CharField(max_length=2, choices=(('1','Salesman'), ('2','Deliveryman'), ('3','Manager'), ('4','AIC')), default = 1)
+    type = models.CharField(max_length=2, choices=(('1','Salesman'), ('2','Deliveryman'), ('3','Manager'), ('4','AIC'), ('5','Other')), default = 1)
     status = models.CharField(max_length=2, choices=(('1','Active'), ('2','Inactive')), default = 1)
     delete_flag = models.IntegerField(default = 0)
     date_added = models.DateTimeField(default = timezone.now)
