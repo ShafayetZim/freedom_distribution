@@ -69,10 +69,15 @@
                     class="badge badge-primary bg-gradient bg-primary px-3 rounded-pill bg-opacity-75 text-sm py-1"
                     >Manager</span
                   >
+                  {% elif item.type == '4' %}
+                  <span
+                    class="badge badge-primary bg-gradient bg-secondary px-3 rounded-pill bg-opacity-75 text-sm py-1"
+                    >AIC</span
+                  >
                   {% else %}
                   <span
-                    class="badge badge-warning bg-gradient bg-secondary px-3 rounded-pill bg-opacity-75 text-sm py-1"
-                    >AIC</span
+                    class="badge badge-warning bg-gradient bg-warning px-3 rounded-pill bg-opacity-75 text-sm py-1"
+                    >Other</span
                   >
                   {% endif %}
                 </td>
