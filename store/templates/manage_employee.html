@@ -38,6 +38,10 @@
         <option value="4" selected>AIC</option>
         {% else %}
         <option value="4">AIC</option>
+        {% endif %} {% if employee.type == '5' %}
+        <option value="5" selected>Other</option>
+        {% else %}
+        <option value="5">Other</option>
         {% endif %}
       </select>
     </div>
