@@ -58,12 +58,16 @@
             >
           </li>
           <li class="nav-item">
-            <a
-              class="nav-link"
-              aria-current="page"
-              href="{% url 'brand-page' %}"
-              >Brand</a
-            >
+            <div class="dropdown mt-1">
+                <button style="color: rgba(255,255,255,.55)" class="btn btn-sm rounded-0 dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Dataset
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="abtn" style="background-color: #ABB2B9">
+                    <li><a class="dropdown-item" href="{% url 'brand-page' %}"> Brand</a></li>
+                    <li><a class="dropdown-item" href="{% url 'road-page' %}"> Road</a></li>
+                    <li><a class="dropdown-item" href="{% url 'employee-page' %}"> Employee</a></li>
+                </ul>
+            </div>
           </li>
           <li class="nav-item">
             <a
@@ -75,7 +79,7 @@
           </li>
           <li class="nav-item">
             <a class="nav-link" aria-current="page" href="{% url 'sale-page' %}"
-              >Transactions</a
+              >Sales</a
             >
           </li>
 <!--          <li class="nav-item">-->
@@ -105,22 +109,35 @@
             >
           </li>
           <li class="nav-item">
-            <a class="nav-link" aria-current="page" href="{% url 'road-page' %}"
-              >Road</a
-            >
-          </li>
-          <li class="nav-item">
             <a class="nav-link" aria-current="page" href="{% url 'client-page' %}"
               >Client</a
             >
           </li>
           <li class="nav-item">
-            <a
-              class="nav-link"
-              aria-current="page"
-              href="{% url 'employee-page' %}"
-              >Employee</a
-            >
+            <div class="dropdown mt-1">
+                <button style="color: rgba(255,255,255,.55)" class="btn btn-sm rounded-0 dropdown-toggle" type="button" id="abtn" data-bs-toggle="dropdown" aria-expanded="false">
+                  Report
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="abtn" style="background-color: #ABB2B9">
+                    <li><a class="dropdown-item" href="{% url 'salesman-report' %}"> Salesman Report</a></li>
+                    <li><a class="dropdown-item" href="{% url 'deliveryman-report' %}"> Deliveryman Report</a></li>
+                    <li><a class="dropdown-item" href="{% url 'fresh-product-report' %}"> Fresh Product Report</a></li>
+                    <li><a class="dropdown-item" href="{% url 'commission-bill-page' %}"> Monthly Commission</a></li>
+                    <li><a class="dropdown-item" href="{% url 'commission-preview' %}"> Commission Report</a></li>
+                    <li><a class="dropdown-item" href="{% url 'loan-dues-report' %}"> Loan Dues Report</a></li>
+                </ul>
+            </div>
+          </li>
+          <li class="nav-item">
+            <div class="dropdown mt-1">
+                <button style="color: rgba(255,255,255,.55)" class="btn btn-sm rounded-0 dropdown-toggle" type="button" id="abtn" data-bs-toggle="dropdown" aria-expanded="false">
+                  Invest
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="abtn" style="background-color: #ABB2B9">
+                    <li><a class="dropdown-item" href="{% url 'investment-page' %}"> Invest</a></li>
+                    <li><a class="dropdown-item" href="{% url 'bank-page' %}"> Bank</a></li>
+                </ul>
+            </div>
           </li>
           {% if request.user.is_superuser %}
           <li class="nav-item">
