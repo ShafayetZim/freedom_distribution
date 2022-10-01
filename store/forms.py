@@ -191,10 +191,10 @@ class SaveSale(forms.ModelForm):
             code = 1
             while True:
                 try:
-                    check = models.Sales.objects.get(code=f"{pref}{code:03d}")
+                    check = models.Sales.objects.get(code=f"{pref}{code:02d}")
                     code = code + 1
                 except:
-                    return f"{pref}{code:03d}"
+                    return f"{pref}{code:02d}"
                     break
         else:
             return code
