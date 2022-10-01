@@ -58,7 +58,7 @@
                                         <ul class="dropdown-menu" aria-labelledby="abtn{{item.pk}}">
                                             <li><a class="dropdown-item" href="{% url 'view-purchase-pk' item.pk %}"><i class="fa fa-eye text-dark"></i> View</a></li>
                                             <li><a class="dropdown-item" href="{% url 'manage-purchase-pk' item.pk %}"><i class="fa fa-edit text-primary"></i> Edit</a></li>
-                                            <li><a class="dropdown-item delete-data" href="javascript:void(0)" data-url="{% url 'delete-sale' item.pk %}"><i class="fa fa-trash text-danger"></i> Delete</a></li>
+                                            <li><a class="dropdown-item delete-data" href="javascript:void(0)" data-url="{% url 'delete-purchase' item.pk %}"><i class="fa fa-trash text-danger"></i> Delete</a></li>
                                         </ul>
                                     </div>
                                 </td>
