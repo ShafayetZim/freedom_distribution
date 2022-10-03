@@ -2,10 +2,19 @@
 
 <!--Section: Content-->
 <section class="">
-    <h2 class="fw-bolder">Welcome, {{request.user.first_name}}&nbsp;{{request.user.last_name}}!</h2>
+    <h2 class="fw-bolder">
+        <img
+              src="static/assets/default/img/FreedomDistributionCopy.png"
+              height="50px"
+              alt="{{ MEDIA_URL }}"
+              loading="lazy"
+              class="bg-white bg-gradient px-1 py-1"
+              style="margin-top: -3px"
+        /> Welcome, {{request.user.first_name}}&nbsp;{{request.user.last_name}}!
+    </h2>
     <hr>
     <div class="row justify-content-center">
-        <div class="col-lg-3 col-md-6 col-sm-12 col-xs-12 px-1 pb-2">
+        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 px-1 pb-2">
             <div class="card card-default rounded-0 shadow bg-info bg-gradient border-0 text-light">
                 <div class="card-body">
                     <div class="container-fluid">
@@ -16,13 +25,13 @@
                             <div class="col-9">
                                 <h1 class="text-end">{{brand|intcomma}}</h1>
                             </div>
-                            <div class="col-12 text-end"><b>Brand</b></div>
+                            <div class="col-12 text-end"><h3><b>Brand</b></h3></div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-lg-3 col-md-6 col-sm-12 col-xs-12 px-1 pb-2">
+        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 px-1 pb-2">
             <div class="card card-default rounded-0 shadow bg-gradient bg-dark bg-opacity-75 text-light">
                 <div class="card-body">
                     <div class="container-fluid">
@@ -33,13 +42,13 @@
                             <div class="col-9">
                                 <h1 class="text-end">{{products|intcomma}}</h1>
                             </div>
-                            <div class="col-12 text-end"><b>Products</b></div>
+                            <div class="col-12 text-end"><h3><b>Products</b></h3></div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-lg-3 col-md-6 col-sm-12 col-xs-12 px-1 pb-2">
+        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 px-1 pb-2">
             <div class="card card-default rounded-0 shadow bg-gradient bg-success bg-opacity-75 text-light">
                 <div class="card-body">
                     <div class="container-fluid">
@@ -50,127 +59,29 @@
                             <div class="col-9">
                                 <h1 class="text-end">{{todays_transaction|intcomma}}</h1>
                             </div>
-                            <div class="col-12 text-end"><b>Today's Transactions</b></div>
+                            <div class="col-12 text-end"><h3><b>Today's Transactions</b></h3></div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-lg-3 col-md-6 col-sm-12 col-xs-12 px-1 pb-2">
-            <div class="card card-default rounded-0 shadow bg-gradient bg-warning bg-opacity-75 text-light">
-                <a href="{% url 'commission-bill-page' %}" style="color: white">
-                    <div class="card-body">
-                        <div class="container-fluid">
-                            <div class="row mx-0 w-100 align-items-center">
-                                <div class="col-3">
-                                    <i class="fs-1 text-light fa fa-coins"></i>
-                                </div>
-                                <div class="col-9">
-                                    <h1 class="text-end">Click</h1>
-                                </div>
-                                <div class="col-12 text-end"><b>Monthly Commission</b></div>
-                            </div>
-                        </div>
-                    </div>
-                </a>
-            </div>
-        </div>
-        <div class="col-lg-3 col-md-6 col-sm-12 col-xs-12 px-1 pb-2">
-            <div class="card card-default rounded-0 shadow bg-gradient bg-primary bg-opacity-75 text-light">
-                <a href="{% url 'daily-report' %}" style="color: white">
-                    <div class="card-body">
-                        <div class="container-fluid">
-                            <div class="row mx-0 w-100 align-items-center">
-                                <div class="col-3">
-                                    <i class="fs-1 text-light fas fa-clipboard-list"></i>
-                                </div>
-                                <div class="col-9">
-                                    <h1 class="text-end">Click</h1>
-                                </div>
-                                <div class="col-12 text-end"><b>Daily Report</b></div>
-                            </div>
-                        </div>
-                    </div>
-                </a>
-            </div>
-        </div>
-        <div class="col-lg-3 col-md-6 col-sm-12 col-xs-12 px-1 pb-2">
+         <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 px-1 pb-2">
             <div class="card card-default rounded-0 shadow bg-gradient bg-danger bg-opacity-75 text-light">
-                <a href="{% url 'low-stock' %}" style="color: white">
+                <a href="{% url 'loan-page' %}" style="color: white">
                     <div class="card-body">
                         <div class="container-fluid">
                             <div class="row mx-0 w-100 align-items-center">
                                 <div class="col-3">
-                                    <i class="fs-1 text-light fa fa-warning"></i>
+                                    <i class="fs-1 text-light fas fa-donate"></i>
                                 </div>
-                                <div class="col-9">
-                                    <h1 class="text-end">Click</h1>
-                                </div>
-                                <div class="col-12 text-end"><b>Low Stock</b></div>
+                                <div class="col-12 text-end"><h3><b>Loan List</b></h3></div>
                             </div>
                         </div>
                     </div>
                 </a>
             </div>
         </div>
-        <div class="col-lg-3 col-md-6 col-sm-12 col-xs-12 px-1 pb-2">
-            <div class="card card-default rounded-0 shadow bg-gradient bg-info bg-opacity-75 text-light">
-                <a href="{% url 'commission-preview' %}" style="color: white">
-                    <div class="card-body">
-                        <div class="container-fluid">
-                            <div class="row mx-0 w-100 align-items-center">
-                                <div class="col-3">
-                                    <i class="fs-1 text-light fa fa-list"></i>
-                                </div>
-                                <div class="col-9">
-                                    <h1 class="text-end">Click</h1>
-                                </div>
-                                <div class="col-12 text-end"><b>Commission Report</b></div>
-                            </div>
-                        </div>
-                    </div>
-                </a>
-            </div>
-        </div>
-        <div class="col-lg-3 col-md-6 col-sm-12 col-xs-12 px-1 pb-2">
-            <div class="card card-default rounded-0 shadow bg-gradient bg-dark bg-opacity-75 text-light">
-                <a href="{% url 'free-product-report' %}" style="color: white">
-                    <div class="card-body">
-                        <div class="container-fluid">
-                            <div class="row mx-0 w-100 align-items-center">
-                                <div class="col-3">
-                                    <i class="fs-1 text-light fas fa-clipboard-check"></i>
-                                </div>
-                                <div class="col-9">
-                                    <h1 class="text-end">Click</h1>
-                                </div>
-                                <div class="col-12 text-end"><b>Free Product Report</b></div>
-                            </div>
-                        </div>
-                    </div>
-                </a>
-            </div>
-        </div>
-        <div class="col-lg-3 col-md-6 col-sm-12 col-xs-12 px-1 pb-2">
-            <div class="card card-default rounded-0 shadow bg-gradient bg-success bg-opacity-75 text-light">
-                <a href="{% url 'advance-report' %}" style="color: white">
-                    <div class="card-body">
-                        <div class="container-fluid">
-                            <div class="row mx-0 w-100 align-items-center">
-                                <div class="col-3">
-                                    <i class="fs-1 text-light fas fa-calculator"></i>
-                                </div>
-                                <div class="col-9">
-                                    <h1 class="text-end">Click</h1>
-                                </div>
-                                <div class="col-12 text-end"><b>Advance Report</b></div>
-                            </div>
-                        </div>
-                    </div>
-                </a>
-            </div>
-        </div>
-        <div class="col-lg-3 col-md-6 col-sm-12 col-xs-12 px-1 pb-2">
+        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 px-1 pb-2">
             <div class="card card-default rounded-0 shadow bg-gradient bg-warning bg-opacity-75 text-light">
                 <a href="{% url 'expense-page' %}" style="color: white">
                     <div class="card-body">
@@ -179,17 +90,14 @@
                                 <div class="col-3">
                                     <i class="fs-1 text-light fab fa-opencart"></i>
                                 </div>
-                                <div class="col-9">
-                                    <h1 class="text-end">Click</h1>
-                                </div>
-                                <div class="col-12 text-end"><b>Expense List</b></div>
+                                <div class="col-12 text-end"><h3><b>Expense List</b></h3></div>
                             </div>
                         </div>
                     </div>
                 </a>
             </div>
         </div>
-        <div class="col-lg-3 col-md-6 col-sm-12 col-xs-12 px-1 pb-2">
+        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 px-1 pb-2">
             <div class="card card-default rounded-0 shadow bg-gradient bg-primary bg-opacity-75 text-light">
                 <a href="{% url 'surplus-page' %}" style="color: white">
                     <div class="card-body">
@@ -198,10 +106,327 @@
                                 <div class="col-3">
                                     <i class="fs-1 text-light fas fa-balance-scale"></i>
                                 </div>
-                                <div class="col-9">
-                                    <h1 class="text-end">Click</h1>
+                                <div class="col-12 text-end"><h3><b>Profit List</b></h3></div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 px-1 pb-2">
+            <div class="card card-default rounded-0 shadow bg-gradient bg-dark bg-opacity-75 text-light">
+                <a href="{% url 'advance-report' %}" style="color: white">
+                    <div class="card-body">
+                        <div class="container-fluid">
+                            <div class="row mx-0 w-100 align-items-center">
+                                <div class="col-3">
+                                    <i class="fs-1 text-light fas fa-calculator"></i>
                                 </div>
-                                <div class="col-12 text-end"><b>Surplus List</b></div>
+                                <div class="col-12 text-end"><h3><b>Advance Report</b></h3></div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 px-1 pb-2">
+            <div class="card card-default rounded-0 shadow bg-gradient bg-success bg-opacity-75 text-light">
+                <a href="{% url 'daily-report' %}" style="color: white">
+                    <div class="card-body">
+                        <div class="container-fluid">
+                            <div class="row mx-0 w-100 align-items-center">
+                                <div class="col-3">
+                                    <i class="fs-1 text-light fas fa-clipboard-list"></i>
+                                </div>
+                                <div class="col-12 text-end"><h3><b>Daily Report</b></h3></div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 px-1 pb-2">
+            <div class="card card-default rounded-0 shadow bg-gradient bg-info bg-opacity-75 text-light">
+                <a href="{% url 'damage-report' %}" style="color: white">
+                    <div class="card-body">
+                        <div class="container-fluid">
+                            <div class="row mx-0 w-100 align-items-center">
+                                <div class="col-3">
+                                    <i class="fs-1 text-light fa fa-random"></i>
+                                </div>
+                                <div class="col-12 text-end"><h3><b>Damage Report</b></h3></div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 px-1 pb-2">
+            <div class="card card-default rounded-0 shadow bg-gradient bg-primary bg-opacity-75 text-light">
+                <a href="{% url 'damage-product-page' %}" style="color: white">
+                    <div class="card-body">
+                        <div class="container-fluid">
+                            <div class="row mx-0 w-100 align-items-center">
+                                <div class="col-3">
+                                    <i class="fs-1 text-light fa fa-leaf"></i>
+                                </div>
+                                <div class="col-12 text-end"><h3><b>Damage Stock</b></h3></div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 px-1 pb-2">
+            <div class="card card-default rounded-0 shadow bg-gradient bg-danger bg-opacity-75 text-light">
+                <a href="{% url 'low-stock' %}" style="color: white">
+                    <div class="card-body">
+                        <div class="container-fluid">
+                            <div class="row mx-0 w-100 align-items-center">
+                                <div class="col-3">
+                                    <i class="fs-1 text-light fa fa-warning"></i>
+                                </div>
+                                <div class="col-12 text-end"><h3><b>Low Stock</b></h3></div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 px-1 pb-2">
+            <div class="card card-default rounded-0 shadow bg-gradient bg-warning bg-opacity-75 text-light">
+                <a href="{% url 'fresh-product-report' %}" style="color: white">
+                    <div class="card-body">
+                        <div class="container-fluid">
+                            <div class="row mx-0 w-100 align-items-center">
+                                <div class="col-3">
+                                    <i class="fs-1 text-light fas fa-seedling"></i>
+                                </div>
+                                <div class="col-12 text-end"><h3><b>Fresh Product Report</b></h3></div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 px-1 pb-2">
+            <div class="card card-default rounded-0 shadow bg-gradient bg-success bg-opacity-75 text-light">
+                <a href="{% url 'free-report' %}" style="color: white">
+                    <div class="card-body">
+                        <div class="container-fluid">
+                            <div class="row mx-0 w-100 align-items-center">
+                                <div class="col-3">
+                                    <i class="fs-1 text-light fas fa-clipboard-check"></i>
+                                </div>
+                                <div class="col-12 text-end"><h3><b>Free Product Report</b></h3></div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 px-1 pb-2">
+            <div class="card card-default rounded-0 shadow bg-gradient bg-info bg-opacity-75 text-light">
+                <a href="{% url 'commission-bill-page' %}" style="color: white">
+                    <div class="card-body">
+                        <div class="container-fluid">
+                            <div class="row mx-0 w-100 align-items-center">
+                                <div class="col-3">
+                                    <i class="fs-1 text-light fa fa-coins"></i>
+                                </div>
+                                <div class="col-12 text-end"><h3><b>Monthly Commission</b></h3></div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 px-1 pb-2">
+            <div class="card card-default rounded-0 shadow bg-gradient bg-dark bg-opacity-75 text-light">
+                <a href="{% url 'commission-preview' %}" style="color: white">
+                    <div class="card-body">
+                        <div class="container-fluid">
+                            <div class="row mx-0 w-100 align-items-center">
+                                <div class="col-3">
+                                    <i class="fs-1 text-light fa fa-list"></i>
+                                </div>
+                                <div class="col-12 text-end"><h3><b>Commission Report</b></h3></div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 px-1 pb-2">
+            <div class="card card-default rounded-0 shadow bg-gradient bg-warning bg-opacity-75 text-light">
+                <a href="{% url 'salesman-report' %}" style="color: white">
+                    <div class="card-body">
+                        <div class="container-fluid">
+                            <div class="row mx-0 w-100 align-items-center">
+                                <div class="col-3">
+                                    <i class="fs-1 text-light fas fa-truck-loading"></i>
+                                </div>
+                                <div class="col-12 text-end"><h3><b>Salesman Report</b></h3></div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 px-1 pb-2">
+            <div class="card card-default rounded-0 shadow bg-gradient bg-primary bg-opacity-75 text-light">
+                <a href="{% url 'deliveryman-report' %}" style="color: white">
+                    <div class="card-body">
+                        <div class="container-fluid">
+                            <div class="row mx-0 w-100 align-items-center">
+                                <div class="col-3">
+                                    <i class="fs-1 text-light fas fa-people-carry"></i>
+                                </div>
+                                <div class="col-12 text-end"><h3><b>Deliveryman Report</b></h3></div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 px-1 pb-2">
+            <div class="card card-default rounded-0 shadow bg-gradient bg-danger bg-opacity-75 text-light">
+                <a href="{% url 'dues-report' %}" style="color: white">
+                    <div class="card-body">
+                        <div class="container-fluid">
+                            <div class="row mx-0 w-100 align-items-center">
+                                <div class="col-3">
+                                    <i class="fs-1 text-light fas fa-bong"></i>
+                                </div>
+                                <div class="col-12 text-end"><h3><b>Dues Report</b></h3></div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 px-1 pb-2">
+            <div class="card card-default rounded-0 shadow bg-gradient bg-info bg-opacity-75 text-light">
+                <a href="{% url 'expenditure-page' %}" style="color: white">
+                    <div class="card-body">
+                        <div class="container-fluid">
+                            <div class="row mx-0 w-100 align-items-center">
+                                <div class="col-3">
+                                    <i class="fs-1 text-light fas fa-beer"></i>
+                                </div>
+                                <div class="col-12 text-end"><h3><b>Daily Expense</b></h3></div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 px-1 pb-2">
+            <div class="card card-default rounded-0 shadow bg-gradient bg-dark bg-opacity-75 text-light">
+                <a href="{% url 'online-transaction-page' %}" style="color: white">
+                    <div class="card-body">
+                        <div class="container-fluid">
+                            <div class="row mx-0 w-100 align-items-center">
+                                <div class="col-3">
+                                    <i class="fs-1 text-light fas fa-beer"></i>
+                                </div>
+                                <div class="col-12 text-end"><h3><b>Online</b></h3></div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 px-1 pb-2">
+            <div class="card card-default rounded-0 shadow bg-gradient bg-success bg-opacity-75 text-light">
+                <a href="{% url 'bank-page' %}" style="color: white">
+                    <div class="card-body">
+                        <div class="container-fluid">
+                            <div class="row mx-0 w-100 align-items-center">
+                                <div class="col-3">
+                                    <i class="fs-1 text-light fas fa-beer"></i>
+                                </div>
+                                <div class="col-12 text-end"><h3><b>Bank Account</b></h3></div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 px-1 pb-2">
+            <div class="card card-default rounded-0 shadow bg-gradient bg-danger bg-opacity-75 text-light">
+                <a href="{% url 'bank-transaction-page' %}" style="color: white">
+                    <div class="card-body">
+                        <div class="container-fluid">
+                            <div class="row mx-0 w-100 align-items-center">
+                                <div class="col-3">
+                                    <i class="fs-1 text-light fas fa-beer"></i>
+                                </div>
+                                <div class="col-12 text-end"><h3><b>Bank Transaction</b></h3></div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 px-1 pb-2">
+            <div class="card card-default rounded-0 shadow bg-gradient bg-warning bg-opacity-75 text-light">
+                <a href="{% url 'investment-page' %}" style="color: white">
+                    <div class="card-body">
+                        <div class="container-fluid">
+                            <div class="row mx-0 w-100 align-items-center">
+                                <div class="col-3">
+                                    <i class="fs-1 text-light fas fa-beer"></i>
+                                </div>
+                                <div class="col-12 text-end"><h3><b>Investment</b></h3></div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 px-1 pb-2">
+            <div class="card card-default rounded-0 shadow bg-gradient bg-primary bg-opacity-75 text-light">
+                <a href="{% url 'today-cash-page' %}" style="color: white">
+                    <div class="card-body">
+                        <div class="container-fluid">
+                            <div class="row mx-0 w-100 align-items-center">
+                                <div class="col-3">
+                                    <i class="fs-1 text-light fas fa-beer"></i>
+                                </div>
+                                <div class="col-12 text-end"><h3><b>Today's Cash</b></h3></div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 px-1 pb-2">
+            <div class="card card-default rounded-0 shadow bg-gradient bg-dark bg-opacity-75 text-light">
+                <a href="{% url 'daily-collection' %}" style="color: white">
+                    <div class="card-body">
+                        <div class="container-fluid">
+                            <div class="row mx-0 w-100 align-items-center">
+                                <div class="col-3">
+                                    <i class="fs-1 text-light fas fa-beer"></i>
+                                </div>
+                                <div class="col-12 text-end"><h3><b>Today's Collection</b></h3></div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 px-1 pb-2">
+            <div class="card card-default rounded-0 shadow bg-gradient bg-success bg-opacity-75 text-light">
+                <a href="{% url 'sale-qty-report' %}" style="color: white">
+                    <div class="card-body">
+                        <div class="container-fluid">
+                            <div class="row mx-0 w-100 align-items-center">
+                                <div class="col-3">
+                                    <i class="fs-1 text-light fas fa-beer"></i>
+                                </div>
+                                <div class="col-12 text-end"><h3><b>Sales Qty Report</b></h3></div>
                             </div>
                         </div>
                     </div>
