@@ -35,7 +35,7 @@
     </div>
     {% endif %}
     <div class="container">
-        <form action="" id="laundry-form" data-product-url="{% url 'ajax_load_product' %}" novalidate>
+        <form action="" id="sale-form" data-product-url="{% url 'ajax_load_product' %}" novalidate>
             <input type="hidden" name="id" value="{{sale.id}}">
             <input type="hidden" name="code" value="{% if sale.code  %}{{sale.code}}{% else %}generate{% endif %}">
             <input type="hidden" name="status" value="{% if sale.status  %}{{sale.status}}{% else %}0{% endif %}">
@@ -213,15 +213,6 @@
                 <div class="card-body">
                     <div class="container-fluid">
                         <div class="row align-items-end">
-<!--                            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">-->
-<!--                                <label for="category" class="control-label">Category</label>-->
-<!--                                  <select name="rcategory" id="rcategory" class="form-select form-control-sm rounded-0">-->
-<!--                                      <option value="" disabled selected></option>-->
-<!--                                      {% for item in category %}-->
-<!--                                      <option value="{{item.pk}}">{{item.name}}</option>-->
-<!--                                      {% endfor %}-->
-<!--                                  </select>-->
-<!--                            </div>-->
                             <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
                                 <label for="products" class="control-label">Products</label>
                                 <select id="rproducts" class="form-control form-control-sm rounded-0">
@@ -242,9 +233,7 @@
                             <colgroup>
                                 <col width="5%">
                                 <col width="25%">
-<!--                                <col width="13%">-->
                                 <col width="26%">
-<!--                                <col width="13%">-->
                                 <col width="26%">
                                 <col width="2%">
                                 <col width="2%">
@@ -256,9 +245,7 @@
                                 <tr>
                                     <th class="p-1 text-center"></th>
                                     <th class="p-1 text-center">Product Name</th>
-<!--                                    <th class="p-1 text-center">Buy Price</th>-->
                                     <th class="p-1 text-center">Price</th>
-<!--                                    <th class="p-1 text-center">Available</th>-->
                                     <th class="p-1 text-center">Quantity</th>
                                     <th class="p-1 text-center"></th>
                                     <th class="p-1 text-center"></th>
@@ -277,11 +264,9 @@
                                         <button class="btn btn-outline-danger btn-sm rounded-0 rem-return" type="button"><i class="fa fa-times"></i></button>
                                     </td>
                                     <td class="px-2 py-1 align-middle product_type">{{pitem.product.name}}</td>
-<!--                                    <td class="px-2 py-1 align-middle text-end product_buy">{{pitem.buy|floatformat}}</td>-->
                                     <td class="px-2 py-1 align-middle text-end">
                                         <input type="number" name="return_price[]" step="0.01" value="{{pitem.price}}">
                                     </td>
-<!--                                    <td class="px-2 py-1 align-middle text-end  product_available">{{pitem.available}}</td>-->
                                     <td class="px-2 py-1 align-middle">
                                         <input type="number" min="1" value="{{pitem.quantity|floatformat}}" class="form-control form-control-sm rounded-0 text-center" name="return_quantity[]" required>
                                     </td>
@@ -320,26 +305,28 @@
                     <div class="container-fluid">
                         <div class="row align-items-end">
                             <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
-                                <label for="prices" class="control-label">Client</label>
-                                <select id="prices" class="form-control form-control-sm rounded-0">
+                                <label for="client" class="control-label">Client</label>
+                                <select id="client" class="form-control form-control-sm rounded-0">
                                     <option value="" disabled selected></option>
-                                    {% for price in prices %}
-                                    <option value="{{price.pk}}" data-price = "{{price.due}}">{{price.name}}</option>
+                                    {% for item in client %}
+                                    <option value="{{item.pk}}" data-price = "{{item.due}}">{{item.name}}</option>
                                     {% endfor %}
                                 </select>
                             </div>
                             <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                                <button class="btn btn-primary btn-sm rounded-0 bg-gradient bg-primary" type="button" id="add_laundry"><i class="fa fa-plus"></i> Add Client</button>
+                                <button class="btn btn-primary btn-sm rounded-0 bg-gradient bg-primary" type="button" id="add_due"><i class="fa fa-plus"></i> Add Client</button>
                             </div>
                         </div>
                         <div class="clear-fix mt-2"></div>
-                        <table class="table table-bordered" id="laundry_list">
+                        <table class="table table-bordered" id="due_list">
                             <colgroup>
                                 <col width="5%">
-                                <col width="20%">
-                                <col width="22%">
-                                <col width="22%">
-                                <col width="11%">
+                                <col width="18%">
+                                <col width="17%">
+                                <col width="18%">
+                                <col width="10%">
+                                <col width="10%">
+                                <col width="2%">
                                 <col width="10%">
                                 <col width="10%">
                             </colgroup>
@@ -350,6 +337,9 @@
                                     <th class="p-1 text-center">Brand Name</th>
                                     <th class="p-1 text-center">Note</th>
                                     <th class="p-1 text-center">Dues</th>
+                                    <th class="p-1 text-center">New</th>
+                                    <th class="p-1 text-center">Date</th>
+                                    <th class="p-1 text-center"></th>
                                     <th class="p-1 text-center">Paid</th>
                                     <th class="p-1 text-center">Balance</th>
                                 </tr>
@@ -358,13 +348,12 @@
                                 {% for item in items %}
                                 <tr>
                                     <td class="px-2 py-1 align-middle text-center">
-                                        <input type="hidden" name="price_id[]" value="{{item.client.id}}">
-<!--                                        <input type="hidden" name="laundry_price[]" value="{{item.due}}">-->
-                                        <button class="btn btn-outline-danger btn-sm rounded-0 rem-laundry" type="button"><i class="fa fa-times"></i></button>
+                                        <input type="hidden" name="client_id[]" value="{{item.client.id}}">
+                                        <button class="btn btn-outline-danger btn-sm rounded-0 rem-due" type="button"><i class="fa fa-times"></i></button>
                                     </td>
-                                    <td class="px-2 py-1 align-middle laundry_type">{{item.client.name}}</td>
+                                    <td class="px-2 py-1 align-middle client_type">{{item.client.name}}</td>
                                     <td class="px-2 py-1 align-middle text-start">
-                                       <select name="laundry_brand[]" id="due-brand" class="form-select form-control-sm rounded-0" required>
+                                       <select name="due_brand[]" id="due-brand" class="form-select form-control-sm rounded-0" required>
                                             {% if item.brand %}
                                             <option selected value="{{item.brand}}">{{item.brand}}</option>
                                             {% endif %}
@@ -374,28 +363,38 @@
                                         </select>
                                     </td>
                                     <td class="px-2 py-1 align-middle">
-                                        <input type="text" class="form-control form-control-sm rounded-0 text-center" name="laundry_note[]" value="{{item.note}}">
+                                        <input type="text" class="form-control form-control-sm rounded-0 text-center" name="due_note[]" value="{{item.note}}">
                                     </td>
                                     <td class="px-2 py-1 align-middle">
-                                        <input type="number" min="0"  step="any" class="form-control form-control-sm rounded-0 text-center" name="laundry_price[]" value="{{item.due|floatformat}}" required>
+                                        <input type="number" min="0"  step="any" class="form-control form-control-sm rounded-0 text-center" name="due_price[]" value="{{item.due|floatformat}}" required>
                                     </td>
                                     <td class="px-2 py-1 align-middle">
-                                        <input type="number" min="0"  step="any" class="form-control form-control-sm rounded-0 text-center" name="laundry_weight[]" value="{{item.paid|floatformat}}" required>
+                                        <input type="number" min="0"  step="any" class="form-control form-control-sm rounded-0 text-center" name="due_new[]" value="0" required>
                                     </td>
-                                    <td class="px-2 py-1 align-middle laundry_total text-end">{{item.balance|floatformat}}</td>
+                                    <td class="px-2 py-1 align-middle">
+                                        <input type="date" class="form-control form-control-sm rounded-0 text-center" name="due_date[]" value="{{item.date|date:'Y-m-d'}}" required>
+                                    </td>
+                                    <td class="px-2 py-1 align-middle">
+                                        <input type="hidden" min="0"  step="any" class="form-control form-control-sm rounded-0 text-center" name="due_previous[]" value="{{item.paid|floatformat}}" required>
+                                    </td>
+                                    <td class="px-2 py-1 align-middle">
+                                        <input type="number" min="0"  step="any" class="form-control form-control-sm rounded-0 text-center" name="due_weight[]" value="{{item.paid|floatformat}}" readonly required>
+                                    </td>
+                                    <td class="px-2 py-1 align-middle due_total text-end">{{item.balance|floatformat}}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
                             <tfoot>
                                 <tr>
-                                    <th class="text-center" colspan="4">Total</th>
-                                    <th class="text-end sub-total-laundry">0.00</th>
+                                    <th class="text-center" colspan="7">Total</th>
+                                    <th class="text-end sub-total-due">0.00</th>
                                 </tr>
                             </tfoot>
                         </table>
                     </div>
                 </div>
             </div>
+
 {% endif %}
             <div class="card rounded-0 mb-3">
                 <div class="card-header">
@@ -423,7 +422,6 @@
                                 <col width="5%">
                                 <col width="40%">
                                 <col width="30%">
-<!--                                <col width="15%">-->
                                 <col width="35%">
                             </colgroup>
                             <thead>
@@ -431,7 +429,6 @@
                                     <th class="p-1 text-center"></th>
                                     <th class="p-1 text-center">Brand Name</th>
                                     <th class="p-1 text-center">Commission</th>
-<!--                                    <th class="p-1 text-center">Paid</th>-->
                                     <th class="p-1 text-center">Total</th>
                                 </tr>
                             </thead>
@@ -463,14 +460,6 @@
 
             <div class="card rounded-0 mb-3">
                 <div class="card-body">
-<!--                    <div class="d-flex w-100 justify-content-end align-items-center">-->
-<!--                        <div class="col-auto">-->
-<!--                            <h4 class="fw-bolder text-muted pe-2">Grand Total:</h4>-->
-<!--                        </div>-->
-<!--                        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 text-end">-->
-<!--                            <h4 class="fw-bolder pe-2 gtotal">{% if sale.total_amount %}{{sale.total_amount|floatformat:2|intcomma}}{% else %}0.00{% endif %}</h4>-->
-<!--                        </div>-->
-<!--                    </div>-->
                     <div class="d-flex w-100 justify-content-end align-items-center">
                         <div class="col-auto">
                             <h4 class="fw-bolder text-muted pe-2">Extra Amount:</h4>
@@ -504,35 +493,25 @@
                             <h4 class="fw-bolder pe-2 gtotal">{% if sale.total_amount %}{{sale.total_amount|floatformat:2|intcomma}}{% else %}0.00{% endif %}</h4>
                         </div>
                     </div>
-
-<!--                    <div class="d-flex w-100 justify-content-end align-items-center">-->
-<!--                        <div class="col-auto">-->
-<!--                            <h4 class="fw-bolder text-muted pe-2">Due Amount:</h4>-->
-<!--                        </div>-->
-<!--                        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 text-end">-->
-<!--                            <h4 class="fw-bolder pe-2 change" id="change">{% if sale.short %}{{sale.short|floatformat:2|intcomma}}{% else %}0.00{% endif %}</h4>-->
-<!--                        </div>-->
-<!--                    </div>-->
                 </div>
                 <div class="card-footer py-1 text-center">
                     <button class="btn btn-primary btn-sm rounded-0" type="button" id="pay_later">Pay Later</button>
-                    <button class="btn btn-success btn-sm rounded-0" id="laundry-submit-btn" form="laundry-form"><i class="fa fa-save"></i> Pay Now</button>
+                    <button class="btn btn-success btn-sm rounded-0" id="sale-submit-btn" form="sale-form"><i class="fa fa-save"></i> Pay Now</button>
                 </div>
             </div>
         </form>
     </div>
 </section>
 
-<noscript id="laundry-clone">
+<noscript id="due-clone">
     <tr>
         <td class="px-2 py-1 align-middle text-center">
-            <input type="hidden" name="price_id[]" value="">
-<!--            <input type="hidden" name="laundry_price[]" value="">-->
-            <button class="btn btn-outline-danger btn-sm rounded-0 rem-laundry" type="button"><i class="fa fa-times"></i></button>
+            <input type="hidden" name="client_id[]" value="">
+            <button class="btn btn-outline-danger btn-sm rounded-0 rem-due" type="button"><i class="fa fa-times"></i></button>
         </td>
-        <td class="px-2 py-1 align-middle laundry_type"></td>
+        <td class="px-2 py-1 align-middle client_type"></td>
         <td class="px-2 py-1 align-middle text-start">
-            <select type="text" name="laundry_brand[]" id="client-brand" class="form-select form-control-sm rounded-0" required>
+            <select type="text" name="due_brand[]" id="client-brand" class="form-select form-control-sm rounded-0" required>
                 <option value="" disabled selected>Please Select Brand Here</option>
                 {% for item in brands %}
                 <option value="{{item.name}}">{{item.name}}</option>
@@ -540,15 +519,24 @@
             </select>
         </td>
         <td class="px-2 py-1 align-middle">
-            <input type="text" class="form-control form-control-sm rounded-0 text-center" name="laundry_note[]">
+            <input type="text" class="form-control form-control-sm rounded-0 text-center" name="due_note[]">
         </td>
         <td class="px-2 py-1 align-middle">
-            <input type="number" step="any" min="0" value="0" class="form-control form-control-sm rounded-0 text-center" name="laundry_price[]" required>
+            <input type="number" step="any" min="0" value="0" class="form-control form-control-sm rounded-0 text-center" name="due_price[]" required>
+        </td>
+         <td class="px-2 py-1 align-middle">
+            <input type="number" step="any" min="0" value="0" class="form-control form-control-sm rounded-0 text-center" name="due_new[]" required>
         </td>
         <td class="px-2 py-1 align-middle">
-            <input type="number" step="any" min="0" value="0" class="form-control form-control-sm rounded-0 text-center" name="laundry_weight[]" required>
+            <input type="date" class="form-control form-control-sm rounded-0 text-center" name="due_date[]" required>
         </td>
-        <td class="px-2 py-1 align-middle laundry_total text-end">0.00</td>
+         <td class="px-2 py-1 align-middle">
+            <input type="hidden" step="any" min="0" value="0" class="form-control form-control-sm rounded-0 text-center" name="due_previous[]" required>
+        </td>
+        <td class="px-2 py-1 align-middle">
+            <input type="number" step="any" min="0" value="0" class="form-control form-control-sm rounded-0 text-center" name="due_weight[]" readonly required>
+        </td>
+        <td class="px-2 py-1 align-middle due_total text-end">0.00</td>
     </tr>
 </noscript>
 
@@ -608,11 +596,9 @@
             <button class="btn btn-outline-danger btn-sm rounded-0 rem-return" type="button"><i class="fa fa-times"></i></button>
         </td>
         <td class="px-2 py-1 align-middle product_type"></td>
-<!--        <td class="px-2 py-1 align-middle text-end product_buy">0.00</td>-->
         <td class="px-2 py-1 align-middle text-end">
             <input type="number" step="0.01" name="return_price[]" value="">
         </td>
-<!--        <td class="px-2 py-1 align-middle text-end product_available"></td>-->
         <td class="px-2 py-1 align-middle">
             <input type="number" min="1" value="1" class="form-control form-control-sm rounded-0 text-center" name="return_quantity[]" required>
         </td>
@@ -634,25 +620,30 @@
 
 <script>
     function calc_total() {
-        var sub_laundry = 0
+        var sub_due = 0
         var sub_product = 0
         var sub_return = 0
         var sub_brand = 0
         var gtotal = 0
-        $('#laundry_list tbody tr').each(function() {
-            var price = $(this).find('[name="laundry_price[]"]').val()
-            var weight = $(this).find('[name="laundry_weight[]"]').val()
+        $('#due_list tbody tr').each(function() {
+            var price = $(this).find('[name="due_price[]"]').val()
+            var weight = $(this).find('[name="due_weight[]"]').val()
+            var current = $(this).find('[name="due_new[]"]').val()
+            var previous = $(this).find('[name="due_previous[]"]').val()
             weight = weight > 0 ? weight : 0;
             price = price > 0 ? price : 0;
-            sub_laundry += parseFloat(parseFloat(weight) - parseFloat(price))
-
-            $(this).find('.laundry_total').text(parseFloat(parseFloat(weight) - parseFloat(price)).toLocaleString('en-US'))
+            current = current > 0 ? current : 0;
+            previous = previous > 0 ? previous : 0;
+            sub_due += parseFloat(parseFloat(weight) - parseFloat(price) + parseFloat(current))
+            gtotal += parseFloat(parseFloat(weight) - parseFloat(price) + parseFloat(current))
+            $(this).find('.due_total').text(parseFloat(parseFloat(weight) - parseFloat(price) + parseFloat(current)).toLocaleString('en-US'))
         })
-        $('.sub-total-laundry').text(parseFloat(sub_laundry).toLocaleString('en-US', {
+        $('.sub-total-due').text(parseFloat(sub_due).toLocaleString('en-US', {
             style: 'decimal',
             maximumFractionDigits: 2,
             minimumFractionDigits: 2
         }))
+
         $('#product_list tbody tr').each(function() {
             var buy = $(this).find('[name="product_buy[]"]').val()
             var price = $(this).find('[name="product_price[]"]').val()
@@ -769,7 +760,7 @@
             width: "100%",
             selectionCssClass: "form-control form-control-sm rounded-0"
         })
-        $('#prices').select2({
+        $('#client').select2({
             placeholder: "Please Select Client Here",
             width: "100%",
             selectionCssClass: "form-control form-control-sm rounded-0"
@@ -790,37 +781,49 @@
             selectionCssClass: "form-control form-control-sm rounded-0"
         })
 
-        $('#laundry_list tbody').find('.rem-laundry').click(function() {
+        $('#due_list tbody').find('.rem-due').click(function() {
             if (confirm("Are you sure to remove this item?") == true) {
                 $(this).closest('tr').remove()
                 calc_total()
             }
         })
 
-        $('#add_laundry').click(function() {
-            var pid = $('#prices').val()
+        $('#due_list tbody').find('[name="due_new[]"]').on('input change', function() {
+            calc_total()
+        })
+
+        $('#add_due').click(function() {
+            var pid = $('#client').val()
             if (pid < '1') {
                 return false
             }
-            var price = $('#prices option[value="' + pid + '"]').attr('data-price')
-            var laundry_type = $('#prices option[value="' + pid + '"]').text()
-            var tr = $($('noscript#laundry-clone').html()).clone()
-            tr.find('.laundry_type').text(laundry_type)
-            tr.find('.laundry_price').text(parseFloat(price).toLocaleString('en-US'))
-            tr.find('.laundry_total').text(parseFloat(price).toLocaleString('en-US'))
-            tr.find('[name="price_id[]"]').val(pid)
-            tr.find('[name="laundry_brand[]"]').val()
-            tr.find('[name="laundry_note[]"]').val()
-            tr.find('[name="laundry_price[]"]').val(price)
-            $('#laundry_list tbody').append(tr)
+            var price = $('#client option[value="' + pid + '"]').attr('data-price')
+            var client_type = $('#client option[value="' + pid + '"]').text()
+            var tr = $($('noscript#due-clone').html()).clone()
+            tr.find('.client_type').text(client_type)
+            tr.find('.due_price').text(parseFloat(price).toLocaleString('en-US'))
+            tr.find('.due_total').text(parseFloat(price).toLocaleString('en-US'))
+            tr.find('[name="client_id[]"]').val(pid)
+            tr.find('[name="due_brand[]"]').val()
+            tr.find('[name="due_note[]"]').val()
+            tr.find('[name="due_date[]"]').val()
+
+            tr.find('[name="due_previous[]"]').val()
+            tr.find('[name="due_price[]"]').val(price)
+            $('#due_list tbody').append(tr)
             calc_total()
-            $('#prices').val('').trigger('change')
-            tr.find('[name="laundry_weight[]"]').on('input change', function() {
+            $('#client').val('').trigger('change')
+            tr.find('[name="due_weight[]"]').on('input change', function() {
                 calc_total()
             })
             calc_total()
-            $('#prices').val('').trigger('change')
-            tr.find('[name="laundry_price[]"]').on('input change', function() {
+            $('#client').val('').trigger('change')
+            tr.find('[name="due_new[]"]').on('input change', function() {
+                calc_total()
+            })
+            calc_total()
+            $('#client').val('').trigger('change')
+            tr.find('[name="due_price[]"]').on('input change', function() {
                 calc_total()
             })
             $('#client-brand').select2({
@@ -829,7 +832,7 @@
             selectionCssClass: "form-control form-control-sm rounded-0"
         })
 
-            tr.find('.rem-laundry').click(function() {
+            tr.find('.rem-due').click(function() {
                 if (confirm("Are you sure to remove this item?") == true) {
                     tr.remove()
                     calc_total()
@@ -919,11 +922,11 @@
             calc_total()
         })
 
-        $('#laundry_list tbody').find('[name="laundry_price[]"]').on('input change', function() {
+        $('#due_list tbody').find('[name="due_price[]"]').on('input change', function() {
             calc_total()
         })
 
-        $('#laundry_list tbody').find('[name="laundry_weight[]"]').on('input change', function() {
+        $('#due_list tbody').find('[name="due_weight[]"]').on('input change', function() {
             calc_total()
         })
         $('#return_list tbody').find('.rem-return').click(function() {
@@ -1060,13 +1063,13 @@
 
         $('#pay_later').click(function() {
             $('#tendered_amount').val(0).attr('required', false)
-            $('#laundry-form').submit()
+            $('#sale-form').submit()
         })
-        $('#laundry-submit-btn').click(function() {
+        $('#sale-submit-btn').click(function() {
             $('#tendered_amount').attr('required', true)
         })
 
-        $('#laundry-form').submit(function(e) {
+        $('#sale-form').submit(function(e) {
             e.preventDefault();
             var _this = $(this)
             $('.err-msg').remove();
@@ -1124,7 +1127,7 @@
     })
     // this one is for fetching product data
     $("#category").change(function () {
-      var url = $("#laundry-form").attr("data-product-url");  // get the url of the `load_product` view
+      var url = $("#sale-form").attr("data-product-url");  // get the url of the `load_product` view
       var brandId = $(this).val();  // get the selected category ID from the HTML input
 
       $.ajax({                       // initialize an AJAX request
@@ -1136,16 +1139,6 @@
           $("#products").html(data);  // replace the contents of the city input with the data that came from the server
         }
       });
-
-
-
-
-
-
-
-
-
-
 
     });
 </script>
