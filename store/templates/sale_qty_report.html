@@ -1,0 +1,236 @@
+{% extends 'base.html' %} {% load static %} {% load humanize %} {% block pageContent %}
+<section class="py-4">
+<div class="container">
+     <h3 class="fw-bolder text-center">Sale Quantity Report</h3>
+        <center>
+            <hr class="bg-primary opacity-100" style="height:3px" width="5%">
+        </center>
+
+        <div class="card rounded-0 mb-1">
+            <div class="card-header py-1">
+                <div class="card-title mb-0">Filter Dues Report</div>
+            </div>
+            <div class="card-body">
+
+                <form method="GET">
+                <section class="site_filter">
+                <div class="container-fluid">
+                    <div class="row justify-content-center">
+
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="date">Start Date</label>
+                                <input type="date" class="form-control mr-sm-3" id="start_date" name="start_date"
+                                       value={{start_date}} required>
+
+                            </div>
+                        </div>
+
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="date">End Date</label>
+                                <input type="date" class="form-control mr-sm-3" id="end_date" name="end_date"
+                                       value={{end_date}} required>
+
+                            </div>
+                        </div>
+
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label for="brand">Check Brand</label>
+                                <select class="form-control" id="check_brand" name="check_brand">
+                                    <option value="All">All</option>
+                                    {% for item in brand %}
+                                    <option value="{{item.id}}">{{item.name}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+
+            <div class="text-center mt-3">
+                <button class="btn btn-success">View</button>
+                <button class="btn btn-danger bg-gradient bg-danger" type="button" id="print"><i class="fa fa-print"></i> Print</button>
+            </div>
+        </form>
+            </div>
+    </div>
+
+      <br>
+    <div class="card rounded-0 shadow">
+            <div class="card-body">
+                <div class="container-fluid">
+                    <table style="width: 100%; border-collapse: collapse;">
+
+                    </table>
+                    <br>
+                    <table class="table table-bordered table-striped" style="border-collapse: collapse; width: 100%;" border="1" cellpadding="8" id="product-tbl">
+                        <tbody>
+                        <tr>
+                            <td style="width: 5%;text-align:center;"><strong>SL</strong></td>
+                            <td style="width: 35%;text-align:center;"><strong>Product</strong></td>
+                            <td style="width: 35%;text-align:center;"><strong>Brand</strong></td>
+                            <td style="width: 25%;text-align:center;"><strong>Quantity</strong></td>
+
+                        </tr>
+                         {% for item in trade %}
+                        <tr>
+                            <td style="width: 5%;">
+                                {{forloop.counter}}
+                            </td>
+                            <td style="width: 20%;">
+                                {{item.product__name}}
+                            </td>
+                            <td style="width: 20%;">
+                                {{item.brand}}
+                            </td>
+                            <td style="width: 20%;">
+                                <input type="text" class="input-fields-to-sum form-control form-control-sm rounded-0" name="qty" id="qty" value="{{item.sum}}" readonly>
+                            </td>
+
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="3" class="text-end">Total Quantity</th>
+                                <th class="text-start fw-bolder">
+                                    <input type="text" class="form-control form-control-sm rounded-0 total" name="total_qty" id="total_qty" value="" readonly>
+                                </th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+    </div>
+</div>
+</section>
+<noscript id="print-header">
+    <div>
+        <style>
+            html{
+                min-height: unset !important;
+            }
+        </style>
+        <div class="d-flex w-100">
+            <div class="col-3 text-center">
+<!--                <img src="{{system_host}}{% static 'assets/default/img/logo-light.png' %}" style="width:12em;height:4em;object-fit:cover;object-position:center center" alt="" class="rounded-circle p-0 img-thumbnail">-->
+            </div>
+            <div class="col-8">
+                <div class="lh-1">
+                    <h4 class="text-center mb-0 fw-bolder">{{system_name}}</h4>
+                    <p class="text-center mb-0">Your Trusted Business Partner...</p>
+                    <p class="text-center mb-0">16 Moharaja Rd, Mymensingh 2200</p>
+                    <h6 class="text-center mb-0 fw-bolder">Pro: A. K. M. Nuruzzaman (Rakib)</h6><br />
+                    <h5 class="text-center mb-0 fw-bolder">Sale Quantity Report</h5>
+                    <div class="text-center mb-0">as of</div>
+                    <h5 class="text-center mb-0">{{start_date}} to {{end_date}}</h5>
+                </div>
+            </div>
+        </div>
+        <hr>
+    </div>
+</noscript>
+ {% endblock pageContent %} {% block ScriptBlock %}
+<script>
+  $(function () {
+    $('#print').click(function() {
+        console.log('print')
+        var h = $('head').clone()
+        h.find('title').text("Sale Quantity Report - Print Details")
+        h.find('link').each(function() {
+            if ($(this).is('[href]')) {
+                $(this).attr('href', "{{system_host}}" + $(this).attr('href'))
+            }
+        })
+        h.find('script').each(function() {
+            if ($(this).is('[src]')) {
+                $(this).attr('src', "{{system_host}}" + $(this).attr('src'))
+            }
+        })
+        var ph = $($('noscript#print-header').html()).clone()
+        var el = "";
+        el += $('#product-tbl').clone()[0].outerHTML
+
+
+        var nw = window.open("", "_blank", "width=" + ($(window).width() * .8) + ", left=" + ($(window).width() * .1) + "height=" + ($(window).height() * .8) + ", top=" + ($(window).height() * .1) + "")
+        nw.document.querySelector('head').innerHTML = h.html()
+        nw.document.querySelector('body').innerHTML = ph[0].outerHTML
+        nw.document.querySelector('body').innerHTML += el
+        nw.document.close()
+        start_loader()
+        setTimeout(() => {
+            nw.print()
+            setTimeout(() => {
+                nw.close()
+                end_loader()
+            }, 200)
+        }, 300)
+    })
+    $('#check_brand').select2({
+        placeholder: "Please Select Brands Here",
+        width: "100%",
+        selectionCssClass: "form-control form-control-sm rounded-2"
+    })
+    $("#product-tbl").find("td, th").addClass("px-2 py-1 align-middle");
+    $("#product-tbl").DataTable({
+      columnDefs: [
+        {
+          orderable: false,
+          targets: [4],
+        },
+      ],
+      lengthMenu: [
+        [25, 50, 100, -1],
+        [25, 50, 100, "All"],
+      ],
+    });
+  });
+
+
+$(document).ready(function() {
+   calculateTotals();
+
+    $(".input-fields-to-sum").on('input', function() {
+        calculateTotals();
+    });
+    $(".input-box-to-sum").on('input', function() {
+        calculateTotals();
+    });
+});
+
+function calculateTotals() {
+   // walk on input fields with class, calculate sum and put it in total field
+   // input can contain invalid numbers, handle errors when parsing
+    var arr = document.getElementsByClassName('input-fields-to-sum');
+    var arr2 = document.getElementsByClassName('input-box-to-sum');
+    var tot1=0;
+    var tot2=0;
+        for(var i=0;i<arr.length;i++){
+            if(parseFloat(arr[i].value))
+                tot1 += parseFloat(arr[i].value);
+        }
+        for(var i=0;i<arr2.length;i++){
+            if(parseFloat(arr2[i].value))
+                tot2 += parseFloat(arr2[i].value);
+        }
+
+    var result = (tot1);
+    $("#total_qty").val(result);
+    $("#total").val(tot2);
+}
+
+function parseNumber(str, defaultValue) {
+    if (str !== undefined && str.length) {
+        var parsed = parseFloat(str.replace(',','.').replace(/\s/g,'').replace(/\&nbsp\;/g,''));
+        if (isNaN(parsed)) return defaultValue;
+        return parsed;
+    }
+    return defaultValue;
+}
+
+</script>
+{% endblock ScriptBlock %}
