@@ -8,6 +8,7 @@
     }
 </style>
 <section class="py-4">
+    <div id="printableArea">
     <div class="container">
         <div class="card rounded-0 mb-3">
             <div class="card-header py-1">
@@ -15,7 +16,17 @@
                     <div class="col-auto flex-shrink-1 flex-grow-1">
                         <div class="card-title mb-0 py-1">Sale Transaction Details</div>
                     </div>
-                    <div class="col-auto">
+                    <div class="col-auto flex-shrink-1 flex-grow-1">
+                        <img
+                              src="../static/assets/default/img/FreedomDistributionCopy.png"
+                              height="50px"
+                              alt="{{ MEDIA_URL }}"
+                              loading="lazy"
+                              class="bg-white bg-gradient px-1 py-1"
+                              style="width:4em;height:4em;"
+                        />
+                    </div>
+                    <div class="col-auto noPrint">
                         {% if sale.status == '0' %}
                         <small class="badge badge-secondary bg-gradient bg-secondary px-3 rounded-pill bg-opacity-75 text-sm py-1">Pending</small> {% elif laundry.status == '1' %}
                         <small class="badge badge-primary bg-gradient bg-primary px-3 rounded-pill bg-opacity-75 text-sm py-1">In-Progress</small> {% elif laundry.status == '2' %}
@@ -273,7 +284,8 @@
                     </div>
                 </div>
             </div>
-            <div class="card-footer py-1 text-center">
+            <div class="noPrint card-footer py-1 text-center">
+                <input type="button" onclick="printDiv('printableArea')" value="print a div!" />
                 <button class="btn btn-primary bg-primary btn-sm rounded-0" id="update-status" type="button">Update Status</button>
                 <a class="btn btn-primary bg-gradient bg-primary btn-sm rounded-0" href="{% url 'manage-sale-pk' sale.pk %}"><i class="fa fa-edit"></i> Edit</a>
                 <button class="btn btn-danger bg-gradient bg-danger btn-sm rounded-0" type="button" id="delete-data"><i class="fa fa-trash"></i> Delete</button>
@@ -281,6 +293,7 @@
                 <a class="btn btn-light bg-gradient bg-light border btn-sm rounded-0" href="{% url 'sale-page' %}"><i class="fa fa-angle-left"></i> Back to List</a>
             </div>
         </div>
+    </div>
     </div>
 </section>
 <noscript id="print-header">
@@ -292,14 +305,17 @@
     </style>
     <div class="d-flex w-100">
         <div class="col-2 text-center">
-            <img src="{{system_host}}{% static 'assets/default/img/FreeDis.png' %}" style="width:4em;height:4em;object-fit:cover;object-position:center center" alt="" class="p-0 img-thumbnail">
+<!--            <img src="{{system_host}}{% static 'assets/default/img/FreeDis.png' %}" style="width:4em;height:4em;object-fit:cover;object-position:center center" alt="" class="p-0 img-thumbnail">-->
         </div>
         <div class="col-8">
-            <div class="lh-1">
-                <h4 class="text-center mb-0 fw-bolder">{{system_name}}</h4>
-                <h5 class="text-center mb-0 fw-bolder">Transaction Receipt</h5>
+                <div class="lh-1">
+                    <h4 class="text-center mb-0 fw-bolder">{{system_name}}</h4>
+                    <p class="text-center mb-0">Your Trusted Business Partner...</p>
+                    <p class="text-center mb-0">16 Moharaza Rd, Mymensingh 2200</p>
+                    <h6 class="text-center mb-0 fw-bolder">Pro: A. K. M. Nuruzzaman (Rakib)</h6><br />
+<!--                    <h5 class="text-center mb-0 fw-bolder">Fresh Product Report</h5>-->
+                </div>
             </div>
-        </div>
     </div>
     <hr>
 </div>
@@ -393,5 +409,16 @@
 
         })
     }
+
+    function printDiv(divName) {
+     var printContents = document.getElementById(divName).innerHTML;
+     var originalContents = document.body.innerHTML;
+
+     document.body.innerHTML = printContents;
+
+     window.print();
+
+     document.body.innerHTML = originalContents;
+}
 </script>
 {% endblock ScriptBlock %}
