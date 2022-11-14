@@ -468,6 +468,9 @@ class OnlineCredit(models.Model):
 class DamageSale(models.Model):
     code = models.CharField(max_length=100)
     total_amount = models.FloatField(max_length=15)
+    payable_amount = models.FloatField(max_length=15, null=True)
+    paid_amount = models.FloatField(max_length=15)
+    short = models.FloatField(max_length=15)
     status = models.CharField(max_length=2,
                               choices=(('0', 'Pending'), ('1', 'In-progress'), ('2', 'Done')),
                               default=0)
