@@ -84,6 +84,8 @@ class Brand(models.Model):
         return str(f"{self.name}")
 
 
+
+
 class Products(models.Model):
     name = models.CharField(max_length=250)
     code = models.CharField(max_length=250, default=0)
@@ -333,6 +335,7 @@ class SaleCommission(models.Model):
 
 class Purchase(models.Model):
     code = models.CharField(max_length=100)
+    note = models.CharField(max_length=250, blank=True, null=True)
     brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, null=True, related_name="brand_fk5")
     total_amount = models.FloatField(max_length=15)
     status = models.CharField(max_length=2,
@@ -832,3 +835,5 @@ class BankTransaction(models.Model):
 
     def __str__(self):
         return str(f"{self.amount} - {self.type}")
+
+
