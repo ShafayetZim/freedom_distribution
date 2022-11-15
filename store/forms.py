@@ -299,6 +299,7 @@ class SaveSale(forms.ModelForm):
 
 class SavePurchase(forms.ModelForm):
     code = forms.CharField(max_length=250)
+    note = forms.CharField(max_length=250, required=False)
     brand = forms.Select(
         attrs={'class': 'form-control form-control-sm rounded-0', 'value': '', 'id': 'id_brand'}
     )
@@ -750,3 +751,4 @@ class SaveBankTransaction(forms.ModelForm):
     class Meta:
         model = models.BankTransaction
         fields = ('amount', 'type',)
+
