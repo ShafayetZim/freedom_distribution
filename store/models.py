@@ -83,6 +83,7 @@ class Brand(models.Model):
     def __str__(self):
         return str(f"{self.name}")
 
+    # commission due
     def due(self):
         try:
             given = DiscountGiven.objects.filter(brand__id=self.id).aggregate(Sum('price'))
@@ -99,6 +100,24 @@ class Brand(models.Model):
         received = received if not received is None else 0
 
         return float(given - received)
+
+    # advance due
+    def advance(self):
+        try:
+            debit = OnlineAdvance.objects.filter(brand__id=self.id).aggregate(Sum('advance'))
+            debit = debit['advance__sum']
+        except:
+            debit = 0
+        try:
+            credit = OnlineCredit.objects.filter(brand__id=self.id).aggregate(Sum('amount'))
+            credit = credit['amount__sum']
+        except:
+            credit = 0
+
+        debit = debit if not debit is None else 0
+        credit = credit if not credit is None else 0
+
+        return float(debit - credit)
 
 
 class Products(models.Model):
