@@ -755,3 +755,92 @@ class SaveBankTransaction(forms.ModelForm):
         model = models.BankTransaction
         fields = ('amount', 'type',)
 
+
+class SaveDiscount(forms.ModelForm):
+    code = forms.CharField(max_length=250)
+    note = forms.CharField(max_length=250, required=False)
+    brand = forms.Select(
+        attrs={'class': 'form-control form-control-sm rounded-0', 'value': '', 'id': 'id_brand'}
+    )
+    month = forms.CharField(max_length=12)
+    total_amount = forms.CharField(max_length=250)
+    extra = forms.CharField(max_length=250)
+    status = forms.CharField(max_length=2)
+
+    class Meta:
+        model = models.Discount
+        fields = ('code', 'note', 'brand', 'month', 'total_amount', 'extra', 'status',)
+
+    def clean_code(self):
+        code = self.cleaned_data['code']
+
+        if code == 'generate':
+            pref = datetime.datetime.now().strftime('%y%m%d')
+            code = 1
+            while True:
+                try:
+                    check = models.Discount.objects.get(code=f"{pref}{code:02d}")
+                    code = code + 1
+                except:
+                    return f"{pref}{code:02d}"
+                    break
+        else:
+            return code
+
+    def save(self):
+        instance = self.instance
+        Given = []
+        Received = []
+        Due = []
+
+        if 'brand_id[]' in self.data:
+            for k, val in enumerate(self.data.getlist('brand_id[]')):
+                brand = models.Brand.objects.get(id=val)
+                previous = self.data.getlist('brand_due[]')[k]
+                price = self.data.getlist('brand_advance[]')[k]
+                total = float(price) + float(previous)
+
+                try:
+                    Given.append(models.DiscountGiven(discount=instance, brand=brand, previous=previous, price=price, total_amount=total,))
+                    print("DiscountGiven..")
+                except Exception as err:
+                    print(err)
+                    return False
+
+        if 'credit_id[]' in self.data:
+            for k, val in enumerate(self.data.getlist('credit_id[]')):
+                brand = models.Brand.objects.get(id=val)
+                price = self.data.getlist('credit_amount[]')[k]
+                total = float(price)
+
+                try:
+                    Received.append(models.DiscountReceived(discount=instance, brand=brand, price=price, total_amount=total))
+                    print("DiscountReceived..")
+                except Exception as err:
+                    print(err)
+                    return False
+
+        if 'due_id[]' in self.data:
+            for k, val in enumerate(self.data.getlist('due_id[]')):
+                brand = models.Client.objects.get(id=val)
+                due = self.data.getlist('due_price[]')[k]
+                total = float(due)
+                try:
+                    Due.append(models.DiscountDue(discount=instance, brand=brand, due=due, total_amount=total))
+                    print("DiscountDues..")
+                except Exception as err:
+                    print(err)
+                    return False
+
+        try:
+            instance.save()
+            models.DiscountGiven.objects.filter(discount=instance).delete()
+            models.DiscountGiven.objects.bulk_create(Given)
+            models.DiscountReceived.objects.filter(discount=instance).delete()
+            models.DiscountReceived.objects.bulk_create(Received)
+            models.DiscountDue.objects.filter(discount=instance).delete()
+            models.DiscountDue.objects.bulk_create(Due)
+
+        except Exception as err:
+            print(err)
+            return False
