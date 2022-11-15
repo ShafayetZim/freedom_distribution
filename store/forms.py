@@ -480,10 +480,13 @@ class SaveDamage(forms.ModelForm):
     code = forms.CharField(max_length=250)
     status = forms.CharField(max_length=2)
     total_amount = forms.CharField(max_length=250)
+    payable_amount = forms.CharField(max_length=250)
+    paid_amount = forms.CharField(max_length=250)
+    short = forms.CharField(max_length=250)
 
     class Meta:
         model = models.DamageSale
-        fields = ('code', 'status', 'total_amount', )
+        fields = ('code', 'status', 'total_amount', 'payable_amount', 'paid_amount', 'short', )
 
     def clean_code(self):
         code = self.cleaned_data['code']
