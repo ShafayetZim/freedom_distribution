@@ -83,7 +83,22 @@ class Brand(models.Model):
     def __str__(self):
         return str(f"{self.name}")
 
+    def due(self):
+        try:
+            given = DiscountGiven.objects.filter(brand__id=self.id).aggregate(Sum('price'))
+            given = given['price__sum']
+        except:
+            given = 0
+        try:
+            received = DiscountReceived.objects.filter(brand__id=self.id).aggregate(Sum('price'))
+            received = received['price__sum']
+        except:
+            received = 0
 
+        given = given if not given is None else 0
+        received = received if not received is None else 0
+
+        return float(given - received)
 
 
 class Products(models.Model):
@@ -840,3 +855,92 @@ class BankTransaction(models.Model):
         return str(f"{self.amount} - {self.type}")
 
 
+class Discount(models.Model):
+    code = models.CharField(max_length=100)
+    note = models.CharField(max_length=250, blank=True, null=True)
+    brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, null=True, related_name="brand_fk7")
+    month = models.CharField(max_length=12, choices=(('1', 'January'), ('2', 'February'), ('3', 'March'),
+                                                     ('4', 'April'), ('5', 'May'), ('6', 'June'), ('7', 'July'),
+                                                     ('8', 'August'), ('9', 'September'), ('10', 'October'),
+                                                     ('11', 'November'), ('12', 'December')), default=1)
+    total_amount = models.FloatField(max_length=15)
+    extra = models.FloatField(max_length=15,  default=0)
+    status = models.CharField(max_length=2,
+                              choices=(('0', 'Pending'), ('1', 'Due'), ('2', 'Done')),
+                              default=0)
+    date_added = models.DateTimeField(default=timezone.now)
+    date_updated = models.DateTimeField(auto_now=True)
+    date = models.DateField(default=date.today)
+
+    class Meta:
+        verbose_name_plural = "List of Discount"
+
+    def __str__(self):
+        return str(f"{self.code} - {self.brand}")
+
+    def totalGiven(self):
+        try:
+            given = DiscountGiven.objects.filter(discount=self).aggregate(Sum('total_amount'))
+            given = given['total_amount__sum']
+        except:
+            given = 0
+        return float(given)
+
+    def totalReceived(self):
+        try:
+            received = DiscountReceived.objects.filter(discount=self).aggregate(Sum('total_amount'))
+            received = received['total_amount__sum']
+        except:
+            received = 0
+        return float(received)
+
+    def totalItems(self):
+        try:
+            due = DiscountDue.objects.filter(sale=self).aggregate(Sum('total_amount'))
+            due = due['total_amount__sum']
+        except:
+            due = 0
+        return float(due)
+
+
+class DiscountGiven(models.Model):
+    discount = models.ForeignKey(Discount, on_delete=models.CASCADE, related_name="discount_fk")
+    brand = models.ForeignKey(Brand, on_delete=models.DO_NOTHING, related_name="brand_fk8")
+    previous = models.FloatField(max_length=15, default=0)
+    price = models.FloatField(max_length=15, default=0)
+    total_amount = models.FloatField(max_length=15)
+    date = models.DateField(default=date.today)
+
+    class Meta:
+        verbose_name_plural = "List of Discount Given"
+
+    def __str__(self):
+        return str(f"{self.discount.code} - {self.brand.name}")
+
+
+class DiscountReceived(models.Model):
+    discount = models.ForeignKey(Discount, on_delete=models.CASCADE, related_name="discount_fk2")
+    brand = models.ForeignKey(Brand, on_delete=models.CASCADE, related_name="brand_fk9")
+    price = models.FloatField(max_length=15, default=0)
+    total_amount = models.FloatField(max_length=15)
+    date = models.DateField(default=date.today)
+
+    class Meta:
+        verbose_name_plural = "List of Discount Received"
+
+    def __str__(self):
+        return str(f"{self.discount.code} - {self.brand.name}")
+
+
+class DiscountDue(models.Model):
+    discount = models.ForeignKey(Discount, on_delete=models.CASCADE, related_name="discount_fk3")
+    brand = models.ForeignKey(Brand, on_delete=models.CASCADE, related_name="brand_fk10")
+    due = models.FloatField(max_length=15, default=0)
+    total_amount = models.FloatField(max_length=15)
+    date = models.DateField(default=date.today)
+
+    class Meta:
+        verbose_name_plural = "List of Discount Due"
+
+    def __str__(self):
+        return str(f"{self.discount.code} - {self.brand.name}")
