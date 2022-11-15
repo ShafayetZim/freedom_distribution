@@ -472,6 +472,7 @@ class Online(models.Model):
 class OnlineAdvance(models.Model):
     online = models.ForeignKey(Online, on_delete=models.CASCADE, related_name="online_fk")
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE, related_name="brand_fk3")
+    previous = models.FloatField(max_length=15, default=0)
     advance = models.FloatField(max_length=15, default=0)
     total_amount = models.FloatField(max_length=15)
     date = models.DateField(default=date.today)
