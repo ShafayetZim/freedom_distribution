@@ -440,12 +440,13 @@ class SaveAdvance(forms.ModelForm):
         if 'brand_id[]' in self.data:
             for k, val in enumerate(self.data.getlist('brand_id[]')):
                 brand = models.Brand.objects.get(id=val)
+                previous = self.data.getlist('brand_previous[]')[k]
                 advance = self.data.getlist('brand_advance[]')[k]
                 day = self.data.getlist('brand_date[]')[k]
                 total = float(advance)
 
                 try:
-                    Brands.append(models.OnlineAdvance(online=instance, brand=brand, advance=advance, day=day, total_amount=total))
+                    Brands.append(models.OnlineAdvance(online=instance, brand=brand, previous=previous, advance=advance, day=day, total_amount=total))
                     print("Advance Brand..")
                 except Exception as err:
                     print(err)
