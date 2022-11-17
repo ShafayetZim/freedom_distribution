@@ -2976,27 +2976,6 @@ def manage_discount(request, pk=None):
 
 
 @login_required
-def edit_discount(request, pk=None):
-    context = context_data(request)
-    context['page'] = 'manage_discount'
-    context['page_title'] = 'Manage Discount'
-    context['brands'] = models.Brand.objects.filter(delete_flag=0).all()
-
-    if pk is None:
-        context['discounts'] = {}
-        context['gitems'] = {}
-        context['ritems'] = {}
-        context['ditems'] = {}
-    else:
-        context['discounts'] = models.Discount.objects.get(id=pk)
-        context['gitems'] = models.DiscountGiven.objects.filter(sale__id=pk).all()
-        context['ritems'] = models.DiscountReceived.objects.filter(sale__id=pk).all()
-        context['ditems'] = models.DiscountDue.objects.filter(sale__id=pk).all()
-
-    return render(request, 'edit_discount.html', context)
-
-
-@login_required
 def update_discount_form(request, pk=None):
     context = context_data(request)
     context['page'] = 'update_discount'
