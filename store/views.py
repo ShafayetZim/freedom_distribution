@@ -2892,3 +2892,106 @@ def loan_dues_report(request):
     context['loan'] = loan
 
     return render(request, 'loan_dues_report.html', context)
+
+
+@login_required
+def discount(request):
+    context = context_data(request)
+    context['page'] = 'discount'
+    context['page_title'] = "Discount List"
+    context['discounts'] = models.Discount.objects.order_by('status', '-date_added').all()
+    return render(request, 'discount.html', context)
+
+
+@login_required
+def save_discount(request):
+    resp = { 'status': 'failed', 'msg' : '', 'id': '' }
+
+    if request.method == 'POST':
+        post = request.POST
+        if not post['id'] == '':
+            discount = models.Discount.objects.get(id=post['id'])
+            form = forms.SaveDiscount(request.POST, instance=discount)
+        else:
+            form = forms.SaveDiscount(request.POST)
+        if form.is_valid():
+            form.save()
+            if post['id'] == '':
+                messages.success(request, "Commission Bill has been saved successfully.")
+                pid = models.Discount.objects.last().id
+                resp['id'] = pid
+            else:
+                messages.success(request, "Commission Bill has been updated successfully.")
+                resp['id'] = post['id']
+            resp['status'] = 'success'
+        else:
+            for field in form:
+                for error in field.errors:
+                    if not resp['msg'] == '':
+                        resp['msg'] += str('<br/>')
+                    resp['msg'] += str(f'[{field.name}] {error}')
+    else:
+         resp['msg'] = "There's no data sent on the request"
+
+    return HttpResponse(json.dumps(resp), content_type="application/json")
+
+
+@login_required
+def view_discount(request, pk=None):
+    context = context_data(request)
+    context['page'] = 'view_discount'
+    context['page_title'] = 'View Discount'
+    if pk is None:
+        context['discount'] = {}
+        context['gitems'] = {}
+        context['ritems'] = {}
+        context['ditems'] = {}
+    else:
+        context['discount'] = models.Discount.objects.get(id=pk)
+        context['gitems'] = models.DiscountGiven.objects.filter(discount__id=pk).all()
+        context['ritems'] = models.DiscountReceived.objects.filter(discount__id=pk).all()
+        context['ditems'] = models.DiscountDue.objects.filter(discount__id=pk).all()
+
+    return render(request, 'view_discount.html', context)
+
+
+@login_required
+def manage_discount(request, pk=None):
+    context = context_data(request)
+    context['page'] = 'manage_discount'
+    context['page_title'] = 'Manage Discount'
+    context['brand'] = models.Brand.objects.filter(delete_flag=0).all()
+    if pk is None:
+        context['discount'] = {}
+        context['gitems'] = {}
+        context['ritems'] = {}
+        context['ditems'] = {}
+    else:
+        context['discount'] = models.Discount.objects.get(id=pk)
+        context['gitems'] = models.DiscountGiven.objects.filter(discount__id=pk).all()
+        context['ritems'] = models.DiscountReceived.objects.filter(discount__id=pk).all()
+        context['ditems'] = models.DiscountDue.objects.filter(discount__id=pk).all()
+
+    return render(request, 'test_discount.html', context)
+
+
+@login_required
+def edit_discount(request, pk=None):
+    context = context_data(request)
+    context['page'] = 'manage_discount'
+    context['page_title'] = 'Manage Discount'
+    context['brands'] = models.Brand.objects.filter(delete_flag=0).all()
+
+    if pk is None:
+        context['discounts'] = {}
+        context['gitems'] = {}
+        context['ritems'] = {}
+        context['ditems'] = {}
+    else:
+        context['discounts'] = models.Discount.objects.get(id=pk)
+        context['gitems'] = models.DiscountGiven.objects.filter(sale__id=pk).all()
+        context['ritems'] = models.DiscountReceived.objects.filter(sale__id=pk).all()
+        context['ditems'] = models.DiscountDue.objects.filter(sale__id=pk).all()
+
+    return render(request, 'edit_discount.html', context)
+
