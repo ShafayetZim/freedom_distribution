@@ -2995,3 +2995,47 @@ def edit_discount(request, pk=None):
 
     return render(request, 'edit_discount.html', context)
 
+
+@login_required
+def update_discount_form(request, pk=None):
+    context = context_data(request)
+    context['page'] = 'update_discount'
+    context['page_title'] = 'Update Discount'
+    if pk is None:
+        context['discount'] = {}
+    else:
+        context['discount'] = models.Discount.objects.get(id=pk)
+
+    return render(request, 'update_discount_status.html', context)
+
+
+@login_required
+def update_discount_status(request):
+    resp = { 'status' : 'failed', 'msg':''}
+    if request.POST['id'] is None:
+        resp['msg'] = 'Transaction ID is invalid'
+    else:
+        try:
+            models.Discount.objects.filter(pk=request.POST['id']).update(status=request.POST['status'])
+            messages.success(request, "Commission Transaction Status has been updated successfully.")
+            resp['status'] = 'success'
+        except:
+            resp['msg'] = "Updating Commission Transaction Failed"
+
+    return HttpResponse(json.dumps(resp), content_type="application/json")
+
+
+@login_required
+def delete_discount(request, pk = None):
+    resp = { 'status' : 'failed', 'msg':''}
+    if pk is None:
+        resp['msg'] = 'Commission ID is invalid'
+    else:
+        try:
+            models.Discount.objects.filter(pk=pk).delete()
+            messages.success(request, "Commission has been deleted successfully.")
+            resp['status'] = 'success'
+        except:
+            resp['msg'] = "Deleting Commission Failed"
+
+    return HttpResponse(json.dumps(resp), content_type="application/json")
