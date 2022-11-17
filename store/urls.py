@@ -191,5 +191,7 @@ urlpatterns = [
     path('view_discount',views.view_discount,name='view-discount'),
     path('view_discount/<int:pk>',views.view_discount,name='view-discount-pk'),
     path('save_discount',views.save_discount,name='save-discount'),
-
+    path('delete_discount/<int:pk>',views.delete_discount,name='delete-discount'),
+    path('update_discount_form/<int:pk>',views.update_discount_form,name='discount-update-status'),
+    path('update_discount_status',views.update_discount_status,name='update-discount-status'),
 ]+ static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
