@@ -185,4 +185,11 @@ urlpatterns = [
     path('edit_sale/<int:pk>',views.edit_sale,name='edit-sale-pk'),
     path('sale_qty_report',views.sale_qty_report,name='sale-qty-report'),
     path('loan_dues_report',views.loan_dues_report,name='loan-dues-report'),
+    path('discount',views.discount,name='discount-page'),
+    path('manage_discount',views.manage_discount,name='manage-discount'),
+    path('manage_discount/<int:pk>',views.manage_discount,name='manage-discount-pk'),
+    path('view_discount',views.view_discount,name='view-discount'),
+    path('view_discount/<int:pk>',views.view_discount,name='view-discount-pk'),
+    path('save_discount',views.save_discount,name='save-discount'),
+
 ]+ static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
