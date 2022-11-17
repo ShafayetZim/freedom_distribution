@@ -15,10 +15,11 @@
                         <colgroup>
                             <col width="5%">
                             <col width="20%">
-                            <col width="20%">
-                            <col width="20%">
+                            <col width="15%">
+                            <col width="15%">
                             <col width="20%">
                             <col width="15%">
+                            <col width="10%">
                         </colgroup>
                         <thead>
                             <tr>
@@ -26,6 +27,7 @@
                                 <th class="text-center">Date Added</th>
                                 <th class="text-center">Code</th>
                                 <th class="text-center">Brand</th>
+                                <th class="text-center">Note</th>
                                 <th class="text-center">Total</th>
                                 <th class="text-center">Action</th>
                             </tr>
@@ -43,6 +45,11 @@
                                 <td class="text-center">
                                     <div class="lh-1">
                                         <div>{{ item.brand}}</div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <div class="lh-1">
+                                        <div>{{ item.note}}</div>
                                     </div>
                                 </td>
                                 <td class="text-center">
