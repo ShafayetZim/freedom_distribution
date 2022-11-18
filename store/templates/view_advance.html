@@ -57,15 +57,17 @@
                 <div class="container-fluid">
                     <table class="table table-bordered" id="product_list">
                         <colgroup>
-                            <col width="20%">
-                            <col width="40%">
-                            <col width="20%">
-                            <col width="20%">
+                            <col width="15%">
+                            <col width="30%">
+                            <col width="15%">
+                            <col width="15%">
+                            <col width="15%">
                         </colgroup>
                         <thead>
                             <tr>
                                 <th class="p-1 text-center">Date</th>
                                 <th class="p-1 text-center">Brand Name</th>
+                                <th class="p-1 text-center">Previous Due</th>
                                 <th class="p-1 text-center">Advance</th>
                                 <th class="p-1 text-center">Total</th>
                             </tr>
@@ -75,14 +77,15 @@
                             <tr>
                                 <td class="px-2 py-1 align-middle text-center">{{pitem.day}}</td>
                                 <td class="px-2 py-1 align-middle product_type">{{pitem.brand.name}}</td>
-                                <td class="px-2 py-1 align-middle text-end product_price">{{pitem.advance|floatformat}}</td>
-                                <td class="px-2 py-1 align-middle product_total text-end">{{pitem.total_amount|floatformat}}</td>
+                                <td class="px-2 py-1 align-middle text-center">{{pitem.previous|floatformat}}</td>
+                                <td class="px-2 py-1 align-middle text-center product_price">{{pitem.advance|floatformat}}</td>
+                                <td class="px-2 py-1 align-middle product_total text-center">{{pitem.total_amount|floatformat}}</td>
                             </tr>
                             {% endfor %}
                         </tbody>
                         <tfoot>
                             <tr>
-                                <th class="text-center" colspan="3">Total</th>
+                                <th class="text-center" colspan="4">Total</th>
                                 <th class="text-end sub-total-product">{{online.totalDue|floatformat:2|intcomma}}</th>
                             </tr>
                         </tfoot>
@@ -117,8 +120,8 @@
                             <tr>
                                 <td class="px-2 py-1 align-middle text-center">{{pitem.day}}</td>
                                 <td class="px-2 py-1 align-middle product_type">{{pitem.brand.name}}</td>
-                                <td class="px-2 py-1 align-middle text-end product_price">{{pitem.amount|floatformat}}</td>
-                                <td class="px-2 py-1 align-middle product_total text-end">{{pitem.total_amount|floatformat}}</td>
+                                <td class="px-2 py-1 align-middle text-center product_price">{{pitem.amount|floatformat}}</td>
+                                <td class="px-2 py-1 align-middle product_total text-center">{{pitem.total_amount|floatformat}}</td>
                             </tr>
                             {% endfor %}
                         </tbody>
