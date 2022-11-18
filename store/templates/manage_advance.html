@@ -63,7 +63,7 @@
                                 <select id="brands" class="form-control form-control-sm rounded-0">
                                     <option value="" disabled selected></option>
                                     {% for item in brand %}
-                                    <option value="{{item.pk}}">{{item.name}}</option>
+                                    <option value="{{item.pk}}" data-previous="{{item.advance}}">{{item.name}}</option>
                                     {% endfor %}
                                 </select>
                             </div>
@@ -76,15 +76,17 @@
                             <colgroup>
                                 <col width="5%">
                                 <col width="35%">
-                                <col width="20%">
-                                <col width="20%">
-                                <col width="20%">
+                                <col width="15%">
+                                <col width="15%">
+                                <col width="15%">
+                                <col width="15%">
                             </colgroup>
                             <thead>
                                 <tr>
                                     <th class="p-1 text-center"></th>
                                     <th class="p-1 text-center">Brand Name</th>
                                     <th class="p-1 text-center">Date</th>
+                                    <th class="p-1 text-center">Previous Due</th>
                                     <th class="p-1 text-center">Advance</th>
                                     <th class="p-1 text-center">Total</th>
                                 </tr>
@@ -101,6 +103,9 @@
                                         <input type="date" value="{{pitem.day}}" class="form-control form-control-sm rounded-0 text-center" name="brand_date[]" required>
                                     </td>
                                     <td class="px-2 py-1 align-middle">
+                                        <input type="number" min="0" value="{{pitem.previous|floatformat}}" class="form-control form-control-sm rounded-0 text-center" name="brand_previous[]" required>
+                                    </td>
+                                    <td class="px-2 py-1 align-middle">
                                         <input type="number" min="1" value="{{pitem.advance|floatformat}}" class="form-control form-control-sm rounded-0 text-center" name="brand_advance[]" required>
                                     </td>
                                     <td class="px-2 py-1 align-middle brand_total text-end">{{pitem.total_amount|floatformat}}</td>
@@ -109,7 +114,7 @@
                             </tbody>
                             <tfoot>
                                 <tr>
-                                    <th class="text-end" colspan="4">Total</th>
+                                    <th class="text-end" colspan="5">Total</th>
                                     <th class="text-end sub-total-product">0.00</th>
                                 </tr>
                             </tfoot>
@@ -246,6 +251,9 @@
             <input type="date" id="day" class="form-control form-control-sm rounded-0 text-center" name="brand_date[]" required>
         </td>
         <td class="px-2 py-1 align-middle">
+            <input type="number" min="0" value="0" class="form-control form-control-sm rounded-0 text-center" name="brand_previous[]" required>
+        </td>
+        <td class="px-2 py-1 align-middle">
             <input type="number" min="0" value="0" class="form-control form-control-sm rounded-0 text-center" name="brand_advance[]" required>
         </td>
         <td class="px-2 py-1 align-middle brand_total text-end">0.00</td>
@@ -271,10 +279,11 @@
         }))
         $('#advance_list tbody tr').each(function() {
             var buy = $(this).find('[name="brand_advance[]"]').val()
+            var due = $(this).find('[name="brand_previous[]"]').val()
             buy = buy > 0 ? buy : 0;
-            sub_product += parseFloat(parseFloat(buy))
-            gtotal += parseFloat(parseFloat(buy))
-            $(this).find('.brand_total').text(parseFloat(parseFloat(buy)).toLocaleString('en-US'))
+            sub_product += parseFloat(parseFloat(buy) + parseFloat(due))
+            gtotal += parseFloat(parseFloat(buy) + parseFloat(due))
+            $(this).find('.brand_total').text(parseFloat(parseFloat(buy) + parseFloat(due)).toLocaleString('en-US'))
         })
         $('.sub-total-product').text(parseFloat(sub_product).toLocaleString('en-US', {
             style: 'decimal',
@@ -328,7 +337,7 @@
                 calc_total()
             }
         })
-        $('#advance_list tbody').find('[name="brand_receive[]"]').on('input change', function() {
+        $('#advance_list tbody').find('[name="brand_previous[]"]').on('input change', function() {
             calc_total()
         })
         $('#advance_list tbody').find('[name="brand_advance[]"]').on('input change', function() {
@@ -372,16 +381,23 @@
                 return false
             }
 
+            var previous = $('#brands option[value="' + pid + '"]').attr('data-previous')
             var brand_name = $('#brands option[value="' + pid + '"]').text()
             var tr = $($('noscript#product-clone').html()).clone()
             tr.find('.brand_type').text(brand_name)
             tr.find('[name="brand_id[]"]').val(pid)
             tr.find('[name="brand_date[]"]').val()
+            tr.find('[name="brand_previous[]"]').val(previous)
 
             $('#advance_list tbody').append(tr)
             calc_total()
             $('#brands').val('').trigger('change')
             tr.find('[name="brand_advance[]"]').on('input change', function() {
+                calc_total()
+            })
+            calc_total()
+            $('#brands').val('').trigger('change')
+            tr.find('[name="brand_previous[]"]').on('input change', function() {
                 calc_total()
             })
             tr.find('.rem-brand').click(function() {
