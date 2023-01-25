@@ -826,7 +826,7 @@
             tr.find('[name="due_price[]"]').on('input change', function() {
                 calc_total()
             })
-            $('#client-brand').select2({
+            $('select[name="due_brand[]"]').select2({
             placeholder: "Please Select Brand Here",
             width: "100%",
             selectionCssClass: "form-control form-control-sm rounded-0"
